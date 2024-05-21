@@ -47,9 +47,9 @@ const SignIn = ({ isLoggedIn }) => {
 
   
   useEffect(() => {
-    // if (isLoggedIn) {
-    //   navigate("/account");
-    // }
+    if (isLoggedIn) {
+      navigate("/account");
+    }
   }, [isLoggedIn, navigate]);
   
   // login function
