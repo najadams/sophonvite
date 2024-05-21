@@ -25,6 +25,8 @@ const ProductCatalogue = lazy(() => import("./views/ProductCatalogue"));
 const StockEntry = lazy(() => import("./views/StockEntry"));
 const SalesOrders = lazy(() => import("./views/SalesOrders"));
 const InventoryReports = lazy(() => import("./views/InventoryReports"));
+const Transactions = lazy(() => import('./views/Transactions'));
+const Vendors = lazy(() => import('./views/Vendors'));
 
 const NoPage = lazy(() => import("./views/NoPage"));
 
@@ -82,6 +84,11 @@ function App() {
                         <Route path="/!employee!@" element={<WorkerForm />} />
                         <Route path="/customers" element={<Customers />} />
                         <Route path="/stocks" element={<StockEntry />} />
+                        <Route
+                          path="/transactions"
+                          element={<Transactions />}
+                        />
+                        <Route path="/vendors" element={<Vendors />} />
                         <Route
                           path="/inventory"
                           element={<InventoryReports />}

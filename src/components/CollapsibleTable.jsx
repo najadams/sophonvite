@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
+import { Tooltip } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
@@ -40,25 +41,30 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function Row({ row }) {
   const [open, setOpen] = useState(false);
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  }
 
   return (
     <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row" style={{ width: "30%" }}>
-          {row.customerName}
-        </TableCell>
-        <TableCell align="left">{row.workerName}</TableCell>
-        <TableCell align="right">{row.total}</TableCell>
-        <TableCell align="right">{row.detail.length}</TableCell>
-      </TableRow>
+      <Tooltip title={formatDate(row.date)} placement="top" arrow>
+        <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}>
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
+          <TableCell component="th" scope="row" style={{ width: "30%" }}>
+            {row.customerName}
+          </TableCell>
+          <TableCell align="left">{row.workerName}</TableCell>
+          <TableCell align="right">{row.total}</TableCell>
+          <TableCell align="right">{row.detail.length}</TableCell>
+        </TableRow>
+      </Tooltip>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
