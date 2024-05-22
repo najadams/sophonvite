@@ -46,7 +46,12 @@ function App() {
                    <Header isLoggedIn={isLoggedIn} />
                  )}
 
-                 <Suspense fallback={<Loader />}>
+                 <Suspense
+                   fallback={
+                     <div style={{height : "100vh"}}>
+                       <Loader />
+                     </div>
+                   }>
                    <Routes>
                      <Route
                        path="/"
