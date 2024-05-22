@@ -8,15 +8,15 @@ import Divider from "@mui/material/Divider";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-import AppAppBar from "../components/AppAppBar"
-import Hero from "../components/Hero";
-import LogoCollection from "../components/LogoCollections";
-import Highlights from "../components/Highlights";
-import Pricing from "../components/Pricing";
-import Features from "../components/Features";
-import Testimonials from "../components/Testimonials";
-import FAQ from "../components/FAQ";
-import Footer from "../components/Footer";
+import AppAppBar from "../components/landingPage/AppAppBar";
+import Hero from "../components/landingPage/Hero";
+import LogoCollection from "../components/landingPage/LogoCollections";
+import Highlights from "../components/landingPage/Highlights";
+import Pricing from "../components/landingPage/Pricing";
+import Features from "../components/landingPage/Features";
+import Testimonials from "../components/landingPage/Testimonials";
+import FAQ from "../components/landingPage/FAQ";
+import Footer from "../components/landingPage/Footer";
 // import getLPTheme from "./getLPTheme";
 
 function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
@@ -41,8 +41,7 @@ function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
           "& .Mui-selected": {
             pointerEvents: "none",
           },
-        }}>
-      </ToggleButtonGroup>
+        }}></ToggleButtonGroup>
     </Box>
   );
 }
@@ -70,11 +69,11 @@ export default function LandingPage() {
 
   return (
     // <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
-    <ThemeProvider theme={defaultTheme}> 
+    <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
       <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
       <Hero />
-      <Box sx={{ bgcolor: "background.default"}}>
+      <Box sx={{ bgcolor: "background.default" }}>
         <LogoCollection />
         <Features />
         <Divider />

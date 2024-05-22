@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import AddItem from "../components/AddItem";
-import SalesOrderForms from "../components/SaleOrderForms";
+import AddItem from "../hooks/AddItem";
+import SalesOrderForms from "../components/forms/SaleOrderForms";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
 import { tableActions } from "../config/Functions";
-import CollapsibleTable from "../components/CollapsibleTable";
+import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/Loader";
 

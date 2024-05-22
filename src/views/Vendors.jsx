@@ -1,5 +1,5 @@
 import React from "react";
-import AddItem from "../components/AddItem";
+import AddItem from "../hooks/AddItem";
 import VendorForm from "../components/forms/VendorForm";
 
 const Vendors = () => {

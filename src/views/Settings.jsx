@@ -1,20 +1,26 @@
-import React from "react";
-import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Paper,
-  Divider,
-  FormControlLabel,
-  Switch,
-} from "@mui/material";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../config/Functions";
 import { tableActions } from "../config/Functions";
 import Loader from "../components/Loader";
+// src/views/Settings.js
+import React from "react";
+import { Formik, Form, Field } from "formik";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Grid,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
+import { styled } from "@mui/system";
+
+const StyledField = styled(Field)({
+  margin: "10px 0",
+});
 
 const WorkerInfo = ({ workers }) => {
   return (
@@ -92,84 +98,164 @@ const Settings = () => {
   } = useQuery(["api/workers", companyId], () =>
     tableActions.fetchWorkers(companyId)
   );
-
-  
-  if (error) return "An error has occurred: " + error.message;
-
   return (
     <div className="page">
-      <Container maxWidth="lg">
-        <Typography variant="h4" gutterBottom>
+      <Container maxWidth="md">
+        <Typography variant="h4" component="h1" gutterBottom>
           Settings
         </Typography>
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Store Information
-          </Typography>
-          <Divider />
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                // label="Store Name"
-                fullWidth
-                label={capitalizeFirstLetter(storename)}
-                variant="outlined"
-                margin="normal"
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Address"
-                fullWidth
-                variant="outlined"
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="City"
-                fullWidth
-                variant="outlined"
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Postal Code"
-                fullWidth
-                variant="outlined"
-                margin="normal"
-              />
-            </Grid>
-          </Grid>
-        </Paper>
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Notifications
-          </Typography>
-          <Divider />
-          <FormControlLabel
-            control={<Switch />}
-            label="Receive email notifications"
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Receive SMS notifications"
-          />
-        </Paper>
+        <Formik
+          initialValues={{
+            // General Settings
+            storeName: "",
+            storeEmail: "",
+            storePhone: "",
+            storeAddress: "",
+            // Payment Settings
+            paymentMethod: "",
+            paymentProvider: "",
+            currency: "",
+            // Tax Settings
+            taxRate: "",
+            taxId: "",
+            // Notification Settings
+            emailNotifications: true,
+            smsNotifications: false,
+          }}
+          onSubmit={(values) => {
+            console.log(values);
+          }}>
+          {({ values, handleChange }) => (
+            <Form>
+              <Box mb={3}>
+                <Typography variant="h6">General Settings</Typography>
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="storeName"
+                  label="Store Name"
+                  variant="outlined"
+                  value={values.storeName}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="storeEmail"
+                  label="Store Email"
+                  variant="outlined"
+                  value={values.storeEmail}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="storePhone"
+                  label="Store Phone"
+                  variant="outlined"
+                  value={values.storePhone}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="storeAddress"
+                  label="Store Address"
+                  variant="outlined"
+                  value={values.storeAddress}
+                  onChange={handleChange}
+                />
+              </Box>
 
-        {isLoading ? (
-          <div style={{ height: 100 }}>
-            <Loader />
-          </div>
-        ) : (
-          <WorkerInfo workers={workers} />
-        )}
+              <Box mb={3}>
+                <Typography variant="h6">Payment Settings</Typography>
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="paymentMethod"
+                  label="Payment Method"
+                  variant="outlined"
+                  value={values.paymentMethod}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="paymentProvider"
+                  label="Payment Provider"
+                  variant="outlined"
+                  value={values.paymentProvider}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="currency"
+                  label="Currency"
+                  variant="outlined"
+                  value={values.currency}
+                  onChange={handleChange}
+                />
+              </Box>
 
-        <Button variant="contained" color="primary" sx={{ mt: 3 }}>
-          Save Settings
-        </Button>
+              <Box mb={3}>
+                <Typography variant="h6">Tax Settings</Typography>
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="taxRate"
+                  label="Tax Rate (%)"
+                  variant="outlined"
+                  value={values.taxRate}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="taxId"
+                  label="Tax ID"
+                  variant="outlined"
+                  value={values.taxId}
+                  onChange={handleChange}
+                />
+              </Box>
+
+              <Box mb={3}>
+                <Typography variant="h6">Notification Settings</Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="emailNotifications"
+                      checked={values.emailNotifications}
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Email Notifications"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="smsNotifications"
+                      checked={values.smsNotifications}
+                      onChange={handleChange}
+                    />
+                  }
+                  label="SMS Notifications"
+                />
+              </Box>
+
+              <Box mt={3}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth>
+                  Save Changes
+                </Button>
+              </Box>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

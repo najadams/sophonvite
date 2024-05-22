@@ -16,10 +16,10 @@ import Logout from "@mui/icons-material/Logout";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import { useDispatch, useSelector } from "react-redux";
-import { ActionCreators } from "../actions/action";
+import { ActionCreators } from "../../actions/action";
 import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "@mui/material";
-import { useSidebar } from "../context/context";
+import { useSidebar } from "../../context/context";
 
 export default function Header() {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ export default function Header() {
     setAnchorEl(null);
     navigate("!employee!@");
   };
-  
+
   const myaccount = () => {
     setAnchorEl(null);
     navigate(`myaccount/${user._id}`);

@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "react-query";
-import TableCreater from "../components/TableCreater";
-import AddItem from "../components/AddItem";
+import TableCreater from "../components/common/TableCreater";
+import AddItem from "../hooks/AddItem";
 import { useSelector } from "react-redux";
 import CustomerForm from "../components/forms/CustomerForm";
 import { tableActions } from "../config/Functions";

@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Formik, Field, FieldArray, Form } from "formik";
-import { Button, TextField, Typography, Snackbar, CircularProgress } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Typography,
+  Snackbar,
+  CircularProgress,
+} from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { tableActions } from "../config/Functions";
+import { tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -22,13 +28,13 @@ const validationSchema = Yup.object().shape({
   total: Yup.number().required(),
 });
 
-const SalesOrderForms = ({ customerOptions, Products , handleClose}) => {
+const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
   const workerId = useSelector((state) => state.userState.currentUser);
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const matchesMobile = useMediaQuery("(max-width:600px)");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   return (
     <div>
@@ -57,7 +63,7 @@ const SalesOrderForms = ({ customerOptions, Products , handleClose}) => {
             setError(error);
           } finally {
             setSubmitting(false);
-            setLoading(false)
+            setLoading(false);
           }
         }}>
         {({ values, submitForm, setFieldValue, isSubmitting, resetForm }) => (

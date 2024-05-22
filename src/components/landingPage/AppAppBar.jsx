@@ -147,7 +147,7 @@ function AppAppBar({ mode, toggleColorMode }) {
                 size="small"
                 component="a"
                 href="/register"
-              // target="_blank"
+                // target="_blank"
               >
                 Sign up
               </Button>

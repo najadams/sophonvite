@@ -4,7 +4,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
-import SlidingCard from "../components/SlidingCard";
+import SlidingCard from "../components/common/SlidingCard";
 import { useQuery } from "react-query";
 import { tableActions } from "../config/Functions";
 import {

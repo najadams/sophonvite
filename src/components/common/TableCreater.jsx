@@ -11,24 +11,24 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EditButton from "./EditButton";
-import ProductForm from "./forms/ProductForm";
-import CustomerForm from "./forms/CustomerForm";
-import axios from "../config";
+import EditButton from "../../hooks/EditButton";
+import ProductForm from "../forms/ProductForm";
+import CustomerForm from "../forms/CustomerForm";
+import axios from "../../config";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useQueryClient, useMutation } from "react-query";
-import { tableActions } from "../config/Functions";
+import { tableActions } from "../../config/Functions";
 import { useMediaQuery } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
 import SearchField from "./SearchField";
 import { useDispatch } from "react-redux";
-import { ActionCreators } from "../actions/action";
-import { capitalizeFirstLetter } from "../config/Functions";
+import { ActionCreators } from "../../actions/action";
+import { capitalizeFirstLetter } from "../../config/Functions";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -220,7 +220,7 @@ const TableCreater = ({ companyId, data, type }) => {
         <Table
           sx={{ minWidth: 650 }}
           size={isSmallScreen ? "small" : "medium"}
-          dense={isSmallScreen} // Make table dense for small screens
+          // dense={isSmallScreen ? } // Make table dense for small screens
           stickyHeader
           aria-label="sticky table">
           <TableHead>

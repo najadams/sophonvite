@@ -1,8 +1,8 @@
 import React from "react";
 import { useQuery } from "react-query";
 import ProductForm from "../components/forms/ProductForm";
-import TableCreater from "../components/TableCreater";
-import AddItem from "../components/AddItem";
+import TableCreater from "../components/common/TableCreater";
+import AddItem from "../hooks/AddItem";
 import axios from "../config/index";
 import { useSelector } from "react-redux";
 import Loader from "../components/Loader";
