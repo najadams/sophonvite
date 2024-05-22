@@ -28,7 +28,7 @@ const AuthenticatedRoutes = () => (
     <Route path="/inventory" element={<InventoryReports />} />
     <Route path="/account" element={<WorkerEntry />} />
     <Route path="/sales" element={<SalesOrders />} />
-    <Route path="/myaccount/:accoutNumber" element={MyAccount} />
+    <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />
     <Route path="/*" element={<NoPage />} />
   </Routes>
 );

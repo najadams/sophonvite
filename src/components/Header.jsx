@@ -45,6 +45,11 @@ export default function Header() {
     setAnchorEl(null);
     navigate("!employee!@");
   };
+  
+  const myaccount = () => {
+    setAnchorEl(null);
+    navigate(`myaccount/${user._id}`);
+  };
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -110,7 +115,7 @@ export default function Header() {
               open={Boolean(anchorEl)}
               onClose={handleClose}>
               <MenuItem
-                onClick={handleClose}
+                onClick={myaccount}
                 style={{
                   display: "flex",
                   gap: 15,
