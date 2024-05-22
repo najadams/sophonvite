@@ -1,6 +1,6 @@
-import React from 'react'
-import AddItem from '../components/AddItem';
-import VendorForm from '../components/VendorsForm';
+import React from "react";
+import AddItem from "../components/AddItem";
+import VendorForm from "../components/forms/VendorForm";
 
 const Vendors = () => {
   return (
@@ -9,12 +9,12 @@ const Vendors = () => {
         <div>
           <h1>Vendors</h1>
         </div>
-        <AddItem>
+        <AddItem title={"Add New Vendor"}>
           <VendorForm />
         </AddItem>
       </div>
     </div>
   );
-}
+};
 
-export default Vendors
+export default Vendors;

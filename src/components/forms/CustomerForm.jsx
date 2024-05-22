@@ -1,4 +1,4 @@
-import { DialogContext } from "../context/context";
+import { DialogContext } from "../../context/context";
 import React, { useState, useContext } from "react";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
@@ -7,8 +7,8 @@ import Button from "@mui/material/Button";
 import * as Yup from "yup";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useSelector, useDispatch } from "react-redux";
-import { ActionCreators } from "../actions/action";
-import { tableActions } from "../config/Functions";
+import { ActionCreators } from "../../actions/action";
+import { tableActions } from "../../config/Functions";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),

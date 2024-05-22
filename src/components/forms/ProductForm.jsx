@@ -5,10 +5,10 @@ import Button from "@mui/material/Button";
 import * as Yup from "yup";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Typography, Snackbar } from "@mui/material";
-import { DialogContext } from "../context/context";
+import { DialogContext } from "../../context/context";
 import { useDispatch, useSelector } from "react-redux";
-import { ActionCreators } from "../actions/action";
-import { tableActions } from "../config/Functions";
+import { ActionCreators } from "../../actions/action";
+import { tableActions } from "../../config/Functions";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),

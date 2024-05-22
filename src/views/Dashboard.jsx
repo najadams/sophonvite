@@ -64,7 +64,7 @@ const Widgets = ({ title, count }) => {
 };
 
 const Dashboard = () => {
-  const companyId = useSelector((state) => state.companyState.data.id);
+  const companyId = useSelector((state) => state.companyState.data?.id);
 
   // Fetch counts using react-query
   const { data: counts } = useQuery(["counts", companyId], () =>

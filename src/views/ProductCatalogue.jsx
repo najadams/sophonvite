@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "react-query";
-import ProductForm from "../components/ProductForm";
+import ProductForm from "../components/forms/ProductForm";
 import TableCreater from "../components/TableCreater";
 import AddItem from "../components/AddItem";
 import axios from "../config/index";

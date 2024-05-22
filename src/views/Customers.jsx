@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import TableCreater from "../components/TableCreater";
 import AddItem from "../components/AddItem";
 import { useSelector } from "react-redux";
-import CustomerForm from "../components/CustomerForm";
+import CustomerForm from "../components/forms/CustomerForm";
 import { tableActions } from "../config/Functions";
 import Loader from "../components/Loader";
 

@@ -8,7 +8,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-const AddItem = ({ children }) => {
+const AddItem = ({ children, title }) => {
   const [open, setOpen] = useState(false);
   const matchesMobile = useMediaQuery("(max-width:600px)");
 
@@ -41,7 +41,7 @@ const AddItem = ({ children }) => {
             maxHeight: "none",
           },
         }}>
-        <DialogTitle>Add New Item</DialogTitle>
+        <DialogTitle>{title || `Add New Item`}</DialogTitle>
         <DialogContent>
           {React.cloneElement(children, { handleClose })}
         </DialogContent>
