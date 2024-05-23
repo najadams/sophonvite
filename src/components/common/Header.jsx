@@ -18,13 +18,27 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionCreators } from "../../actions/action";
 import { useNavigate } from "react-router-dom";
-import { useMediaQuery } from "@mui/material";
+import {
+  useMediaQuery,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
 import { useSidebar } from "../../context/context";
+import bcrypt from "bcryptjs";
 
 export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [password, setPassword] = useState("");
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { isSidebarExpanded, setIsSidebarExpanded } = useSidebar();
   const user = useSelector((state) => state.userState.currentUser);
 
@@ -48,7 +62,23 @@ export default function Header() {
 
   const myaccount = () => {
     setAnchorEl(null);
-    navigate(`myaccount/${user._id}`);
+    setOpenPasswordDialog(true);
+  };
+
+  const handlePasswordSubmit = async () => {
+    try {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (passwordMatch) {
+        setOpenPasswordDialog(false);
+        setPassword("");
+        setErrorMessage("");
+        navigate(`myaccount/${user._id}`);
+      } else {
+        setErrorMessage("Incorrect password. Please try again.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleClose = () => {
@@ -107,7 +137,6 @@ export default function Header() {
                 vertical: "top",
                 horizontal: "right",
               }}
-              // keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -150,6 +179,34 @@ export default function Header() {
           </div>
         </Toolbar>
       </AppBar>
+
+      <Dialog
+        open={openPasswordDialog}
+        onClose={() => setOpenPasswordDialog(false)}>
+        <DialogTitle>Enter Password</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter your password to access your account.
+          </DialogContentText>
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Password"
+            type="password"
+            fullWidth
+            variant="standard"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={!!errorMessage}
+            helperText={errorMessage}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPasswordDialog(false)}>Cancel</Button>
+          <Button onClick={handlePasswordSubmit}>Submit</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
