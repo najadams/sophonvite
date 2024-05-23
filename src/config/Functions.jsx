@@ -353,3 +353,12 @@ export const serverAid = {
 
 
 }
+
+
+export const updateAccount = async (data) => {
+  try {
+    await axios.post(`/api/updateworker`, data)
+  } catch (error) {
+    
+  }
+}
