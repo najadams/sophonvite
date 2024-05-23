@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
 import {
   Container,
@@ -7,6 +7,7 @@ import {
   Typography,
   Box,
   Grid,
+  Snackbar
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useSelector } from "react-redux";
@@ -17,9 +18,10 @@ const StyledField = styled(Field)({
 });
 
 const MyAccount = () => {
+  const [open, setOpen] = useState(false)
   const user = useSelector((state) => state.userState.currentUser);
   const company = useSelector((state) => state.companyState.data);
-  useEffect(() => console.log(company))
+  useEffect(() => console.log(user))
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -115,99 +117,123 @@ const MyAccount = () => {
                 />
               </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Subscription and Billing</Typography>
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="currentPlan"
-                  label="Current Plan"
-                  variant="outlined"
-                  value={values.currentPlan}
-                  onChange={handleChange}
-                  disabled
-                />
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="nextBillingDate"
-                  label="Next Billing Date"
-                  variant="outlined"
-                  value={values.nextBillingDate}
-                  onChange={handleChange}
-                  disabled
-                />
-              </Box>
+              {user.adminstatus && (
+                <>
+                  <Box mb={3}>
+                    <Typography variant="h6">
+                      Subscription and Billing
+                    </Typography>
+                    <StyledField
+                      as={TextField}
+                      fullWidth
+                      name="currentPlan"
+                      label="Current Plan"
+                      variant="outlined"
+                      value={values.currentPlan}
+                      onChange={handleChange}
+                      disabled
+                    />
+                    <StyledField
+                      as={TextField}
+                      fullWidth
+                      name="nextBillingDate"
+                      label="Next Billing Date"
+                      variant="outlined"
+                      value={values.nextBillingDate}
+                      onChange={handleChange}
+                      disabled
+                    />
+                  </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Store Settings</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      Manage Locations
-                    </Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      Manage Employees
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
+                  <Box mb={3}>
+                    <Typography variant="h6">Store Settings</Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          Manage Locations
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          Manage Employees
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Reports and Analytics</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      View Sales Reports
-                    </Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      View Inventory Reports
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
+                  <Box mb={3}>
+                    <Typography variant="h6">Reports and Analytics</Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          View Sales Reports
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          View Inventory Reports
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Support</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      Help Center
-                    </Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Button variant="outlined" fullWidth>
-                      Contact Support
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
+                  <Box mb={3}>
+                    <Typography variant="h6">Support</Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          Help Center
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setOpen(true)}
+                          fullWidth>
+                          Contact Support
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Activity Log</Typography>
-                <TextField
-                  fullWidth
-                  label="Recent Activity"
-                  variant="outlined"
-                  value="Last Login: May 22, 2024, 10:00 AM"
-                  disabled
-                />
-              </Box>
+                  <Box mb={3}>
+                    <Typography variant="h6">Activity Log</Typography>
+                    <TextField
+                      fullWidth
+                      label="Recent Activity"
+                      variant="outlined"
+                      value="Last Login: May 22, 2024, 10:00 AM"
+                      disabled
+                    />
+                  </Box>
 
-              <Box mb={3}>
-                <Typography variant="h6">Notifications</Typography>
-                <TextField
-                  fullWidth
-                  label="System Update"
-                  variant="outlined"
-                  value="Scheduled for May 25, 2024"
-                  disabled
-                />
-              </Box>
+                  <Box mb={3}>
+                    <Typography variant="h6">Notifications</Typography>
+                    <TextField
+                      fullWidth
+                      label="System Update"
+                      variant="outlined"
+                      value="Scheduled for May 25, 2024"
+                      disabled
+                    />
+                  </Box>
+                </>
+              )}
 
               <Box mt={3}>
                 <Button
@@ -222,6 +248,13 @@ const MyAccount = () => {
           )}
         </Formik>
       </Container>
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+        onClose={() => setOpen(false)}
+        message={"Feature Not Implemented!"}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      />
     </div>
   );
 };
