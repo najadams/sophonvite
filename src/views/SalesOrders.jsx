@@ -3,7 +3,7 @@ import AddItem from "../hooks/AddItem";
 import SalesOrderForms from "../components/forms/SaleOrderForms";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
-import { tableActions } from "../config/Functions";
+import { serverAid, tableActions } from "../config/Functions";
 import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/Loader";
@@ -34,7 +34,8 @@ const SalesOrders = () => {
   const fetchReceipts = async () => {
     try {
       const response = await axios.get(`/api/receipts/${companyId}`);
-      return response.data;
+      const todaysReceipts = serverAid.filterReceiptsForToday(response.data)
+      return todaysReceipts;
     } catch (error) {
       console.error("Error fetching receipts:", error);
       throw error;

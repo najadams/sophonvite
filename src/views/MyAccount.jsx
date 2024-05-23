@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import {
   Container,
@@ -9,12 +9,17 @@ import {
   Grid,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import { useSelector } from "react-redux";
+import { capitalizeFirstLetter } from "../config/Functions";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
 });
 
 const MyAccount = () => {
+  const user = useSelector((state) => state.userState.currentUser);
+  const company = useSelector((state) => state.companyState.data);
+  useEffect(() => console.log(company))
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -23,11 +28,11 @@ const MyAccount = () => {
         </Typography>
         <Formik
           initialValues={{
-            fullName: "",
+            fullName: user.name || "",
             username: "",
-            email: "",
+            email: company.email || "",
             phone: "",
-            businessName: "",
+            businessName: company.name || "",
             businessAddress: "",
             taxId: "",
             currentPlan: "Premium",
@@ -46,8 +51,9 @@ const MyAccount = () => {
                   name="fullName"
                   label="Full Name"
                   variant="outlined"
-                  value={values.fullName}
+                  value={capitalizeFirstLetter(values.fullName)}
                   onChange={handleChange}
+                  disabled
                 />
                 <StyledField
                   as={TextField}
@@ -55,7 +61,7 @@ const MyAccount = () => {
                   name="username"
                   label="Username"
                   variant="outlined"
-                  value={values.username}
+                  value={capitalizeFirstLetter(values.username)}
                   onChange={handleChange}
                 />
                 <StyledField
@@ -86,7 +92,7 @@ const MyAccount = () => {
                   name="businessName"
                   label="Business Name"
                   variant="outlined"
-                  value={values.businessName}
+                  value={capitalizeFirstLetter(values.businessName)}
                   onChange={handleChange}
                 />
                 <StyledField

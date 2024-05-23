@@ -15,9 +15,11 @@ import { useSidebar } from "./context/context";
 import Loader from "./components/Loader";
 import AuthenticatedRoutes from "./routes/AuthenticatedRoutes";
 import UnauthenticatedRoutes from "./routes/UnauthenticatedRoutes";
+import { UserProvider } from "./context/UserContext";
 
-const LandingPage = lazy(() => import("./views/LandingPage"));
-const WorkerEntry = lazy(() => import("./views/WorkerEntry"));
+const LandingPage = lazy(() => import("./views/common/LandingPage"));
+const WorkerEntry = lazy(() => import("./views/common/WorkerEntry"));
+const Unauthorized = lazy(() => import("./views/common/Unauthorized"));
 
 const queryClient = new QueryClient();
 
@@ -29,61 +31,64 @@ function App() {
   const isLoggedIn = useSelector((state) => state.companyState.isLoggedIn);
   const hasAccount = useSelector((state) => state.users?.currentUser !== null);
 
-   return (
-     <QueryClientProvider client={queryClient}>
-       <Provider store={store}>
-         <PersistGate loading={null} persistor={persistor}>
-           <div style={{ height: "100vh", display: "flex" }}>
-             <Router>
-               {isLoggedIn && hasAccount && (
-                 <Sidebar
-                   isExpanded={isSidebarExpanded}
-                   toggleSidebar={toggleSidebar}
-                 />
-               )}
-               <div style={{ flex: 1 }}>
-                 {isLoggedIn && hasAccount !== undefined && hasAccount && (
-                   <Header isLoggedIn={isLoggedIn} />
-                 )}
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <UserProvider>
+            <div style={{ height: "100vh", display: "flex", overflow: "hidden" }}>
+              <Router>
+                {isLoggedIn && hasAccount && (
+                  <Sidebar
+                    isExpanded={isSidebarExpanded}
+                    toggleSidebar={toggleSidebar}
+                  />
+                )}
+                <div style={{ flex: 1 }}>
+                  {isLoggedIn && hasAccount !== undefined && hasAccount && (
+                    <Header isLoggedIn={isLoggedIn} />
+                  )}
 
-                 <Suspense
-                   fallback={
-                     <div style={{height : "100vh"}}>
-                       <Loader />
-                     </div>
-                   }>
-                   <Routes>
-                     <Route
-                       path="/"
-                       element={
-                         isLoggedIn && hasAccount ? (
-                           <Navigate to="/dashboard" />
-                         ) : (
-                           <LandingPage isLoggedIn={isLoggedIn} />
-                         )
-                       }
-                     />
-                     {isLoggedIn && hasAccount ? (
-                       <Route path="/*" element={<AuthenticatedRoutes />} />
-                     ) : (
-                       <Route
-                         path="/*"
-                         element={
-                           <UnauthenticatedRoutes isLoggedIn={isLoggedIn} />
-                         }
-                       />
-                     )}
-                     <Route path="/account" element={<WorkerEntry />} />
-                     <Route path="*" element={<Navigate to="/" />} />
-                   </Routes>
-                 </Suspense>
-               </div>
-             </Router>
-           </div>
-         </PersistGate>
-       </Provider>
-     </QueryClientProvider>
-   );
+                  <Suspense
+                    fallback={
+                      <div style={{ height: "100vh" }}>
+                        <Loader />
+                      </div>
+                    }>
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={
+                          isLoggedIn && hasAccount ? (
+                            <Navigate to="/dashboard" />
+                          ) : (
+                            <LandingPage isLoggedIn={isLoggedIn} />
+                          )
+                        }
+                      />
+                      {isLoggedIn && hasAccount ? (
+                        <Route path="/*" element={<AuthenticatedRoutes />} />
+                      ) : (
+                        <Route
+                          path="/*"
+                          element={
+                            <UnauthenticatedRoutes isLoggedIn={isLoggedIn} />
+                          }
+                        />
+                      )}
+                      <Route path="/unauthorized" element={<Unauthorized />} />
+                      <Route path="/account" element={<WorkerEntry />} />
+                      <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                  </Suspense>
+                </div>
+              </Router>
+            </div>
+          </UserProvider>
+        </PersistGate>
+      </Provider>
+    </QueryClientProvider>
+  );
 }
 
 export default App;

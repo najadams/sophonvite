@@ -10,10 +10,10 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import axios from "../config/";
+import axios from "../../config";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { ActionCreators } from "../actions/action";
+import { ActionCreators } from "../../actions/action";
 import { CircularProgress } from "@mui/material";
 
 function Copyright(props) {
@@ -41,7 +41,7 @@ const WorkerEntry = () => {
   const dispatch = useDispatch();
   const companyId = useSelector((state) => state.companyState.data.id);
 
-  // 
+  //
   const accountSignin = async (companyId, name, password) => {
     try {
       const response = await axios.post(`/account`, {
@@ -49,8 +49,6 @@ const WorkerEntry = () => {
         name,
         password,
       });
-
-      
 
       navigate("/dashboard");
       return response.data;

@@ -1,9 +1,20 @@
-import React from 'react'
+import React from "react";
+import AddItem from "../hooks/AddItem";
+import VendorForm from "../components/forms/VendorForm";
 
 const Transactions = () => {
   return (
-    <div>Transactions</div>
-  )
-}
+    <div className="page">
+      <div className="heading">
+        <div>
+          <h1>Transactions</h1>
+        </div>
+        <AddItem title={"Add New Vendor"}>
+          <VendorForm />
+        </AddItem>
+      </div>
+    </div>
+  );
+};
 
-export default Transactions
+export default Transactions;

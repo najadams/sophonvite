@@ -1,5 +1,7 @@
 import React, { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { PERMISSIONS } from "../context/userRoles";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
 const Customers = lazy(() => import("../views/Customers"));
@@ -11,9 +13,9 @@ const Transactions = lazy(() => import("../views/Transactions"));
 const Vendors = lazy(() => import("../views/Vendors"));
 const Settings = lazy(() => import("../views/Settings"));
 const WorkerForm = lazy(() => import("../views/WorkerForm"));
-const WorkerEntry = lazy(() => import("../views/WorkerEntry"));
+const WorkerEntry = lazy(() => import("../views/common/WorkerEntry"));
 const NoPage = lazy(() => import("../views/NoPage"));
-const MyAccount = lazy(() => import("../views/MyAccount"))
+const MyAccount = lazy(() => import("../views/MyAccount"));
 
 const AuthenticatedRoutes = () => (
   <Routes>
@@ -34,3 +36,26 @@ const AuthenticatedRoutes = () => (
 );
 
 export default AuthenticatedRoutes;
+
+
+// THIS IS THE FORMAT YOU SHOULD FOLLOW FOR THIS COMPONENT
+// CHECK THE PERMISSION MAKE THE APPROPRIATE ADJUSTMENTS AND APPLY THEM
+// const AuthenticatedRoutes = () => (
+//   <>
+//     <ProtectedRoute
+//       path="/dashboard"
+//       element={<Dashboard />}
+//       requiredPermissions={[PERMISSIONS.VIEW_DASHBOARD]}
+//     />
+//     <ProtectedRoute
+//       path="/manage-users"
+//       element={<ManageUsers />}
+//       requiredPermissions={[PERMISSIONS.MANAGE_USERS]}
+//     />
+//     <ProtectedRoute
+//       path="/reports"
+//       element={<Reports />}
+//       requiredPermissions={[PERMISSIONS.VIEW_REPORTS]}
+//     />
+//   </>
+// );
