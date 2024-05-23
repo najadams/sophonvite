@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import {
   Container,
@@ -7,7 +7,8 @@ import {
   Typography,
   Box,
   Grid,
-  Snackbar
+  Snackbar,
+  Divider
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useSelector } from "react-redux";
@@ -17,11 +18,54 @@ const StyledField = styled(Field)({
   margin: "10px 0",
 });
 
+const Privileges = ({ worker }) => {
+  return (
+    <>
+      <Typography variant="h6" gutterBottom>
+        Privileges
+      </Typography>
+      <Divider sx={{mb:3}} />
+          <Grid container spacing={3} key={worker._id}>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                Admin Status:{" "}
+                {worker.adminstatus ? "Yes" : "No"}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                Can Make Sales:{" "}
+                {worker.privileges.makeSalesOnly ? "Yes" : "No"}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                Can Add Inventory:{" "}
+                {worker.privileges.addInventory ? "Yes" : "No"}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                Can Edit Data:{" "}
+                {worker.privileges.editData ? "Yes" : "No"}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                Can Access Data:{" "}
+                {worker.privileges.accessData ? "Yes" : "No"}
+              </Typography>
+            </Grid>
+          </Grid>
+    </>
+  );
+};
+
 const MyAccount = () => {
-  const [open, setOpen] = useState(false)
   const user = useSelector((state) => state.userState.currentUser);
+  const userId = user._id;
   const company = useSelector((state) => state.companyState.data);
-  useEffect(() => console.log(user))
+  useEffect(() => console.log(user._id))
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -30,210 +74,76 @@ const MyAccount = () => {
         </Typography>
         <Formik
           initialValues={{
-            fullName: user.name || "",
-            username: "",
-            email: company.email || "",
-            phone: "",
-            businessName: company.name || "",
-            businessAddress: "",
-            taxId: "",
-            currentPlan: "Premium",
-            nextBillingDate: "2024-06-15",
+            user: {
+              name: user.name || "",
+              username: "",
+              phone: "",
+              password: "",
+            },
           }}
-          onSubmit={(values) => {
-            console.log(values);
+          onSubmit={async (values, { setSubmitting }) => {
+            try {
+              const submissionData = { userId, ...values };
+              console.log(submissionData);
+              // Here you would send submissionData to your API
+            } catch (error) {
+              console.log(error);
+            }
+            setSubmitting(false);
           }}>
           {({ values, handleChange }) => (
             <Form>
-              <Box mb={3}>
+              <Box mb={4}>
                 <Typography variant="h6">Personal Information</Typography>
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="fullName"
+                  name="user.name"
                   label="Full Name"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.fullName)}
+                  value={capitalizeFirstLetter(values.user.name)}
                   onChange={handleChange}
-                  disabled
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="username"
+                  name="user.username"
                   label="Username"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.username)}
+                  value={capitalizeFirstLetter(values.user.username)}
                   onChange={handleChange}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="email"
+                  name="user.email"
                   label="Email"
                   variant="outlined"
-                  value={values.email}
+                  value={values.user.email}
                   onChange={handleChange}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="phone"
+                  type="password"
+                  name="user.password"
+                  label="Password"
+                  variant="outlined"
+                  value={values.user.password}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="user.phone"
                   label="Phone"
                   variant="outlined"
-                  value={values.phone}
+                  value={values.user.phone}
                   onChange={handleChange}
                 />
+
+                <Privileges worker={user} />
               </Box>
-
-              <Box mb={3}>
-                <Typography variant="h6">Business Information</Typography>
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="businessName"
-                  label="Business Name"
-                  variant="outlined"
-                  value={capitalizeFirstLetter(values.businessName)}
-                  onChange={handleChange}
-                />
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="businessAddress"
-                  label="Business Address"
-                  variant="outlined"
-                  value={values.businessAddress}
-                  onChange={handleChange}
-                />
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="taxId"
-                  label="Tax ID"
-                  variant="outlined"
-                  value={values.taxId}
-                  onChange={handleChange}
-                />
-              </Box>
-
-              {user.adminstatus && (
-                <>
-                  <Box mb={3}>
-                    <Typography variant="h6">
-                      Subscription and Billing
-                    </Typography>
-                    <StyledField
-                      as={TextField}
-                      fullWidth
-                      name="currentPlan"
-                      label="Current Plan"
-                      variant="outlined"
-                      value={values.currentPlan}
-                      onChange={handleChange}
-                      disabled
-                    />
-                    <StyledField
-                      as={TextField}
-                      fullWidth
-                      name="nextBillingDate"
-                      label="Next Billing Date"
-                      variant="outlined"
-                      value={values.nextBillingDate}
-                      onChange={handleChange}
-                      disabled
-                    />
-                  </Box>
-
-                  <Box mb={3}>
-                    <Typography variant="h6">Store Settings</Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          Manage Locations
-                        </Button>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          Manage Employees
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Box>
-
-                  <Box mb={3}>
-                    <Typography variant="h6">Reports and Analytics</Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          View Sales Reports
-                        </Button>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          View Inventory Reports
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Box>
-
-                  <Box mb={3}>
-                    <Typography variant="h6">Support</Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          Help Center
-                        </Button>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setOpen(true)}
-                          fullWidth>
-                          Contact Support
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Box>
-
-                  <Box mb={3}>
-                    <Typography variant="h6">Activity Log</Typography>
-                    <TextField
-                      fullWidth
-                      label="Recent Activity"
-                      variant="outlined"
-                      value="Last Login: May 22, 2024, 10:00 AM"
-                      disabled
-                    />
-                  </Box>
-
-                  <Box mb={3}>
-                    <Typography variant="h6">Notifications</Typography>
-                    <TextField
-                      fullWidth
-                      label="System Update"
-                      variant="outlined"
-                      value="Scheduled for May 25, 2024"
-                      disabled
-                    />
-                  </Box>
-                </>
-              )}
 
               <Box mt={3}>
                 <Button
@@ -248,13 +158,6 @@ const MyAccount = () => {
           )}
         </Formik>
       </Container>
-      <Snackbar
-        open={open}
-        autoHideDuration={2000}
-        onClose={() => setOpen(false)}
-        message={"Feature Not Implemented!"}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      />
     </div>
   );
 };
