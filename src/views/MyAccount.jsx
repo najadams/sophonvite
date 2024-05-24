@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import {
   Container,
@@ -9,61 +9,57 @@ import {
   Grid,
   Divider,
   Autocomplete,
+  LinearProgress,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useSelector, useDispatch } from "react-redux";
 import * as Yup from "yup";
 import { capitalizeFirstLetter, updateAccount } from "../config/Functions";
 import { ActionCreators } from "../actions/action";
+import { rolePermissions, ROLES } from "../context/userRoles";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
 });
 
-const Privileges = ({ worker }) => (
-  <>
-    <Typography variant="h6" gutterBottom>
-      Privileges
-    </Typography>
-    <Divider sx={{ mb: 3 }} />
-    <Grid container spacing={3} key={worker._id}>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="body1">
-          Admin Status: {worker.adminstatus ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="body1">
-          Can Make Sales: {worker.privileges.makeSalesOnly ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="body1">
-          Can Add Inventory: {worker.privileges.addInventory ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="body1">
-          Can Edit Data: {worker.privileges.editData ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="body1">
-          Can Access Data: {worker.privileges.accessData ? "Yes" : "No"}
-        </Typography>
-      </Grid>
-    </Grid>
-  </>
-);
+const Privileges = ({ user }) => {
+  const userRole = user.role;
+  const userPermissions = rolePermissions[userRole];
 
-const ROLES = [
-  "super_admin",
-  "store_manager",
-  "sales_associate",
-  "inventory_manager",
-  "hr",
-  "it_support",
-];
+  // Function to chunk the permissions array into pairs
+  const chunkArray = (array, size) => {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  };
+
+  const permissionChunks = chunkArray(userPermissions, 2);
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Privileges
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
+      </Grid>
+      {permissionChunks.map((chunk, index) => (
+        <React.Fragment key={index}>
+          {chunk.map((permission) => (
+            <Grid item xs={6} key={permission}>
+              <Typography variant="body1">
+                {capitalizeFirstLetter(permission.split("_").join(" "))}
+              </Typography>
+            </Grid>
+          ))}
+        </React.Fragment>
+      ))}
+    </Grid>
+  );
+};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
@@ -82,6 +78,7 @@ const MyAccount = () => {
   const user = useSelector((state) => state.userState.currentUser);
   const userId = user._id;
   const dispatch = useDispatch();
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   return (
     <div className="page">
@@ -89,6 +86,13 @@ const MyAccount = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           My Account
         </Typography>
+        {alert.show && (
+          <Alert
+            severity={alert.type}
+            onClose={() => setAlert({ show: false })}>
+            {alert.message}
+          </Alert>
+        )}
         <Formik
           initialValues={{
             name: user.name || "",
@@ -100,6 +104,7 @@ const MyAccount = () => {
           }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
+            setSubmitting(true);
             const processedValues = {
               ...values,
               name: values.name.trim().toLowerCase(),
@@ -118,13 +123,23 @@ const MyAccount = () => {
                   ...processedValues,
                 })
               );
+              setAlert({
+                show: true,
+                message: "Account updated successfully!",
+                type: "success",
+              });
               console.log(submissionData);
             } catch (error) {
+              setAlert({
+                show: true,
+                message: "Error updating account.",
+                type: "error",
+              });
               console.log(error);
             }
             setSubmitting(false);
           }}>
-          {({ values, handleChange, setFieldValue }) => (
+          {({ values, handleChange, setFieldValue, isSubmitting }) => (
             <Form>
               <Box mb={4}>
                 <Typography variant="h6">Personal Information</Typography>
@@ -147,7 +162,7 @@ const MyAccount = () => {
                   onChange={handleChange}
                 />
                 <Autocomplete
-                  options={ROLES}
+                  options={Object.values(ROLES)}
                   getOptionLabel={(option) => option}
                   renderInput={(params) => (
                     <TextField
@@ -162,6 +177,7 @@ const MyAccount = () => {
                   onChange={(event, value) => {
                     setFieldValue("role", value);
                   }}
+                  isOptionEqualToValue={(option, value) => option === value}
                   disableClearable
                   disabled={disapbleRole(user)}
                 />
@@ -194,14 +210,17 @@ const MyAccount = () => {
                   onChange={handleChange}
                 />
 
-                <Privileges worker={user} />
+                <Privileges user={user} />
               </Box>
 
+              <br />
+              {isSubmitting && <LinearProgress />}
               <Box mt={3}>
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
+                  disabled={isSubmitting}
                   fullWidth>
                   Save Changes
                 </Button>

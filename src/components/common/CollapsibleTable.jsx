@@ -74,7 +74,7 @@ function Row({ row }) {
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
-                  <StyledTableRow>
+                  <TableRow>
                     <TableCell>
                       <strong>Name</strong>
                     </TableCell>
@@ -84,7 +84,7 @@ function Row({ row }) {
                     <TableCell align="right">
                       <strong>Total Price</strong>
                     </TableCell>
-                  </StyledTableRow>
+                  </TableRow>
                 </TableHead>
                 <TableBody>
                   {row.detail.map((item) => (
