@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionCreators } from "../../actions/action";
 import { CircularProgress } from "@mui/material";
+import { useUser } from "../../context/UserContext";
 
 function Copyright(props) {
   return (
@@ -40,6 +41,7 @@ const WorkerEntry = () => {
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const companyId = useSelector((state) => state.companyState.data.id);
+  const { setUser } = useUser();
 
   //
   const accountSignin = async (companyId, name, password) => {
@@ -83,6 +85,7 @@ const WorkerEntry = () => {
         password
       );
       dispatch(ActionCreators.setCurrentUser(user.worker));
+      setUser(user)
     } catch (error) {
       // Handle error appropriately, e.g., display error message
     } finally {
