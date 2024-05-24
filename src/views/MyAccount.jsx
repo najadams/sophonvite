@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Formik, Form, Field } from "formik";
 import {
   Container,
@@ -7,65 +7,82 @@ import {
   Typography,
   Box,
   Grid,
-  Snackbar,
-  Divider
+  Divider,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useSelector } from "react-redux";
-import { capitalizeFirstLetter } from "../config/Functions";
+import { useSelector, useDispatch } from "react-redux";
+import * as Yup from "yup";
+import { capitalizeFirstLetter, updateAccount } from "../config/Functions";
+import { ActionCreators } from "../actions/action";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
 });
 
-const Privileges = ({ worker }) => {
-  return (
-    <>
-      <Typography variant="h6" gutterBottom>
-        Privileges
-      </Typography>
-      <Divider sx={{mb:3}} />
-          <Grid container spacing={3} key={worker._id}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                Admin Status:{" "}
-                {worker.adminstatus ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                Can Make Sales:{" "}
-                {worker.privileges.makeSalesOnly ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                Can Add Inventory:{" "}
-                {worker.privileges.addInventory ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                Can Edit Data:{" "}
-                {worker.privileges.editData ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                Can Access Data:{" "}
-                {worker.privileges.accessData ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-          </Grid>
-    </>
-  );
+const Privileges = ({ worker }) => (
+  <>
+    <Typography variant="h6" gutterBottom>
+      Privileges
+    </Typography>
+    <Divider sx={{ mb: 3 }} />
+    <Grid container spacing={3} key={worker._id}>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1">
+          Admin Status: {worker.adminstatus ? "Yes" : "No"}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1">
+          Can Make Sales: {worker.privileges.makeSalesOnly ? "Yes" : "No"}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1">
+          Can Add Inventory: {worker.privileges.addInventory ? "Yes" : "No"}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1">
+          Can Edit Data: {worker.privileges.editData ? "Yes" : "No"}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1">
+          Can Access Data: {worker.privileges.accessData ? "Yes" : "No"}
+        </Typography>
+      </Grid>
+    </Grid>
+  </>
+);
+
+const ROLES = [
+  "super_admin",
+  "store_manager",
+  "sales_associate",
+  "inventory_manager",
+  "hr",
+  "it_support",
+];
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Required"),
+  username: Yup.string().required("Required"),
+  role: Yup.string().required("Required"),
+  contact: Yup.number().required("Required").typeError("Must be a number"),
+  email: Yup.string().email("Invalid email").required("Required"),
+  password: Yup.string(),
+});
+
+const disapbleRole = (user) => {
+  return user.role !== undefined;
 };
 
 const MyAccount = () => {
   const user = useSelector((state) => state.userState.currentUser);
   const userId = user._id;
-  const company = useSelector((state) => state.companyState.data);
-  useEffect(() => console.log(user._id))
+  const dispatch = useDispatch();
+
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -74,71 +91,106 @@ const MyAccount = () => {
         </Typography>
         <Formik
           initialValues={{
-            user: {
-              name: user.name || "",
-              username: "",
-              phone: "",
-              password: "",
-            },
+            name: user.name || "",
+            username: user.username || "",
+            role: user.role || "",
+            contact: user.contact || "",
+            email: user.email || "",
+            password: "",
           }}
+          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
+            const processedValues = {
+              ...values,
+              name: values.name.trim().toLowerCase(),
+              username: values.username.trim().toLowerCase(),
+              email: values.email.trim().toLowerCase(),
+              contact: values.contact.trim(),
+              role: values.role.trim().toLowerCase(),
+            };
+
             try {
-              const submissionData = { userId, ...values };
+              const submissionData = { userId, ...processedValues };
+              await updateAccount(submissionData);
+              dispatch(
+                ActionCreators.setCurrentUser({
+                  _id: userId,
+                  ...processedValues,
+                })
+              );
               console.log(submissionData);
-              // Here you would send submissionData to your API
             } catch (error) {
               console.log(error);
             }
             setSubmitting(false);
           }}>
-          {({ values, handleChange }) => (
+          {({ values, handleChange, setFieldValue }) => (
             <Form>
               <Box mb={4}>
                 <Typography variant="h6">Personal Information</Typography>
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="user.name"
+                  name="name"
                   label="Full Name"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.user.name)}
+                  value={capitalizeFirstLetter(values.name)}
                   onChange={handleChange}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="user.username"
+                  name="username"
                   label="Username"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.user.username)}
+                  value={capitalizeFirstLetter(values.username)}
                   onChange={handleChange}
+                />
+                <Autocomplete
+                  options={ROLES}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Role"
+                      name="role"
+                      variant="outlined"
+                      required
+                    />
+                  )}
+                  value={values.role}
+                  onChange={(event, value) => {
+                    setFieldValue("role", value);
+                  }}
+                  disableClearable
+                  disabled={disapbleRole(user)}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="user.email"
+                  name="email"
                   label="Email"
                   variant="outlined"
-                  value={values.user.email}
+                  value={values.email}
                   onChange={handleChange}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
                   type="password"
-                  name="user.password"
+                  name="password"
                   label="Password"
                   variant="outlined"
-                  value={values.user.password}
+                  value={values.password}
                   onChange={handleChange}
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="user.phone"
-                  label="Phone"
+                  name="contact"
+                  label="Contact"
                   variant="outlined"
-                  value={values.user.phone}
+                  value={values.contact}
                   onChange={handleChange}
                 />
 
