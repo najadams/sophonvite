@@ -16,6 +16,7 @@ import Loader from "./components/Loader";
 import AuthenticatedRoutes from "./routes/AuthenticatedRoutes";
 import UnauthenticatedRoutes from "./routes/UnauthenticatedRoutes";
 import { UserProvider } from "./context/UserContext";
+import SignIn from "./views/SignIn";
 
 const LandingPage = lazy(() => import("./views/common/LandingPage"));
 const WorkerEntry = lazy(() => import("./views/common/WorkerEntry"));
@@ -36,7 +37,7 @@ function App() {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <UserProvider>
-            <div style={{ height: "100vh", display: "flex", overflow: "hidden" }}>
+            <div style={{ height: "100vh", display: "flex", overflowY: "hidden" }}>
               <Router>
                 {isLoggedIn && hasAccount && (
                   <Sidebar
@@ -78,6 +79,7 @@ function App() {
                       )}
                       <Route path="/unauthorized" element={<Unauthorized />} />
                       <Route path="/account" element={<WorkerEntry />} />
+                      <Route path="/login" element={<SignIn />} />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </Suspense>
