@@ -12,7 +12,7 @@ const InventoryReports = lazy(() => import("../views/InventoryReports"));
 const Transactions = lazy(() => import("../views/Transactions"));
 const Vendors = lazy(() => import("../views/Vendors"));
 const Settings = lazy(() => import("../views/Settings"));
-const WorkerForm = lazy(() => import("../views/WorkerForm"));
+const CreateUser = lazy(() => import("../views/CreateUser"));
 const WorkerEntry = lazy(() => import("../views/common/WorkerEntry"));
 const NoPage = lazy(() => import("../views/NoPage"));
 const MyAccount = lazy(() => import("../views/MyAccount"));
@@ -22,7 +22,7 @@ const AuthenticatedRoutes = () => (
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/products" element={<ProductCatalogue />} />
     <Route path="/settings" element={<Settings />} />
-    <Route path="/!employee!@" element={<WorkerForm />} />
+    <Route path="/!employee!@" element={<CreateUser />} />
     <Route path="/customers" element={<Customers />} />
     <Route path="/stocks" element={<StockEntry />} />
     <Route path="/transactions" element={<Transactions />} />
