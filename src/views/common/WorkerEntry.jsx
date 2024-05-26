@@ -1,21 +1,25 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import React, { useState } from "react";
+import {
+  createTheme,
+  ThemeProvider,
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Link,
+  Paper,
+  Box,
+  Grid,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
 import axios from "../../config";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionCreators } from "../../actions/action";
-import { CircularProgress } from "@mui/material";
 import { useUser } from "../../context/UserContext";
+import { rolePermissions } from "../../context/userRoles";
 
 function Copyright(props) {
   return (
@@ -43,7 +47,6 @@ const WorkerEntry = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const { setUser } = useUser();
 
-  //
   const accountSignin = async (companyId, name, password) => {
     try {
       const response = await axios.post(`/account`, {
@@ -52,11 +55,8 @@ const WorkerEntry = () => {
         password,
       });
 
-      navigate("/dashboard");
       return response.data;
     } catch (error) {
-      // setError(error.response.data.message);
-      // console.log(error.response)
       setError(
         error.response?.data?.message ||
           "Failed to sign in. Please try again later."
@@ -84,8 +84,19 @@ const WorkerEntry = () => {
         name.toLowerCase().trim(),
         password
       );
+
+      const role = user.worker.role;
+      const permissions = rolePermissions[role] || [];
+
+      const userData = {
+        ...user.worker,
+        permissions: permissions,
+      };
+
       dispatch(ActionCreators.setCurrentUser(user.worker));
-      setUser(user)
+      setUser(userData);
+      console.log(userData)
+      navigate("/dashboard");
     } catch (error) {
       // Handle error appropriately, e.g., display error message
     } finally {
