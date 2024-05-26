@@ -42,11 +42,11 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
             <th style={{ border: "1px solid #000", padding: "8px" }}>
               Product
             </th>
-            <th style={{ border: "1px solid #000", padding: "8px" }}>
-              Quantity
+            <th style={{ border: "1px solid #000", padding: "5px" }}>
+              Qty
             </th>
-            <th style={{ border: "1px solid #000", padding: "8px" }}>Price</th>
-            <th style={{ border: "1px solid #000", padding: "8px" }}>Total</th>
+            <th style={{ border: "1px solid #000", padding: "5px" }}>Price</th>
+            <th style={{ border: "1px solid #000", padding: "5px" }}>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -58,7 +58,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               <td
                 style={{
                   border: "1px solid #000",
-                  padding: "8px",
+                  padding: "5px",
                   textAlign: "right",
                 }}>
                 {product.quantity}
@@ -66,7 +66,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               <td
                 style={{
                   border: "1px solid #000",
-                  padding: "8px",
+                  padding: "5x",
                   textAlign: "right",
                 }}>
                 ${product.price.toFixed(2)}
@@ -74,7 +74,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               <td
                 style={{
                   border: "1px solid #000",
-                  padding: "8px",
+                  padding: "5px",
                   textAlign: "right",
                 }}>
                 ${(product.price * product.quantity).toFixed(2)}

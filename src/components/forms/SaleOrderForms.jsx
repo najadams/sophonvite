@@ -10,7 +10,7 @@ import {
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { tableActions } from "../../config/Functions";
+import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
@@ -87,7 +87,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 return (
                   <Autocomplete
                     {...field}
-                    options={customerOptions}
+                    options={capitalizeFirstLetter(customerOptions)}
                     value={field.value}
                     onChange={(event, newValue) => {
                       form.setFieldValue(field.name, newValue || "");
