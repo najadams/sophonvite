@@ -302,7 +302,24 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
               </Button>
 
               {/* Save & Print button */}
-              <Button
+              <ReactToPrint
+                trigger={() => (
+                  <Button
+                    variant="contained"
+                    color="info"
+                    onClick={async () => {
+                      setLoading(true);
+                      await submitForm();
+                      handlePrint();
+                    }}
+                    disabled={loading || isSubmitting}>
+                    Save & Print
+                  </Button>
+                )}
+                content={() => printRef.current}
+              />
+
+              {/* <Button
                 variant="contained"
                 color="info"
                 onClick={async () => {
@@ -313,7 +330,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
                 Save & Print
-              </Button>
+              </Button> */}
             </div>
           </Form>
         )}
@@ -333,12 +350,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{ }}>
-          <ReactToPrint
-            trigger={() => <button>Print Vendors</button>}
-            content={() => printRef.current}
-          />
-          {/* <ComponentToPrint products={printValues.products} ref={printRef} /> */}
+        <div style={{}}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
