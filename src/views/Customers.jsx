@@ -5,7 +5,7 @@ import AddItem from "../hooks/AddItem";
 import { useSelector } from "react-redux";
 import CustomerForm from "../components/forms/CustomerForm";
 import { tableActions } from "../config/Functions";
-import Loader from "../components/Loader";
+import Loader from "../components/common/Loader";
 
 const Customers = () => {
   const companyId = useSelector((state) => state.companyState.data.id);

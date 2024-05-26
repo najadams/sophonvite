@@ -12,7 +12,7 @@ import { Provider, useSelector } from "react-redux";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { PersistGate } from "redux-persist/integration/react";
 import { useSidebar } from "./context/context";
-import Loader from "./components/Loader";
+import Loader from "./components/common/Loader";
 import AuthenticatedRoutes from "./routes/AuthenticatedRoutes";
 import UnauthenticatedRoutes from "./routes/UnauthenticatedRoutes";
 import { UserProvider } from "./context/UserContext";

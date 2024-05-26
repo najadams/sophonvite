@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../config/Functions";
 import { tableActions } from "../config/Functions";
-import Loader from "../components/Loader";
+import Loader from "../components/common/Loader";
 import { useState } from "react";
 import React from "react";
 import { Formik, Form, Field } from "formik";
@@ -15,14 +15,13 @@ import {
   Grid,
   FormControlLabel,
   Checkbox,
-  Snackbar
+  Snackbar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
 });
-
 
 const Settings = () => {
   const companyId = useSelector((state) => state.companyState.data.id);

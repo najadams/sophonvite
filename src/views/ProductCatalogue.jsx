@@ -5,7 +5,7 @@ import TableCreater from "../components/common/TableCreater";
 import AddItem from "../hooks/AddItem";
 import axios from "../config/index";
 import { useSelector } from "react-redux";
-import Loader from "../components/Loader";
+import Loader from "../components/common/Loader";
 
 const fetchProducts = async (companyId) => {
   try {

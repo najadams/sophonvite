@@ -1,13 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { capitalizeFirstLetter } from "../../config/Functions";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
-    const { customerName, products } = props;
+  const { customerName, products, amountPaid } = props;
+  const company = useSelector((state) => state.companyState.data);
+
+  useEffect(() => {
+    console.log(company);
+  }, [company]);
 
   return (
     <div ref={ref} style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h2>Receipt</h2>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}>
+        <h4 style={{ fontSize: 20,fontFamily:"sans-serif"}}>{capitalizeFirstLetter(company.name)}</h4>
+        {company.email && <h5>Email: {company.email}</h5>}
+        {company.contact && <h5>Contact: {company.contact}</h5>}
+        {company.momo && <h5>Momo: {company.momo}</h5>}
+      </div>
+      <p style={{ textAlign: "left", marginTop: "30px" }}>
+        <strong>Customer:</strong> {customerName}
+      </p>
       <p>
-        <strong>Customer Name:</strong> {customerName}
+        <strong>Cashier: </strong>
+        {customerName}
       </p>
       <table
         style={{
@@ -61,6 +83,12 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           ))}
         </tbody>
       </table>
+      <p style={{ textAlign: "right", marginTop: "20px" }}>
+        <strong>Tax %: {company.taxRate}</strong>
+      </p>
+      <p style={{ textAlign: "right", marginTop: "20px" }}>
+        <strong>Amount Paid: ${amountPaid}</strong>
+      </p>
       <p style={{ textAlign: "right", marginTop: "20px" }}>
         <strong>
           Total: $

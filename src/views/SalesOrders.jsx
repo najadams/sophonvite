@@ -6,7 +6,7 @@ import { useQuery } from "react-query";
 import { serverAid, tableActions } from "../config/Functions";
 import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
-import Loader from "../components/Loader";
+import Loader from "../components/common/Loader";
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -34,7 +34,7 @@ const SalesOrders = () => {
   const fetchReceipts = async () => {
     try {
       const response = await axios.get(`/api/receipts/${companyId}`);
-      const todaysReceipts = serverAid.filterReceiptsForToday(response.data)
+      const todaysReceipts = serverAid.filterReceiptsForToday(response.data);
       return todaysReceipts;
     } catch (error) {
       console.error("Error fetching receipts:", error);
