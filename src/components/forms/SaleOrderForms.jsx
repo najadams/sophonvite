@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Formik, Field, FieldArray, Form } from "formik";
 import {
   Button,
@@ -13,6 +13,10 @@ import * as Yup from "yup";
 import { tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import ReceiptTemplate from "../compPrint/ReceiptTemplate";
+import { useReactToPrint } from "react-to-print";
+import ComponentToPrint from "../compPrint/ComponentToPrint";
+import { ReactToPrint } from "react-to-print";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
@@ -35,6 +39,12 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
   const [open, setOpen] = useState(false);
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
+  const printRef = useRef();
+  const [printValues, setPrintValues] = useState(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current, 
+  });
 
   return (
     <div>
@@ -55,8 +65,9 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
             setSubmitting(true);
             await tableActions.addReceipt(values, companyId, workerId);
             setOpen(true);
+            setPrintValues(values); // Store values for printing
             setTimeout(() => {
-              handleClose();
+              // handleClose();
             }, 5000);
           } catch (error) {
             console.log(error);
@@ -294,9 +305,10 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
               <Button
                 variant="contained"
                 color="info"
-                onClick={() => {
-                  setLoading(true); // Set loading state to true
-                  submitForm(); // Trigger form submission
+                onClick={async () => {
+                  setLoading(true);
+                  await submitForm();
+                  handlePrint();
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
@@ -318,6 +330,22 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
         message={"Sales successfully Recorded"}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
+
+      {/* Receipt Template for printing */}
+      {printValues && (
+        <div style={{ }}>
+          <ReactToPrint
+            trigger={() => <button>Print Vendors</button>}
+            content={() => printRef.current}
+          />
+          {/* <ComponentToPrint products={printValues.products} ref={printRef} /> */}
+          <ReceiptTemplate
+            ref={printRef}
+            customerName={printValues.customerName}
+            products={printValues.products}
+          />
+        </div>
+      )}
     </div>
   );
 };
