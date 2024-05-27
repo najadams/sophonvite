@@ -1,20 +1,27 @@
 import React from "react";
 import { Route, Navigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
+import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ element: Element, requiredPermissions, ...rest }) => {
-  const { user } = useUser();
+  const user = useSelector((state) => state.userState.currentUser);
+  console.log(user.permissions)
 
-  const hasRequiredPermissions = requiredPermissions.every((permission) =>
-    user.permissions.includes(permission)
-  );
+  if (!user) {
+    // You may handle loading or unauthenticated state here
+    return <Navigate to="/login" />;
+  }
+
+  // const hasRequiredPermissions = requiredPermissions.every((permission) =>
+  //   user.permissions.includes(permission)
+  // );
 
   return (
     <Route
       {...rest}
       element={
-        hasRequiredPermissions ? <Element /> : <Navigate to="/unauthorized" />
+        <Element />
       }
+      // hasRequiredPermissions ? <Element /> : <Navigate to="/unauthorized" />
     />
   );
 };

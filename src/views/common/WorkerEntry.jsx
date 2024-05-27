@@ -93,7 +93,7 @@ const WorkerEntry = () => {
         permissions: permissions,
       };
 
-      dispatch(ActionCreators.setCurrentUser(user.worker));
+      dispatch(ActionCreators.setCurrentUser(userData));
       setUser(userData);
       console.log(userData)
       navigate("/dashboard");

@@ -15,8 +15,6 @@ import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import { useReactToPrint } from "react-to-print";
-import ComponentToPrint from "../compPrint/ComponentToPrint";
-import { ReactToPrint } from "react-to-print";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
@@ -43,8 +41,31 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
   const [printValues, setPrintValues] = useState(null);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current, 
+    content: () => printRef.current,
   });
+
+  const handleSubmit = async (values, setSubmitting, resetForm) => {
+    const total = values.products.reduce(
+      (sum, product) => sum + product?.totalPrice,
+      0
+    );
+    values.total = total;
+    try {
+      setSubmitting(true);
+      await tableActions.addReceipt(values, companyId, workerId);
+      setOpen(true);
+      setPrintValues(values); // Store values for printing
+      setTimeout(() => {
+        // handleClose();
+      }, 5000);
+    } catch (error) {
+      console.log(error);
+      setError(error);
+    } finally {
+      setSubmitting(false);
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -55,27 +76,8 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
           total: 0,
         }}
         validationSchema={validationSchema}
-        onSubmit={async (values, { setSubmitting, resetForm }) => {
-          const total = values.products.reduce(
-            (sum, product) => sum + product?.totalPrice,
-            0
-          );
-          values.total = total;
-          try {
-            setSubmitting(true);
-            await tableActions.addReceipt(values, companyId, workerId);
-            setOpen(true);
-            setPrintValues(values); // Store values for printing
-            setTimeout(() => {
-              // handleClose();
-            }, 5000);
-          } catch (error) {
-            console.log(error);
-            setError(error);
-          } finally {
-            setSubmitting(false);
-            setLoading(false);
-          }
+        onSubmit={(values, { setSubmitting, resetForm }) => {
+          handleSubmit(values, setSubmitting, resetForm);
         }}>
         {({ values, submitForm, setFieldValue, isSubmitting, resetForm }) => (
           <Form className="form" style={{ margin: 10 }}>
@@ -259,7 +261,12 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                     color="secondary"
                     type="button"
                     onClick={() => {
-                      push({ name: "", quantity: "", totalPrice: 0, price: 0 });
+                      push({
+                        name: "",
+                        quantity: "",
+                        totalPrice: 0,
+                        price: 0,
+                      });
                     }}
                     disabled={
                       values.products.length > 0 &&
@@ -301,25 +308,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 {loading ? <CircularProgress /> : "Save"}
               </Button>
 
-              {/* Save & Print button */}
-              <ReactToPrint
-                trigger={() => (
-                  <Button
-                    variant="contained"
-                    color="info"
-                    onClick={async () => {
-                      setLoading(true);
-                      await submitForm();
-                      handlePrint();
-                    }}
-                    disabled={loading || isSubmitting}>
-                    Save & Print
-                  </Button>
-                )}
-                content={() => printRef.current}
-              />
-
-              {/* <Button
+              <Button
                 variant="contained"
                 color="info"
                 onClick={async () => {
@@ -329,8 +318,8 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                Save & Print
-              </Button> */}
+                {loading ? <CircularProgress /> : "Save & Print"}
+              </Button>
             </div>
           </Form>
         )}
@@ -350,7 +339,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{}}>
+        <div style={{ display: "none" }}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
@@ -363,3 +352,4 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 };
 
 export default SalesOrderForms;
+ 

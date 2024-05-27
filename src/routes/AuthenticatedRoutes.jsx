@@ -19,7 +19,11 @@ const MyAccount = lazy(() => import("../views/MyAccount"));
 
 const AuthenticatedRoutes = () => (
   <Routes>
-    <Route path="/dashboard" element={<Dashboard />} />
+    <Route
+      path="/dashboard"
+      element={<Dashboard />}
+      requiredPermissions={[PERMISSIONS.VIEW_DASHBOARD]}
+    />
     <Route path="/products" element={<ProductCatalogue />} />
     <Route path="/settings" element={<Settings />} />
     <Route path="/!employee!@" element={<CreateUser />} />
