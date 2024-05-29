@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { capitalizeFirstLetter, updateAccount } from "../config/Functions";
 import { ActionCreators } from "../actions/action";
 import { rolePermissions, ROLES } from "../context/userRoles";
+import bcrypt from "bcryptjs";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
@@ -79,7 +80,7 @@ const MyAccount = () => {
   const userId = user._id;
   const dispatch = useDispatch();
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
-
+ console.log(user.password)
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -95,8 +96,8 @@ const MyAccount = () => {
         )}
         <Formik
           initialValues={{
-            name: user.name || "",
-            username: user.username || "",
+            name: capitalizeFirstLetter(user.name) || "",
+            username: capitalizeFirstLetter(user.username) || "",
             role: user.role || "",
             contact: user.contact || "",
             email: user.email || "",
@@ -105,6 +106,7 @@ const MyAccount = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             setSubmitting(true);
+            const hashpassword = await bcrypt.hash(values.password, 10)
             const processedValues = {
               ...values,
               name: values.name.trim().toLowerCase(),
@@ -112,6 +114,7 @@ const MyAccount = () => {
               email: values.email.trim().toLowerCase(),
               contact: values.contact.trim(),
               role: values.role.trim().toLowerCase(),
+              password: hashpassword
             };
 
             try {
@@ -139,7 +142,13 @@ const MyAccount = () => {
             }
             setSubmitting(false);
           }}>
-          {({ values, handleChange, setFieldValue, isSubmitting }) => (
+          {({
+            values,
+            handleChange,
+            handleBlur,
+            setFieldValue,
+            isSubmitting,
+          }) => (
             <Form>
               <Box mb={4}>
                 <Typography variant="h6">Personal Information</Typography>
@@ -149,8 +158,15 @@ const MyAccount = () => {
                   name="name"
                   label="Full Name"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.name)}
+                  value={values.name}
                   onChange={handleChange}
+                  onBlur={(event) => {
+                    handleBlur(event);
+                    setFieldValue(
+                      "name",
+                      capitalizeFirstLetter(event.target.value)
+                    );
+                  }}
                 />
                 <StyledField
                   as={TextField}
@@ -158,8 +174,15 @@ const MyAccount = () => {
                   name="username"
                   label="Username"
                   variant="outlined"
-                  value={capitalizeFirstLetter(values.username)}
+                  value={values.username}
                   onChange={handleChange}
+                  onBlur={(event) => {
+                    handleBlur(event);
+                    setFieldValue(
+                      "username",
+                      capitalizeFirstLetter(event.target.value)
+                    );
+                  }}
                 />
                 <Autocomplete
                   options={Object.values(ROLES)}
