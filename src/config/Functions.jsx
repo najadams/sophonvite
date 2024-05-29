@@ -357,8 +357,10 @@ export const serverAid = {
 
 export const updateAccount = async (data) => {
   try {
-    await axios.post(`/api/updateworker`, data)
+    const response = await axios.post("/api/updateworker", data);
+    return response.data; 
   } catch (error) {
-    
+    console.error("Error updating account:", error); // Log the error
+    throw error;
   }
-}
+};

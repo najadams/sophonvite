@@ -7,6 +7,7 @@ import { serverAid, tableActions } from "../config/Functions";
 import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
+import { Widgets } from "./Dashboard";
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -67,6 +68,21 @@ const SalesOrders = () => {
       </div>
 
       <div className="content">
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            flexWrap: "wrap",
+            flexDirection: "row-reverse",
+          }}>
+          <Widgets
+            title={"Sales"}
+            count={`₵${receipts.reduce(
+              (total, receipts) => total + receipts.total,
+              0
+            )}` || 0}
+          />
+        </div>
         {!isLoading && !isError && receipts && receipts.length > 0 ? (
           <CollapsibleTable receipts={receipts} />
         ) : (

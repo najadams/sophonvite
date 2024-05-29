@@ -1,14 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../../config/Functions";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
   const { customerName, products, amountPaid } = props;
   const company = useSelector((state) => state.companyState.data);
-
-  useEffect(() => {
-    console.log(company);
-  }, [company]);
 
   return (
     <div ref={ref} style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
@@ -19,10 +15,15 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           alignItems: "center",
           width: "100%",
         }}>
-        <h4 style={{ fontSize: 20,fontFamily:"sans-serif"}}>{capitalizeFirstLetter(company.name)}</h4>
+        <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
+          {capitalizeFirstLetter(company.name)}
+        </h4>
         {company.email && <h5>Email: {company.email}</h5>}
         {company.contact && <h5>Contact: {company.contact}</h5>}
         {company.momo && <h5>Momo: {company.momo}</h5>}
+        {company.tinNumber && (
+          <h5>Tin Number: {capitalizeFirstLetter(company.tinNumber)}</h5>
+        )}
       </div>
       <p style={{ textAlign: "left", marginTop: "30px" }}>
         <strong>Customer:</strong> {customerName}
@@ -42,9 +43,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
             <th style={{ border: "1px solid #000", padding: "8px" }}>
               Product
             </th>
-            <th style={{ border: "1px solid #000", padding: "5px" }}>
-              Qty
-            </th>
+            <th style={{ border: "1px solid #000", padding: "5px" }}>Qty</th>
             <th style={{ border: "1px solid #000", padding: "5px" }}>Price</th>
             <th style={{ border: "1px solid #000", padding: "5px" }}>Total</th>
           </tr>
@@ -69,7 +68,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5x",
                   textAlign: "right",
                 }}>
-                ${product.price.toFixed(2)}
+                ₵{product.price.toFixed(2)}
               </td>
               <td
                 style={{
@@ -77,7 +76,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5px",
                   textAlign: "right",
                 }}>
-                ${(product.price * product.quantity).toFixed(2)}
+                ₵{(product.price * product.quantity).toFixed(2)}
               </td>
             </tr>
           ))}
@@ -87,11 +86,11 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         <strong>Tax %: {company.taxRate}</strong>
       </p>
       <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>Amount Paid: ${amountPaid}</strong>
+        <strong>Amount Paid: ₵{amountPaid}</strong>
       </p>
       <p style={{ textAlign: "right", marginTop: "20px" }}>
         <strong>
-          Total: $
+          Total: ₵
           {products
             .reduce((sum, product) => sum + product.price * product.quantity, 0)
             .toFixed(2)}

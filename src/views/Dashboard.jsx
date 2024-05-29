@@ -40,7 +40,7 @@ const DummyCard = ({ children, title, sx }) => (
   </Box>
 );
 
-const Widgets = ({ title, count }) => (
+export const Widgets = ({ title, count }) => (
   <Card
     sx={{
       width: { xs: "90px", sm: "120px", lg: "150px" },

@@ -51,6 +51,9 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
     );
     values.total = total;
     try {
+      if (!values.customerName) {
+        setError("Customer Name Should not be Empty");
+      } else {
       setSubmitting(true);
       await tableActions.addReceipt(values, companyId, workerId);
       setOpen(true);
@@ -58,6 +61,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       setTimeout(() => {
         // handleClose();
       }, 5000);
+      }
     } catch (error) {
       console.log(error);
       setError(error);
