@@ -24,8 +24,8 @@ const StyledField = styled(Field)({
 });
 
 const Settings = () => {
+  const company = useSelector((state) => state.companyState.data);
   const companyId = useSelector((state) => state.companyState.data.id);
-  const storename = useSelector((state) => state.companyState.data.name);
   const [open, setOpen] = useState(false);
   const {
     data: workers,
@@ -34,6 +34,12 @@ const Settings = () => {
   } = useQuery(["api/workers", companyId], () =>
     tableActions.fetchWorkers(companyId)
   );
+
+  const handleBlur = (event, setFieldValue) => {
+    const { name, value } = event.target;
+    setFieldValue(name, capitalizeFirstLetter(value));
+  };
+
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -43,44 +49,42 @@ const Settings = () => {
         <Formik
           initialValues={{
             // General Settings
-            storeName: "",
-            storeEmail: "",
-            storePhone: "",
-            storeAddress: "",
+            name: company.name || "",
+            storeEmail: company.email || "",
+            contact: company.contact || "",
+            momo: company.momo || "",
+            storeAddress: company.address || "",
             // Payment Settings
             paymentMethod: "",
             paymentProvider: "",
-            currency: "",
+            currency: "cedis  ₵",
             // Tax Settings
+            tinNumber: "",
             taxRate: "",
             taxId: "",
             // Notification Settings
             emailNotifications: true,
             smsNotifications: false,
-            company: {
-              email: "",
-              businessName: "",
-              businessAddress: "",
-              taxId: "",
-              currentPlan: "Standard",
-              nextBillingDate: "2024-06-15",
-            },
+            // Subscription and Billing
+            currentPlan: "Standard",
+            nextBillingDate: "2024-06-15",
           }}
           onSubmit={(values) => {
             console.log(values);
           }}>
-          {({ values, handleChange }) => (
+          {({ values, handleChange, setFieldValue }) => (
             <Form>
               <Box mb={3}>
                 <Typography variant="h6">General Settings</Typography>
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="storeName"
+                  name="name"
                   label="Store Name"
                   variant="outlined"
-                  value={values.storeName}
+                  value={values.name}
                   onChange={handleChange}
+                  onBlur={(event) => handleBlur(event, setFieldValue)}
                 />
                 <StyledField
                   as={TextField}
@@ -94,10 +98,19 @@ const Settings = () => {
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="storePhone"
+                  name="contact"
                   label="Store Phone"
                   variant="outlined"
-                  value={values.storePhone}
+                  value={values.contact}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
+                  name="momo"
+                  label="Momo Number"
+                  variant="outlined"
+                  value={values.momo}
                   onChange={handleChange}
                 />
                 <StyledField
@@ -111,7 +124,7 @@ const Settings = () => {
                 />
               </Box>
 
-              <Box mb={3}>
+              <Box mb={3} style={{ display: "none" }}>
                 <Typography variant="h6">Payment Settings</Typography>
                 <StyledField
                   as={TextField}
@@ -147,6 +160,15 @@ const Settings = () => {
                 <StyledField
                   as={TextField}
                   fullWidth
+                  name="tinNumber"
+                  label="Tin Number"
+                  variant="outlined"
+                  value={values.tinNumber}
+                  onChange={handleChange}
+                />
+                <StyledField
+                  as={TextField}
+                  fullWidth
                   name="taxRate"
                   label="Tax Rate (%)"
                   variant="outlined"
@@ -165,55 +187,24 @@ const Settings = () => {
               </Box>
 
               <Box mb={3}>
-                <Typography variant="h6">Business Information</Typography>
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="company.businessName"
-                  label="Business Name"
-                  variant="outlined"
-                  value={capitalizeFirstLetter(values.company.businessName)}
-                  onChange={handleChange}
-                />
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="company.businessAddress"
-                  label="Business Address"
-                  variant="outlined"
-                  value={values.company.businessAddress}
-                  onChange={handleChange}
-                />
-                <StyledField
-                  as={TextField}
-                  fullWidth
-                  name="company.taxId"
-                  label="Tax ID"
-                  variant="outlined"
-                  value={values.company.taxId}
-                  onChange={handleChange}
-                />
-              </Box>
-
-              <Box mb={3}>
                 <Typography variant="h6">Subscription and Billing</Typography>
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="company.currentPlan"
+                  name="currentPlan"
                   label="Current Plan"
                   variant="outlined"
-                  value={values.company.currentPlan}
+                  value={values.currentPlan}
                   onChange={handleChange}
                   disabled
                 />
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="company.nextBillingDate"
+                  name="nextBillingDate"
                   label="Next Billing Date"
                   variant="outlined"
-                  value={values.company.nextBillingDate}
+                  value={values.nextBillingDate}
                   onChange={handleChange}
                   disabled
                 />
