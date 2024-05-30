@@ -143,6 +143,31 @@ export const tableActions = {
       return error.response?.data?.message || "An error occured";
     }
   },
+  updateCompanyData : async ({ companyId, ...details }) => {
+    try {
+      console.log(companyId)
+      // Prepare the payload by filtering out empty values
+      const updateFields = {};
+      for (const [key, value] of Object.entries(details)) {
+        if (value !== undefined && value !== null && value !== '') {
+          updateFields[key] = value;
+        }
+      }
+
+      const submissionData = {companyId, ...updateFields}
+      // Send the PATCH request to update the company details
+      const response = await axios.patch(`/update/${companyId}`, submissionData);
+
+      // Check if the update was successful
+      if (response.status === 200) {
+        return response.data;  // Return the updated company data
+      }
+    } catch (error) {
+      console.log(error);
+      // return error.response?.data?.message || "An error occurred";
+      throw new Error(error.response?.data?.message || "Ann error occured")
+    }
+  },
 
   addCustomer: async ({ companyId, name, phone, email, address, company }) => {
     try {
