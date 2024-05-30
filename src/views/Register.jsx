@@ -39,10 +39,10 @@ const Register = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   // Register function
-  const registration = async (companyname, email, password) => {
+  const registration = async (companyName, email, password) => {
     try {
       const response = await axios.post(`/register`, {
-        companyname,
+        companyName,
         email,
         password,
       });
@@ -68,16 +68,16 @@ const Register = () => {
     event.preventDefault();
     setError(null);
     const data = new FormData(event.currentTarget);
-    const companyname = data.get("companyname");
+    const companyName = data.get("companyName");
     const email = data.get("email");
     const password = data.get("password");
-    if (!companyname || !email || !password) {
+    if (!companyName || !email || !password) {
       setError("fill all fields");
       setLoading(false);
       return;
     }
     await registration(
-      companyname.toLowerCase().trim(),
+      companyName.toLowerCase().trim(),
       email.trim(),
       password
     );
@@ -137,9 +137,9 @@ const Register = () => {
                   margin="normal"
                   required
                   fullWidth
-                  id="companyname"
+                  id="companyName"
                   label="Company Name"
-                  name="companyname"
+                  name="companyName"
                   onChange={() => setError(null)}
                   //   autoComplete="email"
                   autoFocus

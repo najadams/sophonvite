@@ -11,7 +11,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import axios from '../config/'
+import axios from "../config/";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -40,71 +40,73 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 const SignIn = ({ isLoggedIn }) => {
-  const [loading, setLoading] = useState(false)
-  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const [error, setError] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/account");
     }
   }, [isLoggedIn, navigate]);
-  
+
   // login function
- const login = async (companyname, password) => {
-   try {
-     const response = await axios.post(`/login`, {
-       companyname,
-       password,
+  const login = async (companyName, password) => {
+    try {
+      const response = await axios.post(`/login`, {
+        companyName,
+        password,
       });
-      
+
       if (response.status !== 200) {
         setError("Invalid Credentials");
         throw new Error("Login failed");
       }
-      if (response.status === '401') {
+      if (response.status === "401") {
         setError("Company Doesn't Exist");
         throw new Error("Login failed");
       }
-      
+
       const { companydata, token } = response.data;
-      
+
       dispatch(ActionCreators.setAuthToken(token));
-     window.localStorage.setItem("access_token", token);
-     dispatch(ActionCreators.loginCompany())
-     navigate("/account");
-     
-     // Dispatch fetchUserSuccess after setting the auth token and navigating
-     dispatch(ActionCreators.fetchCompanySuccess(companydata))
-     dispatch(ActionCreators.fetchUserRequest());
-     dispatch(ActionCreators.fetchUserSuccess(companydata.workers));
-     
-     return response.data;
+      window.localStorage.setItem("access_token", token);
+      dispatch(ActionCreators.loginCompany());
+      navigate("/account");
+
+      // Dispatch fetchUserSuccess after setting the auth token and navigating
+      dispatch(ActionCreators.fetchCompanySuccess(companydata));
+      dispatch(ActionCreators.fetchUserRequest());
+      dispatch(ActionCreators.fetchUserSuccess(companydata.workers));
+
+      return response.data;
     } catch (error) {
       setError(error.response?.data?.message || "An error occurred");
-     dispatch(ActionCreators.fetchUserFailure(error.response?.data?.message || "Error during login"));
-     console.error(error.response?.data?.message || error.message);
-   }
- };
+      dispatch(
+        ActionCreators.fetchUserFailure(
+          error.response?.data?.message || "Error during login"
+        )
+      );
+      console.error(error.response?.data?.message || error.message);
+    }
+  };
 
-
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     const data = new FormData(event.currentTarget);
-    const companyname = data.get("company")
-    const password = data.get("password")
-    if (!companyname || !password) {
+    const companyName = data.get("company");
+    const password = data.get("password");
+    if (!companyName || !password) {
       setError("fill all fields");
-      setLoading(false)
+      setLoading(false);
       return;
     }
-    await login(companyname.toLocaleLowerCase().trim(), password);
-    setLoading(false)
-    return; 
+    await login(companyName.toLocaleLowerCase().trim(), password);
+    setLoading(false);
+    return;
   };
 
   return (
@@ -211,6 +213,6 @@ const SignIn = ({ isLoggedIn }) => {
       </ThemeProvider>
     </div>
   );
-}
+};
 
 export default SignIn;

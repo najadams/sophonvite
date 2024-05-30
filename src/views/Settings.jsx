@@ -49,8 +49,8 @@ const Settings = () => {
         <Formik
           initialValues={{
             // General Settings
-            name: company.name || "",
-            storeEmail: company.email || "",
+            companyName: company.name || "",
+            email: company.email || "",
             contact: company.contact || "",
             momo: company.momo || "",
             storeAddress: company.address || "",
@@ -89,10 +89,10 @@ const Settings = () => {
                 <StyledField
                   as={TextField}
                   fullWidth
-                  name="storeEmail"
+                  name="email"
                   label="Store Email"
                   variant="outlined"
-                  value={values.storeEmail}
+                  value={values.email}
                   onChange={handleChange}
                 />
                 <StyledField
