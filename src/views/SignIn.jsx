@@ -75,10 +75,11 @@ const SignIn = ({ isLoggedIn }) => {
 
       return response.data;
     } catch (error) {
+      console.log(error)
       const message =
         error.response?.status === 401
           ? error.response?.data?.message
-          : "Something went wron";
+          : "Something went wrong";
 
       setError(message);
       dispatch(ActionCreators.fetchUserFailure(message));
