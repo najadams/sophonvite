@@ -21,6 +21,7 @@ import SignIn from "./views/SignIn";
 const LandingPage = lazy(() => import("./views/common/LandingPage"));
 const WorkerEntry = lazy(() => import("./views/common/WorkerEntry"));
 const Unauthorized = lazy(() => import("./views/common/Unauthorized"));
+const Register = lazy(() => import("./views/common/Register"))
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ function App() {
                       <Route path="/unauthorized" element={<Unauthorized />} />
                       <Route path="/account" element={<WorkerEntry />} />
                       <Route path="/login" element={<SignIn />} />
+                      <Route path="/register" element={<Register />} />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </Suspense>

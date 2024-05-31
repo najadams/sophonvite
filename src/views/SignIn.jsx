@@ -1,22 +1,24 @@
+import React, { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Link,
+  Paper,
+  Box,
+  Grid,
+  Typography,
+  CircularProgress,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "../config/";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { ActionCreators } from "../actions/action";
-import { CircularProgress } from "@mui/material";
 
 function Copyright(props) {
   return (
@@ -35,14 +37,12 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 const SignIn = ({ isLoggedIn }) => {
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,7 +51,6 @@ const SignIn = ({ isLoggedIn }) => {
     }
   }, [isLoggedIn, navigate]);
 
-  // login function
   const login = async (companyName, password) => {
     try {
       const response = await axios.post(`/login`, {
@@ -60,12 +59,7 @@ const SignIn = ({ isLoggedIn }) => {
       });
 
       if (response.status !== 200) {
-        setError("Invalid Credentials");
-        throw new Error("Login failed");
-      }
-      if (response.status === "401") {
-        setError("Company Doesn't Exist");
-        throw new Error("Login failed");
+        throw new Error("Invalid Credentials");
       }
 
       const { companydata, token } = response.data;
@@ -75,20 +69,20 @@ const SignIn = ({ isLoggedIn }) => {
       dispatch(ActionCreators.loginCompany());
       navigate("/account");
 
-      // Dispatch fetchUserSuccess after setting the auth token and navigating
       dispatch(ActionCreators.fetchCompanySuccess(companydata));
       dispatch(ActionCreators.fetchUserRequest());
       dispatch(ActionCreators.fetchUserSuccess(companydata.workers));
 
       return response.data;
     } catch (error) {
-      setError(error.response?.data?.message || "An error occurred");
-      dispatch(
-        ActionCreators.fetchUserFailure(
-          error.response?.data?.message || "Error during login"
-        )
-      );
-      console.error(error.response?.data?.message || error.message);
+      const message =
+        error.response?.status === 401
+          ? error.response?.data?.message
+          : "Something went wron";
+
+      setError(message);
+      dispatch(ActionCreators.fetchUserFailure(message));
+      console.error(message);
     }
   };
 
@@ -99,14 +93,15 @@ const SignIn = ({ isLoggedIn }) => {
     const data = new FormData(event.currentTarget);
     const companyName = data.get("company");
     const password = data.get("password");
+
     if (!companyName || !password) {
-      setError("fill all fields");
+      setError("Please fill all fields");
       setLoading(false);
       return;
     }
-    await login(companyName.toLocaleLowerCase().trim(), password);
+
+    await login(companyName.toLowerCase().trim(), password);
     setLoading(false);
-    return;
   };
 
   return (
@@ -202,9 +197,11 @@ const SignIn = ({ isLoggedIn }) => {
                     </Link>
                   </Grid>
                 </Grid>
-                <Typography variant="body2" align="center" color="red">
-                  {error}
-                </Typography>
+                {error && (
+                  <Typography variant="body2" align="center" color="error">
+                    {error}
+                  </Typography>
+                )}
                 <Copyright sx={{ mt: 5 }} />
               </Box>
             </Box>

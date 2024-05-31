@@ -65,13 +65,13 @@ const Settings = () => {
               paymentMethod: "",
               paymentProvider: "",
               currency: "cedis  ₵",
-              tinNumber: "",
-              taxRate: "",
-              taxId: "",
-              emailNotifications: true,
-              smsNotifications: false,
-              currentPlan: "Standard",
-              nextBillingDate: "2024-06-15",
+              tinNumber: company.tinNumber || "",
+              taxRate: company.taxRate || "",
+              taxId: company.taxId || "",
+              emailNotifications: company.emailNotifications || true,
+              smsNotifications: company.smsNotifications || false,
+              currentPlan: company.currentPlan ||  "Standard",
+              nextBillingDate: company.nextBillingDate ||  "2024-06-15",
             }}
             onSubmit={async (values, { setSubmitting, setErrors }) => {
               setSubmitting(true);
