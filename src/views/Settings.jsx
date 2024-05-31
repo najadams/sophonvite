@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../config/Functions";
 import { tableActions } from "../config/Functions";
 import Loader from "../components/common/Loader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import {
@@ -19,6 +19,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import ErrorBoundary from "../components/common/ErrorBoundary";
+import { useDispatch } from "react-redux";
+import { ActionCreators } from "../actions/action";
 
 const StyledField = styled(Field)({
   margin: "10px 0",
@@ -29,6 +31,7 @@ const Settings = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const dispatch = useDispatch();
 
   const {
     data: workers,
@@ -48,6 +51,10 @@ const Settings = () => {
     setSnackbarMessage("");
   };
 
+  useEffect(() => {
+    console.log(company)
+  }, [company])
+
   return (
     <ErrorBoundary>
       <div className="page">
@@ -57,7 +64,7 @@ const Settings = () => {
           </Typography>
           <Formik
             initialValues={{
-              companyName: company.name || "",
+              companyName: capitalizeFirstLetter(company.companyName) || "",
               email: company.email || "",
               contact: company.contact || "",
               momo: company.momo || "",
@@ -81,7 +88,6 @@ const Settings = () => {
                 email: values.email.trim().toLowerCase(),
                 contact: values.contact.trim(),
                 momo: values.momo.trim().toLowerCase(),
-                tinNumber: values.tinNumber.trim().toLowerCase(),
                 address: values.address.trim().toLowerCase(),
               };
               try {
@@ -89,6 +95,7 @@ const Settings = () => {
                 await tableActions.updateCompanyData(
                   submissionData
                 );
+                dispatch(ActionCreators.fetchCompanySuccess({id : companyId, ...submissionData}))
                 setSnackbarMessage("Company details updated successfully!");
                 setOpen(true);
               } catch (error) {
