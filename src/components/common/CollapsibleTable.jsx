@@ -15,6 +15,9 @@ import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -41,9 +44,15 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function Row({ row }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate(); // Hook for navigation
+
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
-  }
+  };
+
+  const handleNavigate = () => {
+    navigate(`/receipts/${row._id}`); // Adjust the path as needed
+  };
 
   return (
     <React.Fragment>
@@ -63,6 +72,14 @@ function Row({ row }) {
           <TableCell align="left">{row.workerName}</TableCell>
           <TableCell align="right">{row.total}</TableCell>
           <TableCell align="right">{row.detail.length}</TableCell>
+          <TableCell align="right">
+            <IconButton
+              aria-label="more options"
+              size="small"
+              onClick={handleNavigate}>
+              <MoreVertIcon />
+            </IconButton>
+          </TableCell>
         </TableRow>
       </Tooltip>
       <TableRow>
@@ -106,13 +123,14 @@ function Row({ row }) {
   );
 }
 
+
 Row.propTypes = {
   row: PropTypes.object.isRequired,
 };
 
 export default function CollapsibleTable({ receipts }) {
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: "75vh" }}>
+    <TableContainer component={Paper} sx={{ maxHeight: "60vh" }}>
       <Table stickyHeader aria-label="collapsible table">
         <TableHead>
           <TableRow>
@@ -121,6 +139,8 @@ export default function CollapsibleTable({ receipts }) {
             <StyledTableCell>Worker Name</StyledTableCell>
             <StyledTableCell align="right">Total</StyledTableCell>
             <StyledTableCell align="right">Items Count</StyledTableCell>
+            <StyledTableCell align="right">Options</StyledTableCell>{" "}
+            {/* New header for the options column */}
           </TableRow>
         </TableHead>
         <TableBody>
