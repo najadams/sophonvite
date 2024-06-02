@@ -145,7 +145,6 @@ export const tableActions = {
   },
   updateCompanyData : async ({ companyId, ...details }) => {
     try {
-      console.log(companyId)
       // Prepare the payload by filtering out empty values
       const updateFields = {};
       for (const [key, value] of Object.entries(details)) {
@@ -347,37 +346,42 @@ export const capitalizeFirstLetter = (str) => {
 };
 
 export const serverAid = {
-  filterReceiptsForToday : (receipts) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Start of today
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1); // Start of tomorrow
+  filterReceiptsForToday: (receipts) => {
+    const today = new Date();
+    const startOfDay = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+    );
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setUTCDate(startOfDay.getUTCDate() + 1);
 
-  return receipts.filter((receipt) => {
-    const receiptDate = new Date(receipt.date);
-    return receiptDate >= today && receiptDate < tomorrow;
-  });
-  },
-  calculateTopPurchasedProducts : (receipts) => {
-  const productCounts = receipts.reduce((acc, receipt) => {
-    receipt.detail.forEach((item) => {
-      if (!acc[item.name]) {
-        acc[item.name] = 0;
+    return receipts.filter((receipt) => {
+      const receiptDate = new Date(receipt.date);
+      if (isNaN(receiptDate)) {
+        console.error(`Invalid date format: ${receipt.date}`);
+        return false; // Skip invalid dates
       }
-      acc[item.name] += item.quantity;
+      return receiptDate >= startOfDay && receiptDate < endOfDay;
     });
-    return acc;
-  }, {});
+  },
+  calculateTopPurchasedProducts: (receipts) => {
+    const productCounts = receipts.reduce((acc, receipt) => {
+      receipt.detail.forEach((item) => {
+        if (!acc[item.name]) {
+          acc[item.name] = 0;
+        }
+        acc[item.name] += item.quantity;
+      });
+      return acc;
+    }, {});
 
-  const sortedProducts = Object.entries(productCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
+    const sortedProducts = Object.entries(productCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
 
-  return sortedProducts.map(([name, quantity]) => ({ name, quantity }));
-},
+    return sortedProducts.map(([name, quantity]) => ({ name, quantity }));
+  },
+};
 
-
-}
 
 
 export const updateAccount = async (data) => {
