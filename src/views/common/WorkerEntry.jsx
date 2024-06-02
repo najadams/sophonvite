@@ -95,7 +95,6 @@ const WorkerEntry = () => {
 
       dispatch(ActionCreators.setCurrentUser(userData));
       setUser(userData);
-      console.log(userData)
       navigate("/dashboard");
     } catch (error) {
       // Handle error appropriately, e.g., display error message

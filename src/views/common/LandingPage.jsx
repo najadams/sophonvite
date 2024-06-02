@@ -69,28 +69,30 @@ export default function LandingPage() {
 
   return (
     // <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
-    <ThemeProvider theme={defaultTheme}>
-      <CssBaseline />
-      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
-      <Hero />
-      <Box sx={{ bgcolor: "background.default" }}>
-        <LogoCollection />
-        <Features />
-        <Divider />
-        <Testimonials />
-        <Divider />
-        <Highlights />
-        <Divider />
-        <Pricing />
-        <Divider />
-        <FAQ />
-        <Divider />
-        <Footer />
-      </Box>
-      <ToggleCustomTheme
-        showCustomTheme={showCustomTheme}
-        toggleCustomTheme={toggleCustomTheme}
-      />
-    </ThemeProvider>
+    <div className="page" style={{height: '100vh',padding : 0, margin :0 }}>
+      <ThemeProvider theme={defaultTheme}>
+        <CssBaseline />
+        <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+        <Hero />
+        <Box sx={{ bgcolor: "background.default" }}>
+          <LogoCollection />
+          <Features />
+          <Divider />
+          <Testimonials />
+          <Divider />
+          <Highlights />
+          <Divider />
+          <Pricing />
+          <Divider />
+          <FAQ />
+          <Divider />
+          <Footer />
+        </Box>
+        <ToggleCustomTheme
+          showCustomTheme={showCustomTheme}
+          toggleCustomTheme={toggleCustomTheme}
+        />
+      </ThemeProvider>
+    </div>
   );
 }

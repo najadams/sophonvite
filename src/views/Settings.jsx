@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../config/Functions";
 import { tableActions } from "../config/Functions";
 import Loader from "../components/common/Loader";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import {
@@ -50,10 +50,6 @@ const Settings = () => {
     setOpen(false);
     setSnackbarMessage("");
   };
-
-  useEffect(() => {
-    console.log(company)
-  }, [company])
 
   return (
     <ErrorBoundary>
