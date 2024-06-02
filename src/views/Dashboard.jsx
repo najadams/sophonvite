@@ -43,8 +43,8 @@ const DummyCard = ({ children, title, sx }) => (
 export const Widgets = ({ title, count }) => (
   <Card
     sx={{
-      width: { xs: "90px", sm: "120px", lg: "150px" },
-      height: { xs: "auto", sm: "80px", lg: "100px" },
+      width: { xs: "90px", sm: "120px", lg: "auto" },
+      height: 'auto',
       margin: 1,
       padding: 0,
     }}>
