@@ -38,7 +38,7 @@ function App() {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <UserProvider>
-            <div style={{ height: "100vh", display: "flex", }}>
+            <div style={{ height: "100vh", display: "flex", overflowY: "hidden"}}>
               <Router>
                 {isLoggedIn && hasAccount && (
                   <Sidebar
