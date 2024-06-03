@@ -69,6 +69,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
+      handlePrint()
     }
   };
 
@@ -309,20 +310,19 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                {loading ? <CircularProgress /> : "Save"}
+                {loading ? <CircularProgress /> : "Print"}
               </Button>
 
-              <Button
+              {/* <Button
                 variant="contained"
                 color="info"
                 onClick={async () => {
-                  await submitForm();
                   handlePrint();
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                {loading ? <CircularProgress /> : "Save & Print"}
-              </Button>
+                {loading ? <CircularProgress /> : " Print"}
+              </Button> */}
             </div>
           </Form>
         )}
