@@ -54,12 +54,13 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       if (!values.customerName) {
         setError("Customer Name Should not be Empty");
       } else {
+      setLoading(true);
       setSubmitting(true);
       await tableActions.addReceipt(values, companyId, workerId);
       setOpen(true);
       setPrintValues(values); // Store values for printing
       setTimeout(() => {
-        // handleClose();
+        handleClose();
       }, 5000);
       }
     } catch (error) {
@@ -304,7 +305,6 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 variant="contained"
                 color="success"
                 onClick={() => {
-                  setLoading(true); // Set loading state to true
                   submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
@@ -316,7 +316,6 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 variant="contained"
                 color="info"
                 onClick={async () => {
-                  setLoading(true);
                   await submitForm();
                   handlePrint();
                 }}
@@ -343,7 +342,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{ display: "none" }}>
+        <div style={{ }}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}

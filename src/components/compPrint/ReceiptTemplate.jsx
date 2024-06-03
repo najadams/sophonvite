@@ -7,7 +7,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
   const company = useSelector((state) => state.companyState.data);
 
   return (
-    <div ref={ref} style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div ref={ref} style={{ fontFamily: "Arial, sans-serif", margin:0 }}>
       <div
         style={{
           display: "flex",
@@ -16,14 +16,14 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           width: "100%",
         }}>
         <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
-          {capitalizeFirstLetter(company.name)}
+          {capitalizeFirstLetter(company.companyName)}
         </h4>
-        {company.email && <h5>Email: {company.email}</h5>}
+        {company.tinNumber && (
+          <h5>Tin Number: {company.tinNumber.toUpperCase()}</h5>
+        )}
         {company.contact && <h5>Contact: {company.contact}</h5>}
         {company.momo && <h5>Momo: {company.momo}</h5>}
-        {company.tinNumber && (
-          <h5>Tin Number: {capitalizeFirstLetter(company.tinNumber)}</h5>
-        )}
+        {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
       <p style={{ textAlign: "left", marginTop: "30px" }}>
         <strong>Customer:</strong> {customerName}
@@ -40,41 +40,36 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         }}>
         <thead>
           <tr>
-            <th style={{ border: "1px solid #000", padding: "8px" }}>
-              Product
-            </th>
-            <th style={{ border: "1px solid #000", padding: "5px" }}>Qty</th>
-            <th style={{ border: "1px solid #000", padding: "5px" }}>Price</th>
-            <th style={{ border: "1px solid #000", padding: "5px" }}>Total</th>
+            <th style={{ padding: "5px" }}>Qty</th>
+            <th style={{ padding: "8px" }}>Product</th>
+            <th style={{ padding: "5px" }}>Price</th>
+            <th style={{ padding: "5px" }}>Total</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
             <tr key={index}>
-              <td style={{ border: "1px solid #000", padding: "8px" }}>
+              <td
+                style={{
+                  padding: "5px",
+                  textAlign: "center",
+                }}>
+                {product.quantity}
+              </td>
+              <td style={{ padding: "8px", textAlign: "center" }}>
                 {product.name}
               </td>
               <td
                 style={{
-                  border: "1px solid #000",
-                  padding: "5px",
-                  textAlign: "right",
-                }}>
-                {product.quantity}
-              </td>
-              <td
-                style={{
-                  border: "1px solid #000",
                   padding: "5x",
-                  textAlign: "right",
+                  textAlign: "center",
                 }}>
                 ₵{product.price.toFixed(2)}
               </td>
               <td
                 style={{
-                  border: "1px solid #000",
                   padding: "5px",
-                  textAlign: "right",
+                  textAlign: "center",
                 }}>
                 ₵{(product.price * product.quantity).toFixed(2)}
               </td>
@@ -82,9 +77,12 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           ))}
         </tbody>
       </table>
-      <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>Tax %: {company.taxRate}</strong>
-      </p>
+      <hr style={{ height: 5, backgroundColor: "black" }} />
+      {company.taxRate && (
+        <p style={{ textAlign: "right", marginTop: "20px" }}>
+          <strong>Tax %: {company.taxRate}</strong>
+        </p>
+      )}
       <p style={{ textAlign: "right", marginTop: "20px" }}>
         <strong>Amount Paid: ₵{amountPaid}</strong>
       </p>
@@ -96,6 +94,19 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
             .toFixed(2)}
         </strong>
       </p>
+      <hr style={{ height: 5, backgroundColor: "black" }} />
+      <div
+        style={{
+          paddingTop: 5,
+          marginBottom: 35,
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+        }}>
+        Goods Sold Are Not Returnable
+        <br />
+        <h4>Thanks for shopping with us</h4>
+      </div>
     </div>
   );
 });

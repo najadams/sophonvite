@@ -87,7 +87,7 @@ const SalesOrders = () => {
           <CollapsibleTable receipts={receipts} />
         ) : (
           <div className="content">
-            <h2>No Sales Made yet</h2>
+            <h2>No Sales Made Today</h2>
           </div>
         )}
       </div>

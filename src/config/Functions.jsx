@@ -269,6 +269,19 @@ export const tableActions = {
     }
   },
 
+  fetchReceipts : async (companyId, selectedDate) => {
+    try {
+      const response = await axios.get(
+        `/api/receipts/${companyId}?date=${selectedDate}`
+      );
+      // const todaysReceipts = serverAid.filterReceiptsForToday(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching receipts:", error);
+      throw error;
+    }
+  },
+
   fetchWorkers: async (companyId) => {
     try {
       const response = await axios.get(`api/workers/${companyId}`);

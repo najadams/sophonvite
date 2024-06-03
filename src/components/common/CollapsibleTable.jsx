@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Menu, MenuItem } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
@@ -17,7 +17,6 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,13 +44,30 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function Row({ row }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate(); // Hook for navigation
+  const [anchorEl, setAnchorEl] = useState(null); // State for managing menu anchor
 
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
   };
 
-  const handleNavigate = () => {
-    navigate(`/receipts/${row._id}`); // Adjust the path as needed
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handlePrint = () => {
+    handleMenuClose();
+    // Call the receipt template function
+    console.log("Print receipt for", row._id);
+    // Add your receipt template function call here
+  };
+
+  const handleView = () => {
+    handleMenuClose();
+    navigate(`/receipts/${row._id}`);
   };
 
   return (
@@ -76,9 +92,16 @@ function Row({ row }) {
             <IconButton
               aria-label="more options"
               size="small"
-              onClick={handleNavigate}>
+              onClick={handleMenuClick}>
               <MoreVertIcon />
             </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}>
+              <MenuItem onClick={handlePrint}>Print</MenuItem>
+              <MenuItem onClick={handleView}>View</MenuItem>
+            </Menu>
           </TableCell>
         </TableRow>
       </Tooltip>
@@ -123,14 +146,13 @@ function Row({ row }) {
   );
 }
 
-
 Row.propTypes = {
   row: PropTypes.object.isRequired,
 };
 
 export default function CollapsibleTable({ receipts }) {
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: "60vh" }}>
+    <TableContainer component={Paper} sx={{ maxHeight: "75vh" }}>
       <Table stickyHeader aria-label="collapsible table">
         <TableHead>
           <TableRow>
@@ -152,3 +174,4 @@ export default function CollapsibleTable({ receipts }) {
     </TableContainer>
   );
 }
+ 
