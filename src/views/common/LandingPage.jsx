@@ -69,7 +69,7 @@ export default function LandingPage() {
 
   return (
     // <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
-    <div className="page" style={{height: '100vh',padding : 0, margin :0 }}>
+    <div className="page" style={{height: '100vh',padding : 0, margin :0 , backgroundColor : 'inherit'}}>
       <ThemeProvider theme={defaultTheme}>
         <CssBaseline />
         <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
