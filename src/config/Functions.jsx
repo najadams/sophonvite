@@ -23,27 +23,19 @@ const processDailyData = (receipts) => {
   return { labels, salesData, dailyData };
 };
 
-const calculateProfit = (receipts, inventory) => {
+const calculateProfit = (receipts) => {
   let totalProfit = 0;
 
-  receipts.forEach((receipt) => {
+  for (const receipt of receipts) {
     let receiptProfit = 0;
 
-    receipt.detail.forEach((item) => {
-      const inventoryItem = inventory.find((inv) => inv.name === item.name);
-
-      if (inventoryItem) {
-        const itemCost = inventoryItem.costprice;
-        const itemSales = item.quantity * inventoryItem.salesprice;
-        const itemProfit = itemSales - item.quantity * itemCost;
-        receiptProfit += itemProfit;
-      } else {
-        console.log(`Inventory item "${item.name}" not found.`);
-      }
-    });
+    for (const item of receipt.detail) {
+      const itemProfit = (item.salesprice - item.costprice) * item.quantity;
+      receiptProfit += itemProfit;
+    }
 
     totalProfit += receiptProfit;
-  });
+  }
 
   return totalProfit;
 };
@@ -254,7 +246,7 @@ export const tableActions = {
     }
   },
 
-  addReceipt: async (values, companyId, workerId) => {
+  addReceipt: async (values, companyId, workerId, customerName, workerName) => {
     try {
       const response = await axios.post("/api/receipt/", {
         ...values,
@@ -297,43 +289,42 @@ export const tableActions = {
       throw new Error(error.response.data.message || "Failed to fetch counts");
     }
   },
-  fetchSalesData: async (companyId) => {
-    try {
-      // Fetch receipts and inventory data
-      const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
-      const receipts = receiptsResponse.data;
-      const inventoryResponse = await axios.get(`/api/products/${companyId}`);
-      const inventory = inventoryResponse.data.products;
+  fetchSalesData : async (companyId) => {
+  try {
+    // Fetch receipts data
+    const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
+    const receipts = receiptsResponse.data;
 
-      // Process daily data
-      const { labels, salesData, dailyData } = processDailyData(receipts);
+    // Process daily data
+    const { labels, salesData, dailyData } = processDailyData(receipts);
 
-      // Calculate profits for each day
-      const profitData = labels.map((day) => {
-        const dayReceipts = dailyData[day].details;
-        return calculateProfit([{ detail: dayReceipts }], inventory);
-      });
+    // Calculate profits for each day using historical prices stored in receipts
+    const profitData = labels.map((day) => {
+      const dayReceipts = dailyData[day].details;
+      return calculateProfit([{ detail: dayReceipts }]);
+    });
 
-      // Calculate top purchased products
-      const topProducts = calculateTopPurchasedProducts(receipts);
+    // Calculate top purchased products
+    const topProducts = calculateTopPurchasedProducts(receipts);
 
-      // Combine labels and data into a single array of objects for Recharts
-      const sales = labels.map((label, index) => ({
-        month: label,
-        totalSales: salesData[index],
-      }));
+    // Combine labels and data into a single array of objects for Recharts
+    const sales = labels.map((label, index) => ({
+      month: label,
+      totalSales: salesData[index],
+    }));
 
-      const profit = labels.map((label, index) => ({
-        month: label,
-        totalProfit: profitData[index],
-      }));
+    const profit = labels.map((label, index) => ({
+      month: label,
+      totalProfit: profitData[index],
+    }));
 
-      return { sales, profit, topProducts };
-    } catch (error) {
-      console.error("Error fetching sales data", error);
-      throw new Error("Failed to fetch sales data");
-    }
-  },
+
+    return { sales, profit, topProducts };
+  } catch (error) {
+    console.error("Error fetching sales data", error);
+    throw new Error("Failed to fetch sales data");
+  }
+},
 };
 
 export const capitalizeFirstLetter = (str) => {
