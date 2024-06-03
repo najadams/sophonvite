@@ -60,7 +60,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       setOpen(true);
       setPrintValues(values); // Store values for printing
       setTimeout(() => {
-        handleClose();
+        // handleClose();
       }, 5000);
       }
     } catch (error) {
