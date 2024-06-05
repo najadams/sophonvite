@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
   phone: Yup.string().required("Required"),
   email: Yup.string().email("Invalid email"),
   address: Yup.string(),
-  company: Yup.string().required("Required"),
+  company: Yup.string(),
 });
 
 const CustomerForm = ({ data, editMutation }) => {
