@@ -32,7 +32,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
-  const workerId = useSelector((state) => state.userState.currentUser);
+  const worker = useSelector((state) => state.userState.currentUser);
+  const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
@@ -40,6 +41,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
+  const today = new Date().toLocaleDateString()
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -63,10 +65,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
         setSubmitting(true);
         await tableActions.addReceipt(values, companyId, workerId);
         setOpen(true);
-        setPrintValues({ ...values, balance }); // Store values for printing
-        setTimeout(() => {
-          // handleClose();
-        }, 5000);
+        setPrintValues({ ...values, balance}); // Store values for printing
       }
     } catch (error) {
       console.log(error);
@@ -74,7 +73,9 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      handlePrint();
+      setTimeout(() => {
+        handlePrint();
+      }, 1000);
     }
   };
 
@@ -377,6 +378,8 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
             total={printValues.total}
             balance={printValues.balance}
             amountPaid={printValues.amountPaid}
+            date={today}
+            workerName={worker.name}
           />
         </div>
       )}
