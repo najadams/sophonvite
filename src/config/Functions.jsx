@@ -69,7 +69,7 @@ export const tableActions = {
         company: item.company,
         name: item.name,
         phone: item.phone,
-        email: item.email,
+        // email: item.email,
       }));
       return data;
     } catch (error) {
