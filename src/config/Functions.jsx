@@ -350,23 +350,23 @@ export const capitalizeFirstLetter = (str) => {
 };
 
 export const serverAid = {
-  filterReceiptsForToday: (receipts) => {
-    const today = new Date();
-    const startOfDay = new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-    );
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setUTCDate(startOfDay.getUTCDate() + 1);
+  // filterReceiptsForToday: (receipts) => {
+  //   const today = new Date();
+  //   const startOfDay = new Date(
+  //     Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  //   );
+  //   const endOfDay = new Date(startOfDay);
+  //   endOfDay.setUTCDate(startOfDay.getUTCDate() + 1);
 
-    return receipts.filter((receipt) => {
-      const receiptDate = new Date(receipt.date);
-      if (isNaN(receiptDate)) {
-        console.error(`Invalid date format: ${receipt.date}`);
-        return false; // Skip invalid dates
-      }
-      return receiptDate >= startOfDay && receiptDate < endOfDay;
-    });
-  },
+  //   return receipts.filter((receipt) => {
+  //     const receiptDate = new Date(receipt.date);
+  //     if (isNaN(receiptDate)) {
+  //       console.error(`Invalid date format: ${receipt.date}`);
+  //       return false; // Skip invalid dates
+  //     }
+  //     return receiptDate >= startOfDay && receiptDate < endOfDay;
+  //   });
+  // },
   calculateTopPurchasedProducts: (receipts) => {
     const productCounts = receipts.reduce((acc, receipt) => {
       receipt.detail.forEach((item) => {
