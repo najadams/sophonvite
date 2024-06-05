@@ -35,8 +35,7 @@ const SalesOrders = () => {
   const fetchReceipts = async () => {
     try {
       const response = await axios.get(`/api/receipts/${companyId}`);
-      const todaysReceipts = serverAid.filterReceiptsForToday(response.data);
-      return todaysReceipts;
+      return response.data;
     } catch (error) {
       console.error("Error fetching receipts:", error);
       throw error;
