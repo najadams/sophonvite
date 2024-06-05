@@ -28,6 +28,7 @@ const validationSchema = Yup.object().shape({
     })
   ),
   total: Yup.number().required(),
+  amountPaid: Yup.number().required("Amout Paid should not be empty"),
 });
 
 const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
@@ -50,18 +51,22 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       0
     );
     values.total = total;
+    const balance = total - values.amountPaid;
+
     try {
       if (!values.customerName) {
         setError("Customer Name Should not be Empty");
+      } else if (!values.amountPaid) {
+        setError("Amount Paid Should not be Empty!");
       } else {
-      setLoading(true);
-      setSubmitting(true);
-      await tableActions.addReceipt(values, companyId, workerId);
-      setOpen(true);
-      setPrintValues(values); // Store values for printing
-      setTimeout(() => {
-        // handleClose();
-      }, 5000);
+        setLoading(true);
+        setSubmitting(true);
+        await tableActions.addReceipt(values, companyId, workerId);
+        setOpen(true);
+        setPrintValues({ ...values, balance }); // Store values for printing
+        setTimeout(() => {
+          // handleClose();
+        }, 5000);
       }
     } catch (error) {
       console.log(error);
@@ -69,7 +74,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      handlePrint()
+      handlePrint();
     }
   };
 
@@ -80,6 +85,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
           customerName: "",
           products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
           total: 0,
+          amountPaid: 0,
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
@@ -300,6 +306,27 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 />
               )}
             </Field>
+            <Field name="amountPaid">
+              {({ field, form }) => {
+                const hasError = Boolean(
+                  form.errors.amountPaid && form.touched.amountPaid
+                );
+                return (
+                  <TextField
+                    {...field}
+                    label="Amount Paid"
+                    type="number"
+                    placeholder="Amount Paid"
+                    fullWidth
+                    error={hasError}
+                    helperText={hasError ? form.errors.amountPaid : ""}
+                    onChange={(event) => {
+                      setFieldValue("amountPaid", event.target.value);
+                    }}
+                  />
+                );
+              }}
+            </Field>
 
             <div style={{ display: "flex", gap: 20 }}>
               <Button
@@ -310,7 +337,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                {loading ? <CircularProgress /> : "Print"}
+                {loading ? <CircularProgress /> : "Save"}
               </Button>
 
               {/* <Button
@@ -342,11 +369,14 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{ }}>
+        <div style={{}}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
             products={printValues.products}
+            total={printValues.total}
+            balance={printValues.balance}
+            amountPaid={printValues.amountPaid}
           />
         </div>
       )}
