@@ -86,7 +86,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
           customerName: "",
           products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
           total: 0,
-          amountPaid: 0,
+          amountPaid: "",
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
