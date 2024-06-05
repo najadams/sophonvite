@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import { Tooltip, Menu, MenuItem } from "@mui/material";
@@ -17,6 +17,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { capitalizeFirstLetter } from "../../config/Functions";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,6 +46,8 @@ function Row({ row }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate(); // Hook for navigation
   const [anchorEl, setAnchorEl] = useState(null); // State for managing menu anchor
+  const printRef = useRef();
+  const [printValues, setPrintValues] = useState(null);
 
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
@@ -58,12 +61,9 @@ function Row({ row }) {
     setAnchorEl(null);
   };
 
-  const handlePrint = () => {
-    handleMenuClose();
-    // Call the receipt template function
-    console.log("Print receipt for", row._id);
-    // Add your receipt template function call here
-  };
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
 
   const handleView = () => {
     handleMenuClose();
@@ -83,9 +83,9 @@ function Row({ row }) {
             </IconButton>
           </TableCell>
           <TableCell component="th" scope="row" style={{ width: "30%" }}>
-            {row.customerName}
+            {capitalizeFirstLetter(row.customerName)}
           </TableCell>
-          <TableCell align="left">{row.workerName}</TableCell>
+          <TableCell align="left">{capitalizeFirstLetter(row.workerName)}</TableCell>
           <TableCell align="right">{row.total}</TableCell>
           <TableCell align="right">{row.detail.length}</TableCell>
           <TableCell align="right">
@@ -122,6 +122,9 @@ function Row({ row }) {
                       <strong>Quantity</strong>
                     </TableCell>
                     <TableCell align="right">
+                      <strong>Unit Price</strong>
+                    </TableCell>
+                    <TableCell align="right">
                       <strong>Total Price</strong>
                     </TableCell>
                   </TableRow>
@@ -133,7 +136,10 @@ function Row({ row }) {
                         {item.name}
                       </TableCell>
                       <TableCell align="right">{item.quantity}</TableCell>
-                      <TableCell align="right">{item.totalPrice}</TableCell>
+                      <TableCell align="right">{item.salesprice}</TableCell>
+                      <TableCell align="right">
+                        {item.salesprice * item.quantity}
+                      </TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>

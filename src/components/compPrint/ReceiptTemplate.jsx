@@ -3,7 +3,16 @@ import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../../config/Functions";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
-  const { customerName, products, amountPaid, total, balance } = props;
+  const {
+    customerName,
+    products,
+    amountPaid,
+    total,
+    balance,
+    workerName,
+    date,
+    discount,
+  } = props;
   const company = useSelector((state) => state.companyState.data);
 
   return (
@@ -25,12 +34,16 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         {company.momo && <h5>Momo: {company.momo}</h5>}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
-      <p style={{ textAlign: "left", marginTop: "30px", display:"flex" }}>
+      <p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
         <strong>Customer:</strong> <h5>{customerName}</h5>
       </p>
       <p>
         <strong>Cashier: </strong>
-        {customerName}
+        {workerName}
+      </p>
+      <p>
+        <strong>Date: </strong>
+        {new Date(date).toLocaleDateString()} {/* Ensure only date is shown */}
       </p>
       <table
         style={{
@@ -61,17 +74,17 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               </td>
               <td
                 style={{
-                  padding: "5x",
+                  padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{product.price.toFixed(2)}
+                ₵{product.price ? product.price : product.salesprice}
               </td>
               <td
                 style={{
                   padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{(product.price * product.quantity).toFixed(2)}
+                ₵{(product.price * product.quantity)}
               </td>
             </tr>
           ))}
@@ -83,21 +96,22 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           <strong>Tax %: {company.taxRate}</strong>
         </p>
       )}
+      {discount !== undefined && discount !== null && (
+        <p style={{ textAlign: "right", marginTop: "20px" }}>
+          <strong>Discount: ₵{discount}</strong>
+        </p>
+      )}
       <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>
-          Total: ₵
-          {total}
-        </strong>
+        <strong>Total: ₵{total}</strong>
       </p>
       <p style={{ textAlign: "right", marginTop: "20px" }}>
         <strong>Paid: ₵{amountPaid}</strong>
       </p>
-      <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>
-          Balance: ₵
-          {balance}
-        </strong>
-      </p>
+      {balance !== undefined && balance !== null && balance !== 0 && (
+        <p style={{ textAlign: "right", marginTop: "20px" }}>
+          <strong>Balance: ₵{balance}</strong>
+        </p>
+      )}
       <hr style={{ height: 5, backgroundColor: "black" }} />
       <div
         style={{
