@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../../config/Functions";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
-  const { customerName, products, amountPaid } = props;
+  const { customerName, products, amountPaid, total, balance } = props;
   const company = useSelector((state) => state.companyState.data);
 
   return (
-    <div ref={ref} style={{ fontFamily: "Arial, sans-serif", margin:0 }}>
+    <div ref={ref} style={{ fontFamily: "Arial, sans-serif", margin: 0 }}>
       <div
         style={{
           display: "flex",
@@ -25,8 +25,8 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         {company.momo && <h5>Momo: {company.momo}</h5>}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
-      <p style={{ textAlign: "left", marginTop: "30px" }}>
-        <strong>Customer:</strong> {customerName}
+      <p style={{ textAlign: "left", marginTop: "30px", display:"flex" }}>
+        <strong>Customer:</strong> <h5>{customerName}</h5>
       </p>
       <p>
         <strong>Cashier: </strong>
@@ -84,14 +84,18 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         </p>
       )}
       <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>Amount Paid: ₵{amountPaid}</strong>
+        <strong>
+          Total: ₵
+          {total}
+        </strong>
+      </p>
+      <p style={{ textAlign: "right", marginTop: "20px" }}>
+        <strong>Paid: ₵{amountPaid}</strong>
       </p>
       <p style={{ textAlign: "right", marginTop: "20px" }}>
         <strong>
-          Total: ₵
-          {products
-            .reduce((sum, product) => sum + product.price * product.quantity, 0)
-            .toFixed(2)}
+          Balance: ₵
+          {balance}
         </strong>
       </p>
       <hr style={{ height: 5, backgroundColor: "black" }} />
