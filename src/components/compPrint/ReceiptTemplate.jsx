@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useReactToPrint } from "react-to-print";
 import { capitalizeFirstLetter } from "../../config/Functions";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
@@ -14,9 +15,19 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
     discount,
   } = props;
   const company = useSelector((state) => state.companyState.data);
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
+
+  useEffect(() => {
+    console.log("coco")
+    handlePrint();
+  }, []);
 
   return (
-    <div ref={ref} style={{ fontFamily: "Arial, sans-serif", margin: 0 }}>
+    <div ref={printRef} style={{ fontFamily: "Arial, sans-serif", margin: 0 }}>
       <div
         style={{
           display: "flex",
@@ -84,7 +95,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{(product.price * product.quantity)}
+                ₵{product.price * product.quantity}
               </td>
             </tr>
           ))}

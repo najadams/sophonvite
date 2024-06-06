@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import { Tooltip, Menu, MenuItem } from "@mui/material";
@@ -18,6 +18,8 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { capitalizeFirstLetter } from "../../config/Functions";
+import { useReactToPrint } from "react-to-print"; // Import useReactToPrint
+import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -43,11 +45,15 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function Row({ row }) {
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate(); // Hook for navigation
-  const [anchorEl, setAnchorEl] = useState(null); // State for managing menu anchor
+  const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
 
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
@@ -61,17 +67,39 @@ function Row({ row }) {
     setAnchorEl(null);
   };
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
-
   const handleView = () => {
     handleMenuClose();
     navigate(`/receipts/${row._id}`);
   };
 
+  const handlePrintClick = () => {
+    setPrintValues({
+      customerName: row.customerName,
+      products: row.detail,
+      total: row.total,
+      balance: row.balance, // Assuming balance is part of row
+      amountPaid: row.amountPaid, // Assuming amountPaid is part of row
+      date: formatDate(row.date),
+      workerName: row.workerName,
+    });
+  };
+
   return (
     <React.Fragment>
+      {printValues && (
+        <div style={{display: "none"}}>
+          <ReceiptTemplate
+            ref={printRef}
+            customerName={printValues.customerName}
+            products={printValues.products}
+            total={printValues.total}
+            balance={printValues.balance}
+            amountPaid={printValues.amountPaid}
+            date={printValues.date}
+            workerName={printValues.workerName}
+          />
+        </div>
+      )}
       <Tooltip title={formatDate(row.date)} placement="top" arrow>
         <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
           <TableCell>
@@ -85,7 +113,9 @@ function Row({ row }) {
           <TableCell component="th" scope="row" style={{ width: "30%" }}>
             {capitalizeFirstLetter(row.customerName)}
           </TableCell>
-          <TableCell align="left">{capitalizeFirstLetter(row.workerName)}</TableCell>
+          <TableCell align="left">
+            {capitalizeFirstLetter(row.workerName)}
+          </TableCell>
           <TableCell align="right">{row.total}</TableCell>
           <TableCell align="right">{row.detail.length}</TableCell>
           <TableCell align="right">
@@ -99,7 +129,7 @@ function Row({ row }) {
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}>
-              <MenuItem onClick={handlePrint}>Print</MenuItem>
+              <MenuItem onClick={handlePrintClick}>Print</MenuItem>
               <MenuItem onClick={handleView}>View</MenuItem>
             </Menu>
           </TableCell>
@@ -167,8 +197,7 @@ export default function CollapsibleTable({ receipts }) {
             <StyledTableCell>Worker Name</StyledTableCell>
             <StyledTableCell align="right">Total</StyledTableCell>
             <StyledTableCell align="right">Items Count</StyledTableCell>
-            <StyledTableCell align="right">Options</StyledTableCell>{" "}
-            {/* New header for the options column */}
+            <StyledTableCell align="right">Options</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -180,4 +209,3 @@ export default function CollapsibleTable({ receipts }) {
     </TableContainer>
   );
 }
- 
