@@ -74,7 +74,6 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       setSubmitting(false);
       setLoading(false);
       setTimeout(() => {
-        handlePrint();
       }, 1000);
     }
   };
@@ -340,17 +339,6 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
               >
                 {loading ? <CircularProgress /> : "Save"}
               </Button>
-
-              {/* <Button
-                variant="contained"
-                color="info"
-                onClick={async () => {
-                  handlePrint();
-                }}
-                disabled={loading || isSubmitting} // Disable button when loading or submitting
-              >
-                {loading ? <CircularProgress /> : " Print"}
-              </Button> */}
             </div>
           </Form>
         )}
@@ -370,7 +358,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{}}>
+        <div style={{ display: "none"}}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
