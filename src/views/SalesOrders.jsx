@@ -87,7 +87,7 @@ const SalesOrders = () => {
               )}` || 0
             }
           />
-          <div style={{ marginRight: "20px" }}>
+          <div style={{ marginRight: "20px", position: 'relative', bottom: 0 }}>
             <label htmlFor="dateInput" style={{ marginRight: "10px" }}>
               Select Date:
             </label>

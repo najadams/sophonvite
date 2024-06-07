@@ -18,7 +18,6 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { capitalizeFirstLetter } from "../../config/Functions";
-import { useReactToPrint } from "react-to-print"; // Import useReactToPrint
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -78,6 +77,9 @@ function Row({ row }) {
       date: formatDate(row.date),
       workerName: row.workerName,
     });
+    setTimeout(() => {
+      setPrintValues(null)
+    }, 2000);
   };
 
   return (
@@ -134,7 +136,7 @@ function Row({ row }) {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ margin: 1, background: '#f5f5f5' }}>
               <Typography variant="h6" gutterBottom component="div">
                 Detail
               </Typography>
@@ -184,7 +186,7 @@ Row.propTypes = {
 
 export default function CollapsibleTable({ receipts }) {
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: "75vh" }}>
+    <TableContainer component={Paper} sx={{ maxHeight: "61vh" }}>
       <Table stickyHeader aria-label="collapsible table">
         <TableHead>
           <TableRow>
