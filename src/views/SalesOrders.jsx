@@ -87,11 +87,12 @@ const SalesOrders = () => {
               )}` || 0
             }
           />
-          <div style={{ marginRight: "20px", position: 'relative', bottom: 0 }}>
+          <div style={{ marginRight: "20px", position:'relative', top: '65px' }}>
             <label htmlFor="dateInput" style={{ marginRight: "10px" }}>
               Select Date:
             </label>
             <input
+              className="date-input"
               type="date"
               id="dateInput"
               value={selectedDate.toISOString().split("T")[0]} // Format date to YYYY-MM-DD
