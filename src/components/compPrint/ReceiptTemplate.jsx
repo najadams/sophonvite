@@ -50,7 +50,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
       </p>
       <p>
         <strong>Cashier: </strong>
-        {workerName}
+        {capitalizeFirstLetter(workerName)}
       </p>
       <p>
         <strong>Date: </strong>
@@ -95,7 +95,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{product.price * product.quantity}
+                ₵{product.price ? product.price * product.quantity : product.salesprice * product.quantity}
               </td>
             </tr>
           ))}
