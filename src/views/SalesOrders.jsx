@@ -13,6 +13,7 @@ const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -34,7 +35,10 @@ const SalesOrders = () => {
 
   const fetchReceipts = async () => {
     try {
-      const response = await axios.get(`/api/receipts/${companyId}`);
+      const formattedDate = selectedDate.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+      const response = await axios.get(
+        `/api/receipts/${companyId}?date=${formattedDate}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching receipts:", error);
@@ -46,7 +50,7 @@ const SalesOrders = () => {
     data: receipts,
     isLoading,
     isError,
-  } = useQuery(["receipts", companyId], fetchReceipts, {
+  } = useQuery(["receipts", companyId, selectedDate], fetchReceipts, {
     refetchOnWindowFocus: true,
   });
 
@@ -76,17 +80,37 @@ const SalesOrders = () => {
           }}>
           <Widgets
             title={"Sales"}
-            count={`₵${receipts.reduce(
-              (total, receipts) => total + receipts.total,
-              0
-            )}` || 0}
+            count={
+              `₵${receipts.reduce(
+                (total, receipts) => total + receipts.total,
+                0
+              )}` || 0
+            }
           />
+          <div style={{ marginRight: "20px" }}>
+            <label htmlFor="dateInput" style={{ marginRight: "10px" }}>
+              Select Date:
+            </label>
+            <input
+              type="date"
+              id="dateInput"
+              value={selectedDate.toISOString().split("T")[0]} // Format date to YYYY-MM-DD
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            />
+          </div>
         </div>
         {!isLoading && !isError && receipts && receipts.length > 0 ? (
           <CollapsibleTable receipts={receipts} />
         ) : (
           <div className="content">
-            <h2>No Sales Made Today</h2>
+            {selectedDate.toISOString().split("T")[0] ===
+            new Date().toISOString().split("T")[0] ? (
+              <h2>No Sales Made Today</h2>
+            ) : (
+              <h2>
+                No Sales Made on {selectedDate.toISOString().split("T")[0]}
+              </h2>
+            )}
           </div>
         )}
       </div>
