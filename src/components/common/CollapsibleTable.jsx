@@ -51,10 +51,6 @@ function Row({ row }) {
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
-
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
   };
