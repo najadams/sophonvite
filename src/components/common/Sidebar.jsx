@@ -26,7 +26,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             }}>
             <li className="nav-link">
               <NavLink to={"/dashboard"} activeclassname="active">
-                <i className="bx bxs-home icon"></i>
+                <i className="bx bx-home icon"></i>
                 <span className="text nav-text">DashBoard</span>
               </NavLink>
             </li>
@@ -46,12 +46,12 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             <li className="nav-link">
               <NavLink to={"/products"} activeclassname="active">
                 <i className="bx bx-cart-alt icon"></i>
-                <span className="text nav-text">Stock</span>
+                <span className="text nav-text">Inventory</span>
               </NavLink>
             </li>
             <li className="nav-link">
               <NavLink to={"/vendors"} activeclassname="active">
-                <i className="bx bxs-truck icon"></i>
+                <i className="bx bx-store-alt icon"></i>
                 <span className="text nav-text">Vendors</span>
               </NavLink>
             </li>

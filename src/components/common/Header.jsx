@@ -117,7 +117,7 @@ export default function Header() {
           )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <span style={{ display: "flex"}}>
-              <img src="./logo.png" alt="" style={{ width: 30, height: 30, margin: 10 }} />
+              <img src="./logo.png" alt="" style={{ width: 30, height: 30, margin: 10 , marginLeft: 0}} />
             <h3 className="title">Sophon</h3>
             </span>
           </Typography>

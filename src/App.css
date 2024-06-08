@@ -230,7 +230,9 @@ header .image-text .header-text {
 /* =====Main Pages ==== */
 .title{
   font-family: 'Poppins';
-  font-weight: 400;
+  font-weight: 500;
+  font-size: larger;
+  margin-top: 5px;
 }
 .page{
   position: relative;
