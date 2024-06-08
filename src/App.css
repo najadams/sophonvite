@@ -178,30 +178,6 @@ header .image-text .header-text {
 }
 
 
-/* @media screen and (max-width : 960px) {
-  .sidebar.collapsed{
-    display: none;
-  }
-  .chevron{
-    display: none;
-  }
-  .sidebar{
-    display: block;
-    width: 100%;
-    background-color: white;
-    
-    z-index: 200;
-  }
-  .sidebar .menu-links{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .sidebar .nav-link{
-    width: '100%';
-    background-color: blue;
-  }
-} */
 @media screen and (max-width : 1120px) {
   .sidebar.collapsed{
     display: none;
