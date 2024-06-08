@@ -197,7 +197,7 @@ header .image-text .header-text {
   .navlink{
     display: flex;
     /* justify-content: center; */
-    padding-left: calc(35%);
+    padding-left: calc(20%);
     align-items: center;
     gap: 70px;
     /* background-color: blue; */
