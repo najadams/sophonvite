@@ -60,7 +60,7 @@ const SalesOrders = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1>Sales Order</h1>
+          <h1 style={{ fontWeight: 200}}>Sales Order</h1>
         </div>
         <AddItem>
           <SalesOrderForms

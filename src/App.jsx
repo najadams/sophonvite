@@ -38,56 +38,65 @@ function App() {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <UserProvider>
-            <div style={{ height: "100vh", display: "flex", overflowY: "hidden"}}>
-              <Router>
-                {isLoggedIn && hasAccount && (
-                  <Sidebar
-                    isExpanded={isSidebarExpanded}
-                    toggleSidebar={toggleSidebar}
-                  />
+            <Router>
+              <div style={{ overflowY: "hidden", height: "100vh" }}>
+                {isLoggedIn && hasAccount !== undefined && hasAccount && (
+                  <Header isLoggedIn={isLoggedIn} />
                 )}
-                <div style={{ flex: 1 }}>
-                  {isLoggedIn && hasAccount !== undefined && hasAccount && (
-                    <Header isLoggedIn={isLoggedIn} />
+                <div
+                  style={{
+                    display: "flex",
+                    overflowY: "hidden",
+                    height: "100vh",
+                  }}>
+                  {isLoggedIn && hasAccount && (
+                    <Sidebar
+                      isExpanded={isSidebarExpanded}
+                      toggleSidebar={toggleSidebar}
+                    />
                   )}
-
-                  <Suspense
-                    fallback={
-                      <div style={{ height: "100vh" }}>
-                        <Loader />
-                      </div>
-                    }>
-                    <Routes>
-                      <Route
-                        path="/"
-                        element={
-                          isLoggedIn && hasAccount ? (
-                            <Navigate to="/dashboard" />
-                          ) : (
-                            <LandingPage isLoggedIn={isLoggedIn} />
-                          )
-                        }
-                      />
-                      {isLoggedIn && hasAccount ? (
-                        <Route path="/*" element={<AuthenticatedRoutes />} />
-                      ) : (
+                  <div style={{ flex: 1 }}>
+                    <Suspense
+                      fallback={
+                        <div style={{ height: "100vh" }}>
+                          <Loader />
+                        </div>
+                      }>
+                      <Routes>
                         <Route
-                          path="/*"
+                          path="/"
                           element={
-                            <UnauthenticatedRoutes isLoggedIn={isLoggedIn} />
+                            isLoggedIn && hasAccount ? (
+                              <Navigate to="/dashboard" />
+                            ) : (
+                              <LandingPage isLoggedIn={isLoggedIn} />
+                            )
                           }
                         />
-                      )}
-                      <Route path="/unauthorized" element={<Unauthorized />} />
-                      <Route path="/account" element={<WorkerEntry />} />
-                      <Route path="/login" element={<SignIn />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="*" element={<Navigate to="/" />} />
-                    </Routes>
-                  </Suspense>
+                        {isLoggedIn && hasAccount ? (
+                          <Route path="/*" element={<AuthenticatedRoutes />} />
+                        ) : (
+                          <Route
+                            path="/*"
+                            element={
+                              <UnauthenticatedRoutes isLoggedIn={isLoggedIn} />
+                            }
+                          />
+                        )}
+                        <Route
+                          path="/unauthorized"
+                          element={<Unauthorized />}
+                        />
+                        <Route path="/account" element={<WorkerEntry />} />
+                        <Route path="/login" element={<SignIn />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="*" element={<Navigate to="/" />} />
+                      </Routes>
+                    </Suspense>
+                  </div>
                 </div>
-              </Router>
-            </div>
+              </div>
+            </Router>
           </UserProvider>
         </PersistGate>
       </Provider>

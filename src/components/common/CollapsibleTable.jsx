@@ -22,7 +22,8 @@ import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
+    // backgroundColor: theme.palette.primary.main,
+    backgroundColor: "#262626",
     color: theme.palette.primary.contrastText,
     fontSize: "16px",
     position: "sticky",
@@ -85,7 +86,7 @@ function Row({ row }) {
   return (
     <React.Fragment>
       {printValues && (
-        <div style={{display: "none"}}>
+        <div style={{ display: "none" }}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
@@ -136,7 +137,7 @@ function Row({ row }) {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1, background: '#f5f5f5' }}>
+            <Box sx={{ margin: 1, background: "#f5f5f5", fontFamily: "poppins" }}>
               <Typography variant="h6" gutterBottom component="div">
                 Detail
               </Typography>
@@ -161,7 +162,7 @@ function Row({ row }) {
                   {row.detail.map((item) => (
                     <StyledTableRow key={item.name}>
                       <TableCell component="th" scope="row">
-                        {item.name}
+                        {capitalizeFirstLetter(item.name)}
                       </TableCell>
                       <TableCell align="right">{item.quantity}</TableCell>
                       <TableCell align="right">{item.salesprice}</TableCell>

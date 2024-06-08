@@ -7,7 +7,7 @@ const Transactions = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1>Transactions</h1>
+          <h1 style={{ fontWeight: 200}}>Transactions</h1>
         </div>
         <AddItem title={"Add New Vendor"}>
           <VendorForm />

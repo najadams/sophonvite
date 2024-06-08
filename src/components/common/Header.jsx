@@ -116,7 +116,10 @@ export default function Header() {
             </IconButton>
           )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <h3>Sophon</h3>
+            <span style={{ display: "flex"}}>
+              <img src="./logo.png" alt="" style={{ width: 30, height: 30, margin: 10 }} />
+            <h3 className="title">Sophon</h3>
+            </span>
           </Typography>
           <div>
             <Tooltip title="Profile">

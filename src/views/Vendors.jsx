@@ -7,7 +7,7 @@ const Vendors = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1>Vendors</h1>
+          <h1 style={{fontWeight: 200}}>Vendors</h1>
         </div>
         <AddItem title={"Add New Vendor"}>
           <VendorForm />

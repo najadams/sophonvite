@@ -39,7 +39,7 @@ const ProductCatalogue = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1>Products</h1>
+          <h1 style={{ fontWeight: 200}}>Products</h1>
         </div>
         <AddItem>
           <ProductForm />

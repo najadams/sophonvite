@@ -3,10 +3,13 @@
   position: relative;
   display: block;
   transition: width 0.5s ease;
-  height: 100vh;
-  /* background-color: var(--sidebar-color); */
-  background: #262626;
-  color:  #00eaff;
+  height: 91vh;
+  position: "absolute";
+  top: .6vh;
+  font-family: 'Lato';
+  background-color: #ffffffa2;
+  border-right: #262626 dotted  1px;
+  
   
 }
 
@@ -26,13 +29,6 @@ nav .content {
   align-items: center;
   overflow-x: hidden;
 }
-
-
-.menu-bar{
-  padding-top: 70px;
-}
-
-
 
 /* copied css  */
 /* TOGGLING THE SIDEBAR */
@@ -54,7 +50,6 @@ nav .content {
   font-size: 18px;
   font-weight: 500;
   /* color: var(--text-color); */
-  color: #00eaff;
   transition: var(--trans-05);
   white-space: nowrap;
   opacity: 1;
@@ -91,7 +86,9 @@ nav .content {
 .sidebar li .icon,
 .sidebar li .text {
   /* color: var(--text-color); */
-  color: #00eaff;
+  /* color: #1976d2; */
+  color: #262626;
+  /* color: #00eaff; */
   transition: var(--trans-04);
 }
 .sidebar li a {
@@ -177,7 +174,8 @@ header .image-text .header-text {
   transform: translateY(-50%);
   height: 25px;
   width: 25px;
-  background: var(--primary-color);
+  border: #262626 dotted 1px;
+  background-color: #ffffffa2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,9 +196,19 @@ header .image-text .header-text {
   .sidebar{
     display: block;
     width: 100%;
+    background-color: white;
     position: absolute;
     top: 7%;
     z-index: 200;
+  }
+  .sidebar .menu-links{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: '100%';
+  }
+  .sidebar .nav-link{
+    width: '100%';
   }
 }
 @media screen and (max-width : 1120px) {
@@ -220,6 +228,10 @@ header .image-text .header-text {
 }
 
 /* =====Main Pages ==== */
+.title{
+  font-family: 'Poppins';
+  font-weight: 400;
+}
 .page{
   position: relative;
   margin: 0;

@@ -91,7 +91,7 @@ const Dashboard = () => {
   return (
     <div className="page">
       <div className="heading" style={{ background: "none" }}>
-        <h1>Dashboard</h1>
+        <h1 style={{fontWeight: 200}}>Dashboard</h1>
       </div>
 
       <div className="content">
@@ -197,7 +197,7 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="quantity" fill="#8884d8" />
+                <Bar dataKey="quantity" fill="#00caff" />
               </BarChart>
             </ResponsiveContainer>
           )}
