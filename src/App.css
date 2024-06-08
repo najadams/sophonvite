@@ -300,3 +300,10 @@ header .image-text .header-text {
   color: #333; /* Set text color */
   background-color: #fff; /* Set background color */
 }
+
+.pressable{
+  display: inline-block;
+}
+.pressable:hover{
+  cursor: pointer;
+}

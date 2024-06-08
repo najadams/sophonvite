@@ -1,6 +1,7 @@
 import React from "react";
 import AddItem from "../hooks/AddItem";
 import VendorForm from "../components/forms/VendorForm";
+import UsersCard from "../components/UsersCard";
 
 const Vendors = () => {
   return (
@@ -13,6 +14,7 @@ const Vendors = () => {
           <VendorForm />
         </AddItem>
       </div>
+      <UsersCard name={"Najm Adams Lambon"} companyFrom={"coco"} />
     </div>
   );
 };
