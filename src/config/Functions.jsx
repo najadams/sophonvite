@@ -246,12 +246,32 @@ export const tableActions = {
     }
   },
 
-  addReceipt: async (values, companyId, workerId, customerName, workerName) => {
+  addReceipt: async (values, companyId, workerId) => {
     try {
       const response = await axios.post("/api/receipt/", {
         ...values,
         companyId: companyId,
         workerId: workerId,
+      });
+      if (response.status === 200 || response.status === 201) {
+        // Successful response
+        return response.data; // You can return any data you receive from the server
+      } else {
+        // Handle unexpected status codes
+        console.error("Unexpected status code:", response.status);
+        return "Unexpected status code";
+      }
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+      throw new Error(error.response?.data?.message || "An error occurred");
+    }
+  },
+  addVendor: async (values, companyId,) => {
+    try {
+      const response = await axios.post("/api/vendor/", {
+        ...values,
+        companyId: companyId,
       });
 
       if (response.status === 200 || response.status === 201) {

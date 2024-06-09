@@ -61,6 +61,12 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
                 <span className="text nav-text">Transactions</span>
               </NavLink>
             </li>
+            <li className="nav-link">
+              <NavLink className="navlink" to={"/notification"} activeclassname="active">
+                <i className="bx bx-notification icon"></i>
+                <span className="text nav-text">Notification</span>
+              </NavLink>
+            </li>
           </ul>
         </div>
       </div>

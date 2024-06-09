@@ -22,7 +22,6 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
   });
 
   useEffect(() => {
-    console.log("coco")
     handlePrint();
   }, []);
 
@@ -46,7 +45,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
       <p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
-        <strong>Customer:</strong> <h5>{customerName}</h5>
+        <strong>Customer:</strong> <strong>{customerName}</strong>
       </p>
       <p>
         <strong>Cashier: </strong>
@@ -81,7 +80,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 {product.quantity}
               </td>
               <td style={{ padding: "8px", textAlign: "center" }}>
-                {product.name}
+                {capitalizeFirstLetter(product.name)}
               </td>
               <td
                 style={{
@@ -95,7 +94,10 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{product.price ? product.price * product.quantity : product.salesprice * product.quantity}
+                ₵
+                {product.price
+                  ? product.price * product.quantity
+                  : product.salesprice * product.quantity}
               </td>
             </tr>
           ))}

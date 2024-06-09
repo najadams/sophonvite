@@ -78,6 +78,7 @@ function Row({ row }) {
       date: formatDate(row.date),
       workerName: row.workerName,
     });
+    console.log(row)
     setTimeout(() => {
       setPrintValues(null)
     }, 2000);

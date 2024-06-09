@@ -6,7 +6,10 @@ import {
   Typography,
   Snackbar,
   CircularProgress,
+  IconButton,
+  Grid,
 } from "@mui/material";
+import { Add, Remove } from "@mui/icons-material";
 import * as Yup from "yup";
 import { tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
@@ -18,18 +21,17 @@ const validationSchema = Yup.object().shape({
   contact: Yup.string().required("Contact is required"),
   tinNumber: Yup.string().required("TIN number is required"),
   address: Yup.string().required("Address is required"),
-  products: Yup.array().of(
-    Yup.object().shape({
-      name: Yup.string().required("Product name is required"),
-      quantity: Yup.number().required("Quantity is required"),
-      sellingPrice: Yup.number().required("Selling price is required"),
-      costPrice: Yup.number().required("Cost price is required"),
-    })
-  ),
+  products: Yup.array()
+    .of(
+      Yup.object().shape({
+        name: Yup.string().required("Product name is required"),
+      })
+    )
+    .min(1, "At least one product must be added"),
   invoiceImage: Yup.mixed().required("Invoice image is required"),
 });
 
-const VendorForm = ({ customerOptions, Products, handleClose }) => {
+const VendorForm = ({ handleClose }) => {
   const workerId = useSelector((state) => state.userState.currentUser);
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
@@ -46,14 +48,14 @@ const VendorForm = ({ customerOptions, Products, handleClose }) => {
           contact: "",
           tinNumber: "",
           address: "",
-          products: [{ name: "", quantity: 0, sellingPrice: 0, costPrice: 0 }],
+          products: [{ name: "" }],
           invoiceImage: null,
         }}
         validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
           try {
             setSubmitting(true);
-            await tableActions.addReceipt(values, companyId, workerId);
+            await tableActions.addVendor(values, companyId, workerId);
             setOpen(true);
             setTimeout(() => {
               handleClose();
@@ -178,6 +180,61 @@ const VendorForm = ({ customerOptions, Products, handleClose }) => {
                 );
               }}
             </Field>
+
+            <FieldArray name="products">
+              {({ push, remove }) => (
+                <div>
+                  {values.products.map((product, index) => (
+                    <div key={index} style={{ marginBottom: 10 }}>
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={9}>
+                          <Field name={`products[${index}].name`}>
+                            {({ field, form }) => {
+                              const hasError = Boolean(
+                                form.errors.products &&
+                                  form.errors.products[index] &&
+                                  form.errors.products[index].name &&
+                                  form.touched.products &&
+                                  form.touched.products[index] &&
+                                  form.touched.products[index].name
+                              );
+                              return (
+                                <TextField
+                                  {...field}
+                                  label="Product Name"
+                                  fullWidth
+                                  error={hasError}
+                                  helperText={
+                                    hasError
+                                      ? form.errors.products[index].name
+                                      : ""
+                                  }
+                                />
+                              );
+                            }}
+                          </Field>
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                          <IconButton
+                            color="secondary"
+                            onClick={() => remove(index)}
+                            disabled={values.products.length === 1}>
+                            <Remove />
+                          </IconButton>
+                          {index === values.products.length - 1 && (
+                            <IconButton
+                              color="primary"
+                              onClick={() => push({ name: "" })}>
+                              <Add />
+                            </IconButton>
+                          )}
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </FieldArray>
 
             <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
               <Button
