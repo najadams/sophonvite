@@ -67,7 +67,7 @@ const validationSchema = Yup.object().shape({
   username: Yup.string().required("Required"),
   role: Yup.string().required("Required"),
   contact: Yup.number().required("Required").typeError("Must be a number"),
-  email: Yup.string().email("Invalid email").required("Required"),
+  email: Yup.string().email("Invalid email"),
   password: Yup.string(),
 });
 
@@ -87,13 +87,6 @@ const MyAccount = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           My Account
         </Typography>
-        {alert.show && (
-          <Alert
-            severity={alert.type}
-            onClose={() => setAlert({ show: false })}>
-            {alert.message}
-          </Alert>
-        )}
         <Formik
           initialValues={{
             name: capitalizeFirstLetter(user.name) || "",
@@ -106,7 +99,7 @@ const MyAccount = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             setSubmitting(true);
-            const hashpassword = await bcrypt.hash(values.password, 10)
+            const hashpassword = await bcrypt.hash(values.password, 10);
             const processedValues = {
               ...values,
               name: values.name.trim().toLowerCase(),
@@ -114,7 +107,7 @@ const MyAccount = () => {
               email: values.email.trim().toLowerCase(),
               contact: values.contact.trim(),
               role: values.role.trim().toLowerCase(),
-              password: hashpassword
+              password: hashpassword,
             };
 
             try {
@@ -237,6 +230,13 @@ const MyAccount = () => {
               </Box>
 
               <br />
+              {alert.show && (
+                <Alert
+                  severity={alert.type}
+                  onClose={() => setAlert({ show: false })}>
+                  {alert.message}
+                </Alert>
+              )}
               {isSubmitting && <LinearProgress />}
               <Box mt={3}>
                 <Button
