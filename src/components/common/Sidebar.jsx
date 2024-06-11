@@ -25,44 +25,81 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
               isMobile && toggleSidebar();
             }}>
             <li className="nav-link">
-              <NavLink className="navlink" to={"/dashboard"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/dashboard"}
+                activeclassname="active">
                 <i className="bx bx-home icon"></i>
                 <span className="text nav-text">DashBoard</span>
               </NavLink>
             </li>
 
             <li className="nav-link">
-              <NavLink className="navlink" to={"/sales"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/sales"}
+                activeclassname="active">
                 <i className="bx bx-receipt icon"></i>
                 <span className="text nav-text">Make Sales</span>
               </NavLink>
             </li>
             <li className="nav-link">
-              <NavLink className="navlink" to={"/customers"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/customers"}
+                activeclassname="active">
                 <i className="bx bx-user-plus icon"></i>
                 <span className="text nav-text">Customers</span>
               </NavLink>
             </li>
             <li className="nav-link">
-              <NavLink className="navlink" to={"/products"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/products"}
+                activeclassname="active">
                 <i className="bx bx-cart-alt icon"></i>
                 <span className="text nav-text">Inventory</span>
               </NavLink>
             </li>
             <li className="nav-link">
-              <NavLink className="navlink" to={"/vendors"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/vendors"}
+                activeclassname="active">
                 <i className="bx bx-store-alt icon"></i>
                 <span className="text nav-text">Vendors</span>
               </NavLink>
             </li>
+            {/*   */}
             <li className="nav-link">
-              <NavLink className="navlink" to={"/transactions"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/notification"}
+                activeclassname="active">
+                <i class="icon">
+                  <img
+                    src="./debt.png"
+                    style={{ height: 20, width: 20 }}
+                    alt=""
+                  />
+                </i>
+                <span className="text nav-text">Debt</span>
+              </NavLink>
+            </li>
+            <li className="nav-link">
+              <NavLink
+                className="navlink"
+                to={"/transactions"}
+                activeclassname="active">
                 <i className="bx bx-money-withdraw icon"></i>
                 <span className="text nav-text">Transactions</span>
               </NavLink>
             </li>
             <li className="nav-link">
-              <NavLink className="navlink" to={"/notification"} activeclassname="active">
+              <NavLink
+                className="navlink"
+                to={"/notification"}
+                activeclassname="active">
                 <i className="bx bx-notification icon"></i>
                 <span className="text nav-text">Notification</span>
               </NavLink>
