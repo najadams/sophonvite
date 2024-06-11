@@ -211,7 +211,10 @@ header .image-text .header-text {
   font-size: larger;
   margin-top: 5px;
 }
-.page{
+/* App.css */
+
+/* ===== Main Pages ==== */
+.page {
   position: relative;
   margin: 0;
   margin-top: 5px;
@@ -223,14 +226,13 @@ header .image-text .header-text {
   scrollbar-width: none;
 }
 
-.content{
+.content {
   display: flex;
   flex-wrap: wrap;
-  justify-content: 'center';
-
+  justify-content: center;
 }
 
-.heading{
+.heading {
   z-index: 100;
   display: flex;
   justify-content: space-between;
@@ -238,8 +240,23 @@ header .image-text .header-text {
   margin-bottom: 10px;
   position: sticky;
   top: 0;
-  background-color: rgb(255, 255, 255, 0.8); 
+  background-color: rgba(255, 255, 255, 0.8);
 }
+
+.links {
+  margin-top: 20px;
+}
+
+.links a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: #1976d2;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
 
 .notlogin{
   position : absolute;
