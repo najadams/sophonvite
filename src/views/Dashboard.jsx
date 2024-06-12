@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import SlidingCard from "../components/common/SlidingCard";
@@ -40,22 +42,37 @@ const DummyCard = ({ children, title, sx }) => (
   </Box>
 );
 
-export const Widgets = ({ title, count }) => (
-  <Card
-    sx={{
-      width: { xs: "auto", sm: "auto", lg: "auto" },
-      height: 'auto',
-      margin: 1,
-      padding: 0,
-    }}>
-    <CardContent>
-      <Typography variant="body" component="div">
-        {title}
-      </Typography>
-      <Typography variant="h4">{count}</Typography>
-    </CardContent>
-  </Card>
-);
+export const Widgets = ({ title, count }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
+  return (
+    <Card
+      sx={{
+        width: { xs: "auto", sm: "auto", lg: "auto" },
+        height: "auto",
+        margin: 1,
+        padding: 0,
+      }}>
+      <CardContent>
+        <span style={{display: 'flex', gap: 10}}>
+          <Typography variant="body" component="div">
+            {title}
+          </Typography>
+          <IconButton sx={{ height: 10, width: 10 }} onClick={toggleVisibility}>
+            {isVisible ? <VisibilityOff /> : <Visibility />}
+          </IconButton>
+        </span>
+        <Typography variant="h4">
+          {isVisible ? count : "*".repeat(count.toString().length)}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Dashboard = () => {
   const companyId = useSelector((state) => state.companyState.data?.id);
@@ -91,7 +108,7 @@ const Dashboard = () => {
   return (
     <div className="page">
       <div className="heading" style={{ background: "none" }}>
-        <h1 style={{fontWeight: 200}}>Dashboard</h1>
+        <h1 style={{ fontWeight: 200 }}>Dashboard</h1>
       </div>
 
       <div className="content">
