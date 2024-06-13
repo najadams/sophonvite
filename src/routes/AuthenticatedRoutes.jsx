@@ -16,6 +16,7 @@ const CreateUser = lazy(() => import("../views/CreateUser"));
 const WorkerEntry = lazy(() => import("../views/common/WorkerEntry"));
 const NoPage = lazy(() => import("../views/NoPage"));
 const MyAccount = lazy(() => import("../views/MyAccount"));
+const Debt = lazy(() => import("../views/Debt"));
 
 const AuthenticatedRoutes = () => (
   <Routes>
@@ -32,6 +33,7 @@ const AuthenticatedRoutes = () => (
     <Route path="/transactions" element={<Transactions />} />
     <Route path="/vendors" element={<Vendors />} />
     <Route path="/inventory" element={<InventoryReports />} />
+    <Route path="/debt" element={<Debt />} />
     <Route path="/account" element={<WorkerEntry />} />
     <Route path="/sales" element={<SalesOrders />} />
     <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />

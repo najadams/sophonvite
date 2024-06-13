@@ -301,6 +301,28 @@ export const tableActions = {
       throw error;
     }
   },
+  fetchDebt: async (companyId, selectedDate, selectedDuration) => {
+  try {
+    let url = `/api/debts/${companyId}?`;
+
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      url += `date=${formattedDate}&`;
+      console.log(formattedDate)
+    }
+
+    if (selectedDuration) {
+      url += `duration=${selectedDuration}`;
+    }
+
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching debts:", error);
+    throw error;
+  }
+}
+,
 
   fetchWorkers: async (companyId) => {
     try {

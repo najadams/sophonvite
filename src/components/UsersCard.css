@@ -1,11 +1,12 @@
 .card-client {
-  background: #c5c9d2;
-  width: 13rem;
-  padding-top: 25px;
-  padding-bottom: 25px;
-  padding-left: 20px;
-  padding-right: 20px;
-  /* border: 4px solid #7cdacc; */
+  /* background: #c5c9d2; */
+  background: var(--body-color);
+  width: 12rem;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
+  /* border: 4px solid #00caff; */
   border: 4px solid #fff;
   box-shadow: 0 6px 10px rgba(207, 212, 222, 1);
   border-radius: 10px;
@@ -13,6 +14,7 @@
   /* color: #fff; */
   font-family: "Poppins", sans-serif;
   transition: all 0.3s ease;
+  margin: 20px;
 }
 
 .card-client:hover {
@@ -22,18 +24,18 @@
 .user-picture {
   overflow: hidden;
   object-fit: cover;
-  width: 5rem;
-  height: 5rem;
+  width: 4rem;
+  height: 4rem;
   border: 4px solid #fff;
   border-radius: 999px;
-  display: flex;
+  display: flex;  
   justify-content: center;
   align-items: center;
   margin: auto;
 }
 
 .user-picture svg {
-  width: 2.5rem;
+  width: 1.5rem;
   fill: currentColor;
 }
 
@@ -78,7 +80,7 @@
 
 /*-- Tooltip Social Media --*/
 .tooltip-social {
-  background: #262626;
+  /* background: #262626; */
   display: block;
   position: absolute;
   bottom: 0;

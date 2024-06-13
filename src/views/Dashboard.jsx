@@ -67,7 +67,7 @@ export const Widgets = ({ title, count }) => {
           </IconButton>
         </span>
         <Typography variant="h4">
-          {isVisible ? count : "*".repeat(count.toString().length)}
+          {isVisible ? count : "#".repeat(count.toString().length)}
         </Typography>
       </CardContent>
     </Card>

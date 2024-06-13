@@ -62,7 +62,7 @@ const SalesOrders = () => {
         <div>
           <h1 style={{ fontWeight: 200}}>Sales Order</h1>
         </div>
-        <AddItem>
+        <AddItem title={"Make Sales"}>
           <SalesOrderForms
             customerOptions={customerOptions}
             Products={productOptions}

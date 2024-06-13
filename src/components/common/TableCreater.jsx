@@ -25,7 +25,7 @@ import { tableActions } from "../../config/Functions";
 import { useMediaQuery } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
-import SearchField from "./SearchField";
+import SearchField from "../../hooks/SearchField";
 import { useDispatch } from "react-redux";
 import { ActionCreators } from "../../actions/action";
 import { capitalizeFirstLetter } from "../../config/Functions";

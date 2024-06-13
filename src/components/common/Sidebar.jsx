@@ -74,9 +74,9 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             <li className="nav-link">
               <NavLink
                 className="navlink"
-                to={"/notification"}
+                to={"/debt"}
                 activeclassname="active">
-                <i class="icon">
+                <i className="icon">
                   <img
                     src="./debt.png"
                     style={{ height: 20, width: 20 }}

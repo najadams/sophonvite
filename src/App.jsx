@@ -39,7 +39,7 @@ function App() {
         <PersistGate loading={null} persistor={persistor}>
           <UserProvider>
             <Router>
-              <div style={{ overflowY: "hidden", height: "100vh" }}>
+              <div className="main" style={{ overflowY: "hidden", height: "100vh" }}>
                 {isLoggedIn && hasAccount !== undefined && hasAccount && (
                   <Header isLoggedIn={isLoggedIn} />
                 )}

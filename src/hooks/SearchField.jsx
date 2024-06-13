@@ -42,14 +42,14 @@ const SearchField = ({ onSearch }) => {
         borderRadius: 20,
         padding: 10,
         boxShadow: 1,
-        maxWidth: 200,
+        maxWidth: 280,
       }}>
       <i
         className="bx bx-search-alt icon"
         style={{ fontSize: 30, paddingTop: 5 }}></i>
       <input
         type="search"
-        className="searcox"
+        className="date-input"
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

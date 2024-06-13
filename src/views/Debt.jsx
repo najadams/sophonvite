@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
-import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
+import UsersCard from "../components/UsersCard"; // Adjust the import path as needed
+import SearchField from "../hooks/SearchField";
 
 const Debt = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDebts = async () => {
     try {
@@ -34,6 +36,14 @@ const Debt = () => {
   const handleDateChange = (e) => {
     setSelectedDate(new Date(e.target.value));
   };
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
+  const filteredDebts = debts?.filter((debt) =>
+    debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (isLoading) return <Loader />;
 
@@ -73,9 +83,17 @@ const Debt = () => {
               onChange={handleDateChange}
             />
           </span>
+          <SearchField onSearch={handleSearch} />
         </div>
-        {!isLoading && !isError && debts && debts.length > 0 ? (
-          <CollapsibleTable debts={debts} />
+        {!isLoading && !isError && filteredDebts && filteredDebts.length > 0 ? (
+          filteredDebts.map((debt) => (
+            <UsersCard
+              key={debt.id}
+              name={`₵${debt.amount}`}
+              companyFrom={debt.customerName}
+              onClick={() => console.log(`Debt ID: ${debt.id}`)}
+            />
+          ))
         ) : (
           <div className="content">
             {selectedDate.toISOString().split("T")[0] ===
