@@ -8,12 +8,14 @@ import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
+import SearchField from "../hooks/SearchField";
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -54,13 +56,23 @@ const SalesOrders = () => {
     refetchOnWindowFocus: true,
   });
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
+  const filteredReceipts = receipts
+    ? receipts.filter((receipt) =>
+        receipt.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
   if (isLoading) return <Loader />;
 
   return (
     <div className="page">
       <div className="heading">
         <div>
-          <h1 style={{ fontWeight: 200}}>Sales Order</h1>
+          <h1 style={{ fontWeight: 200 }}>Sales Order</h1>
         </div>
         <AddItem title={"Make Sales"}>
           <SalesOrderForms
@@ -77,18 +89,19 @@ const SalesOrders = () => {
             width: "100%",
             flexWrap: "wrap",
             flexDirection: "row-reverse",
+            alignItems: "flex-end",
           }}>
           <Widgets
             title={"Sales"}
             count={
-              `₵${receipts.reduce(
-                (total, receipts) => total + receipts.total,
+              `₵${filteredReceipts.reduce(
+                (total, receipt) => total + receipt.total,
                 0
               )}` || 0
             }
           />
-          <div style={{ marginRight: "20px", position:'relative', top: '65px' }}>
-            <label htmlFor="dateInput" style={{ marginRight: "10px" }}>
+          <div style={{ marginBottom: 10 }}>
+            <label htmlFor="dateInput" style={{ marginLeft: 10 }}>
               Select Date:
             </label>
             <input
@@ -99,16 +112,20 @@ const SalesOrders = () => {
               onChange={(e) => setSelectedDate(new Date(e.target.value))}
             />
           </div>
+          <SearchField onSearch={handleSearch} />
         </div>
-        {!isLoading && !isError && receipts && receipts.length > 0 ? (
-          <CollapsibleTable receipts={receipts} />
+        {!isLoading &&
+        !isError &&
+        filteredReceipts &&
+        filteredReceipts.length > 0 ? (
+          <CollapsibleTable receipts={filteredReceipts} />
         ) : (
           <div className="content">
             {selectedDate.toISOString().split("T")[0] ===
             new Date().toISOString().split("T")[0] ? (
-              <h2>No Sales Made Today</h2>
+              <h2 style={{ paddingTop: "50%" }}>No Sales Made Today</h2>
             ) : (
-              <h2>
+              <h2 style={{ paddingTop: "50%" }}>
                 No Sales Made on {selectedDate.toISOString().split("T")[0]}
               </h2>
             )}
