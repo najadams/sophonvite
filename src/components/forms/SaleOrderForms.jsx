@@ -6,6 +6,11 @@ import {
   Typography,
   Snackbar,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
@@ -28,7 +33,8 @@ const validationSchema = Yup.object().shape({
     })
   ),
   total: Yup.number().required(),
-  amountPaid: Yup.number().required("Amout Paid should not be empty"),
+  amountPaid: Yup.number().required("Amount Paid should not be empty"),
+  discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
 const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
@@ -37,11 +43,13 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
-  const today = new Date().toLocaleDateString()
+  const today = new Date().toLocaleDateString();
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -52,8 +60,8 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
       (sum, product) => sum + product?.totalPrice,
       0
     );
-    values.total = total;
-    const balance = total - values.amountPaid;
+    values.total = total - values.discount; // Subtract discount from total
+    const balance = values.total - values.amountPaid
 
     try {
       if (!values.customerName) {
@@ -65,7 +73,10 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
         setSubmitting(true);
         await tableActions.addReceipt(values, companyId, workerId);
         setOpen(true);
-        setPrintValues({ ...values, balance}); // Store values for printing
+        setPrintValues({ ...values, balance }); // Store values for printing
+        setTimeout(() => {
+          handleClose();
+        }, 1000);
       }
     } catch (error) {
       console.log(error);
@@ -73,8 +84,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => {
-      }, 1000);
+      setTimeout(() => {}, 1000);
     }
   };
 
@@ -86,6 +96,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
           products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
           total: 0,
           amountPaid: "",
+          discount: 0,
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
@@ -221,9 +232,10 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
                                 (p) => p.name === product.name
                               );
                               if (value > selectedProduct?.onhand) {
-                                alert(
+                                setModalMessage(
                                   `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
                                 );
+                                setModalOpen(true);
                               }
                             }}
                           />
@@ -328,6 +340,28 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
               }}
             </Field>
 
+            <Field name="discount">
+              {({ field, form }) => {
+                const hasError = Boolean(
+                  form.errors.discount && form.touched.discount
+                );
+                return (
+                  <TextField
+                    {...field}
+                    label="Discount"
+                    type="number"
+                    placeholder="Discount"
+                    fullWidth
+                    error={hasError}
+                    helperText={hasError ? form.errors.discount : ""}
+                    onChange={(event) => {
+                      setFieldValue("discount", event.target.value);
+                    }}
+                  />
+                );
+              }}
+            </Field>
+
             <div style={{ display: "flex", gap: 20 }}>
               <Button
                 variant="contained"
@@ -356,9 +390,30 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
 
+      {/* Modal for insufficient inventory */}
+      <Dialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">
+          {"Insufficient Inventory"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {modalMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Receipt Template for printing */}
       {printValues && (
-        <div style={{ display: "none"}}>
+        <div style={{ display: "none" }}>
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
@@ -366,6 +421,7 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
             total={printValues.total}
             balance={printValues.balance}
             amountPaid={printValues.amountPaid}
+            discount={printValues.discount}
             date={today}
             workerName={worker.name}
           />
@@ -376,4 +432,3 @@ const SalesOrderForms = ({ customerOptions, Products, handleClose }) => {
 };
 
 export default SalesOrderForms;
- 
