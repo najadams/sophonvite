@@ -109,7 +109,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           <strong>Tax %: {company.taxRate}</strong>
         </p>
       )}
-      {discount !== undefined && discount !== null && (
+      {discount !== undefined && discount !== null && discount !== 0 && (
         <p style={{ textAlign: "right", marginTop: "20px" }}>
           <strong>Discount: ₵{discount}</strong>
         </p>
