@@ -35,7 +35,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           width: "100%",
         }}>
         <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
-          {capitalizeFirstLetter(company.companyName)}
+          {capitalizeFirstLetter(company.companyName)}!
         </h4>
         {company.tinNumber && (
           <h5>Tin Number: {company.tinNumber.toUpperCase()}</h5>
