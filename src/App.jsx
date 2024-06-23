@@ -31,7 +31,7 @@ function App() {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
   const isLoggedIn = useSelector((state) => state.companyState.isLoggedIn);
-  const hasAccount = useSelector((state) => state.users?.currentUser !== null);
+  const hasAccount = useSelector((state) => state.userState?.currentUser !== null);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -65,15 +65,15 @@ function App() {
                       <Routes>
                         <Route
                           path="/"
-                          element={
-                            isLoggedIn && hasAccount ? (
+                          element={ 
+                            isLoggedIn && hasAccount && hasAccount !== undefined ? (
                               <Navigate to="/dashboard" />
                             ) : (
                               <LandingPage isLoggedIn={isLoggedIn} />
                             )
                           }
                         />
-                        {isLoggedIn && hasAccount ? (
+                        {isLoggedIn && hasAccount && hasAccount !== undefined ? (
                           <Route path="/*" element={<AuthenticatedRoutes />} />
                         ) : (
                           <Route
