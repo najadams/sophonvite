@@ -1,28 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import Box from "@mui/material/Box";
-import { Tooltip, Menu, MenuItem } from "@mui/material";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { capitalizeFirstLetter } from "../../config/Functions";
-import ReceiptTemplate from "../compPrint/ReceiptTemplate";
+import Row from "./Row";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    // backgroundColor: theme.palette.primary.main,
     backgroundColor: "#262626",
     color: theme.palette.primary.contrastText,
     fontSize: "16px",
@@ -44,149 +33,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function Row({ row }) {
-  const [open, setOpen] = React.useState(false);
-  const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const printRef = useRef();
-  const [printValues, setPrintValues] = useState(null);
+function CollapsibleTable({ receipts }) {
+  const [updatedReceipts, setUpdatedReceipts] = useState(receipts);
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString();
+  const handleFlagChange = (id, flagged) => {
+    setUpdatedReceipts((prevReceipts) =>
+      prevReceipts.map((receipt) =>
+        receipt._id === id ? { ...receipt, flagged } : receipt
+      )
+    );
   };
 
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleView = () => {
-    handleMenuClose();
-    navigate(`/receipts/${row._id}`);
-  };
-
-  const handlePrintClick = () => {
-    setPrintValues({
-      customerName: row.customerName,
-      products: row.detail,
-      total: row.total,
-      balance: row.balance, // Assuming balance is part of row
-      amountPaid: row.amountPaid, // Assuming amountPaid is part of row
-      date: formatDate(row.date),
-      workerName: row.workerName,
-    });
-    console.log(row)
-    setTimeout(() => {
-      setPrintValues(null)
-    }, 2000);
-  };
-
-  return (
-    <React.Fragment>
-      {printValues && (
-        <div style={{ display: "none" }}>
-          <ReceiptTemplate
-            ref={printRef}
-            customerName={printValues.customerName}
-            products={printValues.products}
-            total={printValues.total}
-            balance={printValues.balance}
-            amountPaid={printValues.amountPaid}
-            date={printValues.date}
-            workerName={printValues.workerName}
-          />
-        </div>
-      )}
-      <Tooltip title={formatDate(row.date)} placement="top" arrow>
-        <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-          <TableCell>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}>
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </TableCell>
-          <TableCell component="th" scope="row" style={{ width: "30%" }}>
-            {capitalizeFirstLetter(row.customerName)}
-          </TableCell>
-          <TableCell align="left">
-            {capitalizeFirstLetter(row.workerName)}
-          </TableCell>
-          <TableCell align="right">{row.total}</TableCell>
-          <TableCell align="right">{row.detail.length}</TableCell>
-          <TableCell align="right">
-            <IconButton
-              aria-label="more options"
-              size="small"
-              onClick={handleMenuClick}>
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}>
-              <MenuItem onClick={handlePrintClick}>Print</MenuItem>
-              <MenuItem onClick={handleView}>View</MenuItem>
-            </Menu>
-          </TableCell>
-        </TableRow>
-      </Tooltip>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1, background: "#f5f5f5", fontFamily: "poppins" }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Detail
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Quantity</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Unit Price</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Total Price</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.detail.map((item) => (
-                    <StyledTableRow key={item.name}>
-                      <TableCell component="th" scope="row">
-                        {capitalizeFirstLetter(item.name)}
-                      </TableCell>
-                      <TableCell align="right">{item.quantity}</TableCell>
-                      <TableCell align="right">{item.salesprice}</TableCell>
-                      <TableCell align="right">
-                        {item.salesprice * item.quantity}
-                      </TableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
-Row.propTypes = {
-  row: PropTypes.object.isRequired,
-};
-
-export default function CollapsibleTable({ receipts }) {
   return (
     <TableContainer component={Paper} sx={{ maxHeight: "61vh" }}>
       <Table stickyHeader aria-label="collapsible table">
@@ -201,11 +58,21 @@ export default function CollapsibleTable({ receipts }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {receipts.map((receipt) => (
-            <Row key={receipt._id} row={receipt} />
+          {updatedReceipts.map((receipt) => (
+            <Row
+              key={receipt._id}
+              row={receipt}
+              onFlagChange={handleFlagChange}
+            />
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
+
+CollapsibleTable.propTypes = {
+  receipts: PropTypes.array.isRequired,
+};
+
+export default CollapsibleTable;
