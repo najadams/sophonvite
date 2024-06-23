@@ -1,7 +1,8 @@
-import React, { lazy } from "react";
+import React, { lazy, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { PERMISSIONS } from "../context/userRoles";
+import { useSelector } from "react-redux";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
 const Customers = lazy(() => import("../views/Customers"));
@@ -19,51 +20,34 @@ const MyAccount = lazy(() => import("../views/MyAccount"));
 const Debt = lazy(() => import("../views/Debt"));
 const Notifications = lazy(() => import("../views/Notifications"));
 
-const AuthenticatedRoutes = () => (
-  <Routes>
-    <Route
-      path="/dashboard"
-      element={<Dashboard />}
-      requiredPermissions={[PERMISSIONS.VIEW_DASHBOARD]}
-    />
-    <Route path="/products" element={<ProductCatalogue />} />
-    <Route path="/settings" element={<Settings />} />
-    <Route path="/!employee!@" element={<CreateUser />} />
-    <Route path="/customers" element={<Customers />} />
-    <Route path="/stocks" element={<StockEntry />} />
-    <Route path="/transactions" element={<Transactions />} />
-    <Route path="/vendors" element={<Vendors />} />
-    <Route path="/inventory" element={<InventoryReports />} />
-    <Route path="/debt" element={<Debt />} />
-    <Route path="/account" element={<WorkerEntry />} />
-    <Route path="/sales" element={<SalesOrders />} />
-    <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />
-    <Route path="/notification" element={<Notifications />} />
-    <Route path="/*" element={<NoPage />} />
-  </Routes>
-);
+const AuthenticatedRoutes = () => {
+  const isLoggedIn = useSelector((state) => state.companyState.isLoggedIn);
+  return (
+    <Routes>
+      <Route
+        path="/dashboard"
+        element={<Dashboard />}
+        requiredPermissions={[PERMISSIONS.VIEW_DASHBOARD]}
+      />
+      <Route path="/products" element={<ProductCatalogue />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/!employee!@" element={<CreateUser />} />
+      <Route path="/customers" element={<Customers />} />
+      <Route path="/stocks" element={<StockEntry />} />
+      <Route path="/transactions" element={<Transactions />} />
+      <Route path="/vendors" element={<Vendors />} />
+      <Route path="/inventory" element={<InventoryReports />} />
+      <Route path="/debt" element={<Debt />} />
+      <Route
+        path="/account"
+        element={<WorkerEntry isLoggedIn={isLoggedIn} />}
+      />
+      <Route path="/sales" element={<SalesOrders />} />
+      <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />
+      <Route path="/notification" element={<Notifications />} />
+      <Route path="/*" element={<NoPage />} />
+    </Routes>
+  );
+};
 
 export default AuthenticatedRoutes;
-
-
-// THIS IS THE FORMAT YOU SHOULD FOLLOW FOR THIS COMPONENT
-// CHECK THE PERMISSION MAKE THE APPROPRIATE ADJUSTMENTS AND APPLY THEM
-// const AuthenticatedRoutes = () => (
-//   <>
-//     <ProtectedRoute
-//       path="/dashboard"
-//       element={<Dashboard />}
-//       requiredPermissions={[PERMISSIONS.VIEW_DASHBOARD]}
-//     />
-//     <ProtectedRoute
-//       path="/manage-users"
-//       element={<ManageUsers />}
-//       requiredPermissions={[PERMISSIONS.MANAGE_USERS]}
-//     />
-//     <ProtectedRoute
-//       path="/reports"
-//       element={<Reports />}
-//       requiredPermissions={[PERMISSIONS.VIEW_REPORTS]}
-//     />
-//   </>
-// );
