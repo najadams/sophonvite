@@ -101,7 +101,7 @@ const SalesOrders = () => {
             }
           />
           <div style={{ marginBottom: 10 }}>
-            <label htmlFor="dateInput" style={{ marginLeft: 10 }}>
+            <label htmlFor="dateInput" style={{ marginLeft: 10, fontSize: 'larger', font: "icon" }}>
               Select Date:
             </label>
             <input
@@ -112,7 +112,7 @@ const SalesOrders = () => {
               onChange={(e) => setSelectedDate(new Date(e.target.value))}
             />
           </div>
-          <SearchField onSearch={handleSearch} />
+          <SearchField onSearch={handleSearch} placeholder={'Search Customer Name'} />
         </div>
         {!isLoading &&
         !isError &&

@@ -49,7 +49,7 @@ const Debt = () => {
 
   return (
     <div className="page">
-      <div className="heading">
+      <div className="heading" style={{ padding: 10 }}>
         <div>
           <h1 style={{ fontWeight: 200 }}>Debt Acquired</h1>
         </div>
@@ -72,7 +72,9 @@ const Debt = () => {
             }`}
           />
           <span style={{ marginBottom: 10 }}>
-            <label htmlFor="dateInput" style={{ marginLeft: 10 }}>
+            <label
+              htmlFor="dateInput"
+              style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
               Select Date:
             </label>
             <input
