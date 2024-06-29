@@ -40,23 +40,55 @@ const calculateProfit = (receipts) => {
   return totalProfit;
 };
 
+function calculateTopsProfit(receipts) {
+  const productProfits = {};
+
+  receipts.forEach((receipt) => {
+    receipt.detail.forEach((product) => {
+      const profit =
+        (product.salesprice - product.costprice) * product.quantity;
+
+      if (productProfits[product.name]) {
+        productProfits[product.name] += profit;
+      } else {
+        productProfits[product.name] = profit;
+      }
+    });
+  });
+
+  return Object.keys(productProfits).map((name) => ({
+    name: name,
+    profit: productProfits[name],
+  }));
+}
+
 
 const calculateTopPurchasedProducts = (receipts) => {
+  // Accumulate the total quantity and profit of each product across all receipts
   const productCounts = receipts.reduce((acc, receipt) => {
     receipt.detail.forEach((item) => {
       if (!acc[item.name]) {
-        acc[item.name] = 0;
+        acc[item.name] = { quantity: 0, profit: 0 };
       }
-      acc[item.name] += item.quantity;
+      acc[item.name].quantity += item.quantity;
+      acc[item.name].profit +=
+        (item.salesprice - item.costprice) * item.quantity;
     });
     return acc;
   }, {});
 
+  // Convert the productCounts object to an array of [name, { quantity, profit }] pairs
+  // and sort the array in descending order based on quantity
   const sortedProducts = Object.entries(productCounts)
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => b[1].quantity - a[1].quantity)
     .slice(0, 10);
 
-  return sortedProducts.map(([name, quantity]) => ({ name, quantity }));
+  // Convert the sorted array back to an array of objects with name, quantity, and profit
+  return sortedProducts.map(([name, { quantity, profit }]) => ({
+    name,
+    quantity,
+    profit,
+  }));
 };
 
 export const tableActions = {
@@ -97,6 +129,7 @@ export const tableActions = {
         salesPrice: item.salesprice,
         onHand: item.onhand,
       }));
+      // const page = response.page 
       return data;
     } catch (error) {
       throw new Error("Failed to fetch products");
@@ -361,6 +394,9 @@ export const tableActions = {
 
     // Calculate top purchased products
     const topProducts = calculateTopPurchasedProducts(receipts);
+    // adding data for the pie graph
+    const profitable5 = topProducts.slice(0, 5)
+    console.log(topProducts)
 
     // Combine labels and data into a single array of objects for Recharts
     const sales = labels.map((label, index) => ({
@@ -374,7 +410,7 @@ export const tableActions = {
     }));
 
 
-    return { sales, profit, topProducts };
+    return { sales, profit, topProducts , profitable5};
   } catch (error) {
     console.error("Error fetching sales data", error);
     throw new Error("Failed to fetch sales data");
