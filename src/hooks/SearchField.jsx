@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const SearchField = ({ onSearch }) => {
+const SearchField = ({ onSearch, placeholder }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
 
@@ -50,7 +50,7 @@ const SearchField = ({ onSearch }) => {
       <input
         type="search"
         className="date-input"
-        placeholder="Search..."
+        placeholder= {placeholder || "Search..."}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
