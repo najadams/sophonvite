@@ -204,7 +204,7 @@ const TableCreater = ({ companyId, data, type }) => {
 
   // Filter data based on search term
   const filteredData = Data.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.company?.toLowerCase().includes(searchTerm.toLocaleLowerCase())
   );
 
   return (
