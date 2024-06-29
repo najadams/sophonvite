@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   PieChart,
   Pie,
@@ -7,10 +7,20 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useMediaQuery } from "@mui/material";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF69B4"];
+const COLORS = [
+  "#00caff",
+  "#FF8042",
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF69B4",
+];
 
 const MyPie = ({ data }) => {
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
@@ -18,23 +28,26 @@ const MyPie = ({ data }) => {
           data={data}
           dataKey="profit"
           nameKey="name"
-          cx="50%" // Position the chart to the left
+          cx="50%"
           cy="50%"
-          innerRadius={60} 
-          outerRadius={120}
+          innerRadius={"40%"}
+          outerRadius={"90%"}
           fill="#8884d8"
           labelLine={false} // Remove the lines pointing to the chart
-          label={false}
-        >
+          label={false}>
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
         <Tooltip />
-        <Legend layout="vertical" align="right" verticalAlign="middle"/>
+        <Legend
+          layout={isMobile ? "horizontal" : "vertical"}
+          align={isMobile ? "center" : "right"}
+          verticalAlign={isMobile ? "bottom" : "middle"}
+        />
       </PieChart>
     </ResponsiveContainer>
   );
-}
+};
 
-export default MyPie
+export default MyPie;

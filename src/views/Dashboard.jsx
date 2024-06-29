@@ -9,6 +9,7 @@ import { Box } from "@mui/material";
 import SlidingCard from "../components/common/SlidingCard";
 import { useQuery } from "react-query";
 import { tableActions } from "../config/Functions";
+import MyPie from "../utils/MyPie";
 import {
   Bar,
   BarChart,
@@ -192,7 +193,7 @@ const Dashboard = () => {
 
         <DummyCard
           title={"Most Selling Products"}
-          sx={{ width: { xs: "100%", sm: "400px", md: "800px" } }}>
+          sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
           ) : isOverallError ? (
@@ -217,6 +218,20 @@ const Dashboard = () => {
                 <Bar dataKey="quantity" fill="#00caff" />
               </BarChart>
             </ResponsiveContainer>
+          )}
+        </DummyCard>
+
+        <DummyCard
+          title={"Most Profitable Products"}
+          sx={{ width: { xs: "100%", sm: "400px" } }}>
+          {isOverallLoading ? (
+            <Typography>Loading...</Typography>
+          ) : isOverallError ? (
+            <Typography>Error loading product sales data</Typography>
+          ) : overall?.profitable5.length === 0 ? (
+            <Typography>No product sales data available</Typography>
+          ) : (
+            <MyPie data={overall.profitable5} />
           )}
         </DummyCard>
 
