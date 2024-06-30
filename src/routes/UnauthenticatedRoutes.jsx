@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 const SignIn = lazy(() => import("../views/SignIn"));
 const Register = lazy(() => import("../views/common/Register"));
-const LandingPage = lazy(() => import("../views/common/LandingPage"));
+const LandingPage = lazy(() => import("../views/common/landingPage/LandingPage"));
 const NoPage = lazy(() => import("../views/NoPage"));
 
 const UnauthenticatedRoutes = ({ isLoggedIn }) => (

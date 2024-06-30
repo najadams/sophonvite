@@ -18,7 +18,7 @@ import UnauthenticatedRoutes from "./routes/UnauthenticatedRoutes";
 import { UserProvider } from "./context/UserContext";
 import SignIn from "./views/SignIn";
 
-const LandingPage = lazy(() => import("./views/common/LandingPage"));
+const LandingPage = lazy(() => import("./views/common/landingPage/LandingPage"));
 const WorkerEntry = lazy(() => import("./views/common/WorkerEntry"));
 const Unauthorized = lazy(() => import("./views/common/Unauthorized"));
 const Register = lazy(() => import("./views/common/Register"))
