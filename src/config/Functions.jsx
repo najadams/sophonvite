@@ -396,7 +396,6 @@ export const tableActions = {
     const topProducts = calculateTopPurchasedProducts(receipts);
     // adding data for the pie graph
     const profitable5 = topProducts.slice(0, 5)
-    console.log(topProducts)
 
     // Combine labels and data into a single array of objects for Recharts
     const sales = labels.map((label, index) => ({
