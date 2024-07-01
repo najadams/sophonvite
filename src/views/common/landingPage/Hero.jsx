@@ -1,15 +1,13 @@
 import * as React from "react";
 import { alpha } from "@mui/material";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import {useMediaQuery} from "@mui/material";
 
 const images = [
   "/shot1.png",
@@ -29,9 +27,9 @@ export default function Hero() {
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: true,
-    infinite: true
   };
 
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   return (
     <Box
       id="hero"
@@ -42,7 +40,6 @@ export default function Hero() {
             ? "linear-gradient(270deg, #CEE5FD, #FFFE)"
             : `linear-gradient(#02294F, ${alpha("#090E10", 0.0)})`,
         backgroundSize: "100%",
-        // backgroundRepeat: "no-repeat",
       })}>
       <Container
         sx={{
@@ -57,66 +54,80 @@ export default function Hero() {
             variant="h1"
             sx={{
               display: "flex",
+              pt: { xs: 20, sm: 20, md: "inherit" },
               flexDirection: { xs: "column", md: "row" },
               alignSelf: "center",
               textAlign: "center",
-              fontSize: "clamp(3.5rem, 10vw, 4rem)",
+              fontSize: "clamp(2rem, 6vw, 4rem)",
             }}>
-            Empowering Wholesalers, Connecting Investors, Fueling Growth. &nbsp;
-            {/* <Typography
-              component="span"
-              variant="h1"
-              sx={{
-                fontSize: "clamp(3rem, 10vw, 4rem)",
-                color: (theme) =>
-                  theme.palette.mode === "light"
-                    ? "primary.main"
-                    : "primary.light",
-              }}>
-              product
-            </Typography> */}
+            Empowering Wholesalers, Connecting Investors, Fueling Growth.
           </Typography>
           <Typography
             textAlign="center"
             color="text.secondary"
             sx={{ alignSelf: "center", width: { sm: "100%", md: "80%" } }}>
-            Explore our vast community. A network of sellers, buyers and investors.Welcome to the world of business.
-            {/* cutting-edge dashboard, delivering high-quality
-            solutions tailored to your needs. Elevate your experience with
-            top-tier features and services. */}
+            Explore our vast community. A network of sellers, buyers, and
+            investors. Welcome to the world of business.
           </Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            alignSelf="center"
-            spacing={1}
-            useFlexGap
-            sx={{ pt: 2, width: { xs: "100%", sm: "auto" } }}></Stack>
         </Stack>
         <Box
           id="image"
           sx={{
-            // mt: { xs: 8, sm: 10 },
             alignSelf: "center",
-            width: "100%",
-            maxWidth: "1260px",
+            height: { xs: 200, sm: 400, md: 600 },
+            width: "90%", // Adjust as needed
+            maxWidth: "1000px",
             borderRadius: "10px",
             overflow: "hidden",
             boxShadow: 10,
+            mt: { xs: 4, sm: 6 },
           }}>
-          <Slider {...settings}>
-            {images.map((image, index) => (
-              <Box
-                key={index}
-                sx={{
-                  height: { xs: 200, sm: 700 },
-                  backgroundImage: `url(${image})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                }}
-              />
-            ))}
-          </Slider>
+          {isMobile ? (
+            <Box
+              id="image"
+              sx={(theme) => ({
+                // mt: { xs: 8, sm: 10 },
+                alignSelf: "center",
+                height: { xs: 200, sm: 700 },
+                width: "100%",
+                backgroundImage: "url('/shot1.png')",
+                backgroundSize: "cover",
+                borderRadius: "10px",
+                outline: "1px solid",
+                outlineColor:
+                  theme.palette.mode === "light"
+                    ? alpha("#BFCCD9", 0.5)
+                    : alpha("#9CCCFC", 0.1),
+                boxShadow:
+                  theme.palette.mode === "light"
+                    ? `0 0 12px 8px ${alpha("#9CCCFC", 0.2)}`
+                    : `0 0 24px 12px ${alpha("#033363", 0.2)}`,
+              })}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: { sx: 100, sm: 500, md: "100%" },
+                m: "auto",
+                background: "greden",
+              }}>
+              <Slider {...settings} style={{ background: "bluffe" }}>
+                {images.map((image, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      height: { xs: 150, sm: 400, md: 600 },
+                      width: "100%",
+                      backgroundImage: `url(${image})`,
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                ))}
+              </Slider>
+            </Box>
+          )}
         </Box>
       </Container>
     </Box>

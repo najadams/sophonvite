@@ -58,8 +58,9 @@ export default function Highlights() {
       sx={{
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
-        color: "white",
-        bgcolor: "#06090a",
+        color: "black",
+        backgroundImage: "linear-gradient(270deg, #CEE5FD, #FFFE)",
+        backgroundSize: "100%",
       }}>
       <Container
         sx={{
@@ -77,7 +78,7 @@ export default function Highlights() {
           <Typography component="h2" variant="h4">
             Highlights
           </Typography>
-          <Typography variant="body1" sx={{ color: "grey.400" }}>
+          <Typography variant="body1" sx={{ color: "black.400" }}>
             Explore why our product stands out: adaptability, durability,
             user-friendly design, and innovation. Enjoy reliable customer
             support and precision in every detail.
@@ -97,15 +98,15 @@ export default function Highlights() {
                   height: "100%",
                   border: "1px solid",
                   borderColor: "grey.800",
-                  background: "transparent",
-                  backgroundColor: "grey.900",
+                  // background: "transparent",
+                  backgroundColor: "white.900",
                 }}>
-                <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
+                <Box sx={{ opacity: "100%" }}>{item.icon}</Box>
                 <div>
                   <Typography fontWeight="medium" gutterBottom>
                     {item.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "grey.400" }}>
+                  <Typography variant="body2" sx={{ color: "black.400" }}>
                     {item.description}
                   </Typography>
                 </div>
