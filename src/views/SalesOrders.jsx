@@ -16,6 +16,7 @@ const SalesOrders = () => {
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
+  const [totalSales, setTotalSales] = useState(0);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -52,12 +53,26 @@ const SalesOrders = () => {
     data: receipts,
     isLoading,
     isError,
+    refetch,
   } = useQuery(["receipts", companyId, selectedDate], fetchReceipts, {
     refetchOnWindowFocus: true,
   });
 
+  useEffect(() => {
+    if (receipts) {
+      const total = receipts
+        .filter((receipt) => !receipt.flagged)
+        .reduce((total, receipt) => total + receipt.total, 0);
+      setTotalSales(total);
+    }
+  }, [receipts]);
+
   const handleSearch = (term) => {
     setSearchTerm(term);
+  };
+
+  const handleFlaggedChange = () => {
+    refetch();
   };
 
   const filteredReceipts = receipts
@@ -91,17 +106,11 @@ const SalesOrders = () => {
             flexDirection: "row-reverse",
             alignItems: "flex-end",
           }}>
-          <Widgets
-            title={"Sales"}
-            count={
-              `₵${filteredReceipts.reduce(
-                (total, receipt) => total + receipt.total,
-                0
-              )}` || 0
-            }
-          />
+          <Widgets title={"Sales"} count={`₵${totalSales}`} />
           <div style={{ marginBottom: 10 }}>
-            <label htmlFor="dateInput" style={{ marginLeft: 10, fontSize: 'larger', font: "icon" }}>
+            <label
+              htmlFor="dateInput"
+              style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
               Select Date:
             </label>
             <input
@@ -112,13 +121,19 @@ const SalesOrders = () => {
               onChange={(e) => setSelectedDate(new Date(e.target.value))}
             />
           </div>
-          <SearchField onSearch={handleSearch} placeholder={'Search Customer Name'} />
+          <SearchField
+            onSearch={handleSearch}
+            placeholder={"Search Customer Name"}
+          />
         </div>
         {!isLoading &&
         !isError &&
         filteredReceipts &&
         filteredReceipts.length > 0 ? (
-          <CollapsibleTable receipts={filteredReceipts} />
+          <CollapsibleTable
+            receipts={filteredReceipts}
+            onFlagChange={handleFlaggedChange}
+          />
         ) : (
           <div className="content">
             {selectedDate.toISOString().split("T")[0] ===

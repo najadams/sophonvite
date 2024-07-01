@@ -33,7 +33,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CollapsibleTable({ receipts }) {
+function CollapsibleTable({ receipts, onFlagChange }) {
   const [updatedReceipts, setUpdatedReceipts] = useState(receipts);
 
   const handleFlagChange = (id, flagged) => {
@@ -42,6 +42,7 @@ function CollapsibleTable({ receipts }) {
         receipt._id === id ? { ...receipt, flagged } : receipt
       )
     );
+    onFlagChange();
   };
 
   return (
