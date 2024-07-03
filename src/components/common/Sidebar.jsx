@@ -80,7 +80,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
                   <img
                     src="./debt.png"
                     style={{ height: 20, width: 20 }}
-                    alt=""
+                    alt="D"
                   />
                 </i>
                 <span className="text nav-text">Debt</span>
