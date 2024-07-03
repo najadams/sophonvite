@@ -48,7 +48,7 @@ export default function Header() {
 
   const logout = () => {
     dispatch(ActionCreators.logoutCompany());
-    navigate("/login");
+    navigate("/");
   };
 
   const toggleSidebar = () => {
