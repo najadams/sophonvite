@@ -95,6 +95,7 @@
 
 .sidebar li a:hover {
   background: var(--primary-color);
+  transform: scaleY(1.2);
 }
 
 .link {
@@ -109,7 +110,7 @@
 }
 
 .sidebar li a.active {
-  background: var(--primary-color); /* Change this to your desired style */
+  background: var(--primary-color); 
   color: var(--sidebar-color);
 }
 
