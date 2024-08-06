@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { useQuery } from "react-query";
 import ProductForm from "../components/forms/ProductForm";
 import TableCreater from "../components/common/TableCreater";
@@ -6,6 +6,9 @@ import AddItem from "../hooks/AddItem";
 import axios from "../config/index";
 import { useSelector } from "react-redux";
 import Loader from "../components/common/Loader";
+import { Box, Tabs, Tab, Typography } from "@mui/material";
+
+const ReceiveInventory = lazy(() => import('../components/forms/ReceiveInventory'))
 
 const fetchProducts = async (companyId) => {
   try {
@@ -24,13 +27,44 @@ const fetchProducts = async (companyId) => {
   }
 };
 
+export const TabPanel = (props) => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}>
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+};
+
+export const a11yProps = (index) => {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+};
+
 const ProductCatalogue = () => {
+  const [value, setValue] = React.useState(0);
   const companyId = useSelector((state) => state.companyState.data.id);
   const {
     data: products,
     isLoading,
     isError,
   } = useQuery(["api/products", companyId], () => fetchProducts(companyId));
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   if (isLoading) return <Loader />;
   if (isError) return <div>Error fetching data</div>;
@@ -39,14 +73,34 @@ const ProductCatalogue = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1 style={{ fontWeight: 200}}>Products</h1>
+          <h1 style={{ fontWeight: 200 }}>Products</h1>
+        </div>
+        <div style={{
+          display: 'flex', 
+          flexDirection: 'row',
+          // gap: ,
+          // background: 'blue',
+          width: '40%'
+        }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="secondary"
+            textColor="inherit"
+            variant="fullWidth"
+            aria-label="full width tabs example">
+            <Tab label="Products" {...a11yProps(0)} />
+            <Tab label="Receive inventory" {...a11yProps(1)} />
+            <Tab label="Reports" {...a11yProps(2)} />
+            <Tab label="Groups" {...a11yProps(3)} />
+          </Tabs>
         </div>
         <AddItem>
           <ProductForm />
         </AddItem>
       </div>
 
-      <div className="content">
+      <TabPanel value={value} index={0}>
         {products.length > 0 ? (
           <TableCreater companyId={companyId} type="products" />
         ) : (
@@ -54,7 +108,15 @@ const ProductCatalogue = () => {
             <h2>Add Products to Get Started</h2>
           </div>
         )}
-      </div>
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+          <ReceiveInventory />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <AddItem>
+          <ProductForm />
+        </AddItem>
+      </TabPanel>
     </div>
   );
 };
