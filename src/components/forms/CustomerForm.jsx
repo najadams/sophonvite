@@ -12,7 +12,7 @@ import { tableActions } from "../../config/Functions";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
-  phone: Yup.string().required("Required"),
+  phone: Yup.string(),
   email: Yup.string().email("Invalid email"),
   address: Yup.string(),
   company: Yup.string(),

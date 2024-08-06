@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const SalesOrderForms = ({ customers, Products, handleClose }) => {
+const MakeSales = ({ customers, Products}) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -50,7 +50,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
-  const customerOptions = [" <<<< Add New Customer  >>>>", ...customers]
+  const customerOptions = [" <<<< Add New Customer  >>>>", ...customers];
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -75,11 +75,11 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
       } else {
         setLoading(true);
         setSubmitting(true);
+        console.log("coco")
         await tableActions.addReceipt(values, companyId, workerId);
         setOpen(true);
         setPrintValues({ ...values, balance }); // Store values for printing
         setTimeout(() => {
-          handleClose();
         }, 1000);
       }
     } catch (error) {
@@ -88,7 +88,8 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => {}, 1000);
+      setTimeout(() => { }, 1000);
+      resetForm();
     }
   };
 
@@ -208,7 +209,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
                                   <TextField
                                     style={{
                                       flex: 1,
-                                      width: matchesMobile ? 200 : 300,
+                                      width: matchesMobile ? 150 : 450,
                                     }}
                                     {...params}
                                     label="Product Name"
@@ -264,7 +265,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
                             }}
                           />
                         </div>
-                        <div style={{ display: "flex", flex: 1, gap: 10 }}>
+                        <div style={{ display: "flex", flex: 1, gap: 20 }}>
                           <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <Input
@@ -272,8 +273,11 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
                                   Products.find((p) => p.name === product.name)
                                     ?.salesPrice
                                 }
+                                style={{
+                                  flex: 1,
+                                  width: matchesMobile ? 100 : 150,
+                                }}
                                 label="Price"
-                                readOnly
                                 inputProps={{
                                   style: { textAlign: "right" },
                                 }}
@@ -386,12 +390,12 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
               }}
             </Field>
 
-            <div style={{ display: "flex", gap: 20 }}>
+            <div className="bottom_left">
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => {
-                  submitForm(); // Trigger form submission
+                onClick={async () => {
+                  await submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
@@ -400,8 +404,8 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => {
-                  submitForm(); // Trigger form submission
+                onClick={async () => {
+                  await submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
@@ -465,4 +469,4 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
   );
 };
 
-export default SalesOrderForms;
+export default MakeSales;
