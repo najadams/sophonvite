@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const SearchField = ({ onSearch, placeholder }) => {
+const SearchField = ({ onSearch, placeholder, customstyles }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
 
@@ -40,9 +40,10 @@ const SearchField = ({ onSearch, placeholder }) => {
         display: "flex",
         outline: "thin",
         borderRadius: 20,
-        padding: 10,
         boxShadow: 1,
         maxWidth: 280,
+        padding: 10,
+        ...customstyles
       }}>
       <i
         className="bx bx-search-alt icon"
