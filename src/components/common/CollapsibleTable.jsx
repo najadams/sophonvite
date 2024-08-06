@@ -52,7 +52,7 @@ function CollapsibleTable({ receipts, onFlagChange }) {
           <TableRow>
             <TableCell />
             <StyledTableCell>Customer Name</StyledTableCell>
-            <StyledTableCell>Worker Name</StyledTableCell>
+            <StyledTableCell>Cashier</StyledTableCell>
             <StyledTableCell align="right">Total</StyledTableCell>
             <StyledTableCell align="right">Items Count</StyledTableCell>
             <StyledTableCell align="right">Options</StyledTableCell>

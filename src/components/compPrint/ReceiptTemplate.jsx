@@ -26,13 +26,14 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
   }, []);
 
   return (
-    <div ref={printRef} style={{ fontFamily: "Arial, sans-serif", margin: 0 }}>
+    <div ref={printRef} style={{ fontFamily: "monospace", margin: 0 }}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           width: "100%",
+          gap: 4
         }}>
         <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
           {capitalizeFirstLetter(company.companyName)}!
@@ -63,10 +64,10 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         }}>
         <thead>
           <tr>
-            <th style={{ padding: "5px" }}>Qty</th>
-            <th style={{ padding: "8px" }}>Product</th>
-            <th style={{ padding: "5px" }}>Price</th>
-            <th style={{ padding: "5px" }}>Total</th>
+            <th style={{ padding: "5px", font: "caption" }}>Qty</th>
+            <th style={{ padding: "8px", font: "caption" }}>Product</th>
+            <th style={{ padding: "5px", font: "caption" }}>Price</th>
+            <th style={{ padding: "5px", font: "caption" }}>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +80,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 }}>
                 {product.quantity}
               </td>
-              <td style={{ padding: "8px", textAlign: "center" }}>
+              <td style={{ padding: "8px", textAlign: "center", font: "icon" }}>
                 {capitalizeFirstLetter(product.name)}
               </td>
               <td
@@ -104,28 +105,30 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         </tbody>
       </table>
       <hr style={{ height: 5, backgroundColor: "black" }} />
-      {company.taxRate && (
-        <p style={{ textAlign: "right", marginTop: "20px" }}>
-          <strong>Tax %: {company.taxRate}</strong>
+      <div style={{ fontSize: 15}}>
+        {company.taxRate && (
+          <p style={{ textAlign: "left", marginTop: "20px" }}>
+            <strong>Tax %: {company.taxRate}</strong>
+          </p>
+        )}
+        {discount !== undefined && discount !== null && discount !== 0 && (
+          <p style={{ textAlign: "left", marginTop: "20px" }}>
+            <strong>Discount: ₵{discount}</strong>
+          </p>
+        )}
+        <p style={{ textAlign: "left", marginTop: "20px" }}>
+          <strong>Total: ₵{total}</strong>
         </p>
-      )}
-      {discount !== undefined && discount !== null && discount !== 0 && (
-        <p style={{ textAlign: "right", marginTop: "20px" }}>
-          <strong>Discount: ₵{discount}</strong>
+        <p style={{ textAlign: "left", marginTop: "20px" }}>
+          <strong>Paid: ₵{amountPaid}</strong>
         </p>
-      )}
-      <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>Total: ₵{total}</strong>
-      </p>
-      <p style={{ textAlign: "right", marginTop: "20px" }}>
-        <strong>Paid: ₵{amountPaid}</strong>
-      </p>
-      {balance !== undefined && balance !== null && balance !== 0 && (
-        <p style={{ textAlign: "right", marginTop: "20px" }}>
-          <strong>Balance: ₵{balance}</strong>
-        </p>
-      )}
-      <hr style={{ height: 5, backgroundColor: "black" }} />
+        {balance !== undefined && balance !== null && balance !== 0 && (
+          <p style={{ textAlign: "left", marginTop: "20px" }}>
+            <strong>Balance: ₵{balance}</strong>
+          </p>
+        )}
+      </div>
+      <hr style={{ height: 5, backgroundColor: "black"  }} />
       <div
         style={{
           paddingTop: 5,
