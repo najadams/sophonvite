@@ -26,7 +26,7 @@ import {
 const DummyCard = ({ children, title, sx }) => (
   <Box
     sx={{
-      width: { xs: "100%", sm: "400px", md: "500px" },
+      width: { xs: "100%", sm: "400px", md: "367px" },
       height: { xs: "auto", sm: "400px" },
       margin: 2,
       flexGrow: 1,
@@ -53,13 +53,13 @@ export const Widgets = ({ title, count }) => {
   return (
     <Card
       sx={{
-        width: { xs: "auto", sm: "auto", lg: "auto" },
-        height: "auto",
+        width: { xs: "165px", sm: "auto", md: "148px", lg: "272px" },
+        height: { xs: "90px", sm: "auto",md: "130px", lg: "106px" },
         margin: 1,
         padding: 0,
       }}>
       <CardContent>
-        <span style={{display: 'flex', gap: 10}}>
+        <span style={{ display: "flex", gap: 10 }}>
           <Typography variant="body" component="div">
             {title}
           </Typography>
@@ -120,6 +120,7 @@ const Dashboard = () => {
             flexWrap: "wrap",
             flexDirection: "row-reverse",
           }}>
+          <Widgets title={"Sales "} count={userCount} />
           <Widgets title={"Employees"} count={userCount} />
           <Widgets title={"Products"} count={productCount} />
           <Widgets title={"Customers"} count={customerCount} />
@@ -235,7 +236,7 @@ const Dashboard = () => {
           )}
         </DummyCard>
 
-        <DummyCard title={"Customer Analysis"} />
+        <DummyCard title={"Cookie"} />
         <SlidingCard />
       </div>
     </div>
