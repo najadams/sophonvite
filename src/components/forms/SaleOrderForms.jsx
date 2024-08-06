@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Formik, Field, FieldArray, Form } from "formik";
 import {
   Button,
@@ -50,7 +50,11 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
-  const customerOptions = [" <<<< Add New Customer  >>>>", ...customers]
+  const [customerOptions, setCustomerOptions] = useState([
+    "<<<< Add New Customer >>>>",
+    ...customers,
+  ]);
+  useEffect(() => console.log(customers) , [])
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -93,15 +97,20 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
   };
 
   const handleNewCustomerSubmit = async () => {
-    // Logic to add a new customer to the database
-    // You can use your tableActions or API call here
     try {
       const newCustomer = await tableActions.addCustomer({
         name: newCustomerName,
         companyId,
       });
-      customerOptions.push(newCustomer.name); // Add new customer to options
+      setCustomerOptions((prevOptions) => [
+        "<<<< Add New Customer >>>>",
+        ...prevOptions.filter(
+          (option) => option !== "<<<< Add New Customer >>>>"
+        ),
+        newCustomer.name,
+      ]);
       setNewCustomerDialogOpen(false); // Close the dialog
+      setNewCustomerName(""); // Clear the input field
     } catch (error) {
       console.log(error);
       setError("Failed to add new customer");
@@ -135,7 +144,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
                     options={capitalizeFirstLetter(customerOptions)}
                     value={field.value}
                     onChange={(event, newValue) => {
-                      if (newValue === "Add New Customer") {
+                      if (newValue === "<<<< Add New Customer >>>>") {
                         setNewCustomerDialogOpen(true);
                       } else {
                         form.setFieldValue(field.name, newValue || "");
@@ -441,6 +450,43 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
         <DialogActions>
           <Button onClick={() => setModalOpen(false)} color="primary">
             OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog for new customer */}
+      <Dialog
+        open={newCustomerDialogOpen}
+        onClose={() => setNewCustomerDialogOpen(false)}
+        aria-labelledby="new-customer-dialog-title"
+        aria-describedby="new-customer-dialog-description">
+        <DialogTitle id="new-customer-dialog-title">
+          {"Add New Customer"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="new-customer-dialog-description">
+            Enter the name of the new customer:
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="new-customer-name"
+            label="Customer Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCustomerName}
+            onChange={(e) => setNewCustomerName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setNewCustomerDialogOpen(false)}
+            color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleNewCustomerSubmit} color="primary">
+            Add
           </Button>
         </DialogActions>
       </Dialog>

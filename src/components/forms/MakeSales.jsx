@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const MakeSales = ({ customers, Products}) => {
+const MakeAles = ({ customers, Products, handleClose }) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -50,7 +50,10 @@ const MakeSales = ({ customers, Products}) => {
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
-  const customerOptions = [" <<<< Add New Customer  >>>>", ...customers];
+  const [customerOptions, setCustomerOptions] = useState([
+    "<<<< Add New Customer >>>>",
+    ...customers,
+  ]);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -75,11 +78,11 @@ const MakeSales = ({ customers, Products}) => {
       } else {
         setLoading(true);
         setSubmitting(true);
-        console.log("coco")
         await tableActions.addReceipt(values, companyId, workerId);
         setOpen(true);
         setPrintValues({ ...values, balance }); // Store values for printing
         setTimeout(() => {
+          handleClose();
         }, 1000);
       }
     } catch (error) {
@@ -88,21 +91,25 @@ const MakeSales = ({ customers, Products}) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => { }, 1000);
-      resetForm();
+      setTimeout(() => {}, 1000);
     }
   };
 
   const handleNewCustomerSubmit = async () => {
-    // Logic to add a new customer to the database
-    // You can use your tableActions or API call here
     try {
       const newCustomer = await tableActions.addCustomer({
         name: newCustomerName,
         companyId,
       });
-      customerOptions.push(newCustomer.name); // Add new customer to options
+      setCustomerOptions((prevOptions) => [
+        "<<<< Add New Customer >>>>",
+        ...prevOptions.filter(
+          (option) => option !== "<<<< Add New Customer >>>>"
+        ),
+        `None - ${newCustomer.name}`,
+      ]);
       setNewCustomerDialogOpen(false); // Close the dialog
+      setNewCustomerName(`None-${newCustomerName}`); // Clear the input field
     } catch (error) {
       console.log(error);
       setError("Failed to add new customer");
@@ -110,7 +117,7 @@ const MakeSales = ({ customers, Products}) => {
   };
 
   return (
-    <div>
+    <div style={{background: ''}}>
       <Formik
         initialValues={{
           customerName: "",
@@ -136,7 +143,7 @@ const MakeSales = ({ customers, Products}) => {
                     options={capitalizeFirstLetter(customerOptions)}
                     value={field.value}
                     onChange={(event, newValue) => {
-                      if (newValue === "Add New Customer") {
+                      if (newValue === "<<<< Add New Customer >>>>") {
                         setNewCustomerDialogOpen(true);
                       } else {
                         form.setFieldValue(field.name, newValue || "");
@@ -209,7 +216,7 @@ const MakeSales = ({ customers, Products}) => {
                                   <TextField
                                     style={{
                                       flex: 1,
-                                      width: matchesMobile ? 150 : 450,
+                                      width: matchesMobile ? 150 : 400,
                                     }}
                                     {...params}
                                     label="Product Name"
@@ -231,9 +238,9 @@ const MakeSales = ({ customers, Products}) => {
                               const selectedProduct = Products.find(
                                 (p) => p.name === product.name
                               );
-                              if (value > selectedProduct?.onhand) {
-                                return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
-                              }
+                              // if (value > selectedProduct?.onhand) {
+                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
+                              // }
                             }}
                             onChange={(event) => {
                               const newValue = parseInt(event.target.value);
@@ -265,7 +272,7 @@ const MakeSales = ({ customers, Products}) => {
                             }}
                           />
                         </div>
-                        <div style={{ display: "flex", flex: 1, gap: 20 }}>
+                        <div style={{ display: "flex", flex: 1, gap: 10 }}>
                           <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <Input
@@ -273,11 +280,9 @@ const MakeSales = ({ customers, Products}) => {
                                   Products.find((p) => p.name === product.name)
                                     ?.salesPrice
                                 }
-                                style={{
-                                  flex: 1,
-                                  width: matchesMobile ? 100 : 150,
-                                }}
+                                style={matchesMobile ? {} : { flex: 1 }}
                                 label="Price"
+                                readOnly
                                 inputProps={{
                                   style: { textAlign: "right" },
                                 }}
@@ -394,8 +399,8 @@ const MakeSales = ({ customers, Products}) => {
               <Button
                 variant="contained"
                 color="success"
-                onClick={async () => {
-                  await submitForm(); // Trigger form submission
+                onClick={() => {
+                  submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
@@ -404,8 +409,8 @@ const MakeSales = ({ customers, Products}) => {
               <Button
                 variant="contained"
                 color="success"
-                onClick={async () => {
-                  await submitForm(); // Trigger form submission
+                onClick={() => {
+                  submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
@@ -449,6 +454,43 @@ const MakeSales = ({ customers, Products}) => {
         </DialogActions>
       </Dialog>
 
+      {/* Dialog for new customer */}
+      <Dialog
+        open={newCustomerDialogOpen}
+        onClose={() => setNewCustomerDialogOpen(false)}
+        aria-labelledby="new-customer-dialog-title"
+        aria-describedby="new-customer-dialog-description">
+        <DialogTitle id="new-customer-dialog-title">
+          {"Add New Customer"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="new-customer-dialog-description">
+            Enter the name of the new customer:
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="new-customer-name"
+            label="Customer Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCustomerName}
+            onChange={(e) => setNewCustomerName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setNewCustomerDialogOpen(false)}
+            color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleNewCustomerSubmit} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Receipt Template for printing */}
       {printValues && (
         <div style={{ display: "none" }}>
@@ -469,4 +511,4 @@ const MakeSales = ({ customers, Products}) => {
   );
 };
 
-export default MakeSales;
+export default MakeAles;

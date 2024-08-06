@@ -111,7 +111,7 @@ export const tableActions = {
   fetchCustomersNames: async (companyId) => {
     try {
       const response = await axios.get(`/api/customers/${companyId}`);
-      const data = response.data.customers.map((item) => (capitalizeFirstLetter(`${item?.company} - ${item?.name}`)));
+      const data = response.data.customers.map((item) => (capitalizeFirstLetter(`${item?.company || "None"} - ${item?.name}`)));
       return data;
     } catch (error) {
       throw new Error("Failed to fetch customers");
