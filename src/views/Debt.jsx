@@ -11,6 +11,7 @@ const Debt = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const fetchDebts = async () => {
     try {
@@ -41,6 +42,10 @@ const Debt = () => {
     setSearchTerm(term);
   };
 
+  const toggleFilters = () => {
+    setShowFilters((prev) => !prev);
+  };
+
   const filteredDebts = debts?.filter((debt) =>
     debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -63,29 +68,68 @@ const Debt = () => {
             flexWrap: "wrap",
             flexDirection: "row-reverse",
             alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 10,
           }}>
-          <Widgets title={"Customers"} count={debts?.length || 0} />
-          <Widgets
-            title={"Total Amount"}
-            count={`₵${
-              debts?.reduce((total, debt) => total + debt.amount, 0) || 0
-            }`}
-          />
-          <span style={{ marginBottom: 10 }}>
-            <label
-              htmlFor="dateInput"
-              style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-              Select Date:
-            </label>
-            <input
-              className="date-input"
-              type="date"
-              id="dateInput"
-              value={selectedDate.toISOString().split("T")[0]}
-              onChange={handleDateChange}
+          <div style={{ display: "flex" }}>
+            <Widgets title={"Customers"} count={debts?.length || 0} />
+            <Widgets
+              title={"Total Amount"}
+              count={`₵${
+                debts?.reduce((total, debt) => total + debt.amount, 0) || 0
+              }`}
             />
-          </span>
-          <SearchField onSearch={handleSearch} />
+          </div>
+          <div className={`filter-options ${showFilters ? "visible" : ""}`}>
+            <SearchField onSearch={handleSearch} />
+            <span style={{ padding: 10 }}>
+              <label
+                htmlFor="dateInput"
+                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
+                Select Date:
+              </label>
+              <input
+                className="date-input"
+                type="date"
+                id="dateInput"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={handleDateChange}
+              />
+            </span>
+            <span style={{ padding: 10 }}>
+              <label
+                htmlFor="All"
+                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
+                All Debtors:
+              </label>
+              <input
+                className="date-nput"
+                id="All"
+                style={{
+                  height: 24,
+                  width: 20,
+                  color: "blue",
+                  position: "relative",
+                  top: 5,
+                }}
+                type="checkbox"
+                // onChange={handleDateChange}
+              />
+            </span>
+          </div>
+          <div className="filter-icon-container">
+            <i
+              className="bx bx-filter filter-icon"
+              onClick={toggleFilters}
+              style={{
+                fontSize: 40,
+                borderRadius: 10,
+                backgroundColor: "white",
+                padding: 5,
+                cursor: "pointer",
+              }}></i>
+            <span className="filter-text">Filters</span>
+          </div>
         </div>
         {!isLoading && !isError && filteredDebts && filteredDebts.length > 0 ? (
           filteredDebts.map((debt) => (

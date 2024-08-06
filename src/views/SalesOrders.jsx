@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import AddItem from "../hooks/AddItem";
 import SalesOrderForms from "../components/forms/SaleOrderForms";
 import { useSelector } from "react-redux";
@@ -8,15 +8,21 @@ import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
+import { Box, Tabs, Tab, Typography } from "@mui/material";
 import SearchField from "../hooks/SearchField";
+import { TabPanel, a11yProps } from "./ProductCatalogue";
+
+const MakeSales = lazy(() => import("../components/forms/MakeSales"))
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
+  const [value, setValue] = React.useState(0);
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [totalSales, setTotalSales] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -35,6 +41,10 @@ const SalesOrders = () => {
 
     fetchProducts();
   }, [companyId]);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const fetchReceipts = async () => {
     try {
@@ -75,6 +85,10 @@ const SalesOrders = () => {
     refetch();
   };
 
+  const toggleFilters = () => {
+    setShowFilters((prev) => !prev);
+  };
+
   const filteredReceipts = receipts
     ? receipts.filter((receipt) =>
         receipt.customerName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -87,66 +101,102 @@ const SalesOrders = () => {
     <div className="page">
       <div className="heading">
         <div>
-          <h1 style={{ fontWeight: 200 }}>Sales Order</h1>
+          <h1 style={{ fontWeight: 200 }}>Sales</h1>
         </div>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          indicatorColor="secondary"
+          textColor="inherit"
+          variant="fullWidth"
+          aria-label="full width tabs example">
+          <Tab label="Sales" {...a11yProps(0)} />
+          <Tab label="Make Sales" {...a11yProps(1)} />
+          {/* <Tab label="Groups" {...a11yProps(1)} /> */}
+        </Tabs>
         <AddItem title={"Make Sales"}>
           <SalesOrderForms
-            customerOptions={customerOptions}
+            customers={customerOptions}
             Products={productOptions}
           />
         </AddItem>
       </div>
 
-      <div className="content">
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row-reverse",
-            alignItems: "flex-end",
-          }}>
-          <Widgets title={"Sales"} count={`₵${totalSales}`} />
-          <div style={{ marginBottom: 10 }}>
-            <label
-              htmlFor="dateInput"
-              style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-              Select Date:
-            </label>
-            <input
-              className="date-input"
-              type="date"
-              id="dateInput"
-              value={selectedDate.toISOString().split("T")[0]} // Format date to YYYY-MM-DD
-              onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            />
+      <TabPanel value={value} index={0}>
+        <div className="content">
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              flexWrap: "wrap",
+              flexDirection: "row-reverse",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}>
+            <Widgets title={"Sales"} count={`₵${totalSales}`} />
+            <div className={`filter-options ${showFilters ? "visible" : ""}`}>
+              <span style={{ padding: 10 }}>
+                <label
+                  htmlFor="dateInput"
+                  style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
+                  Select Date:
+                </label>
+                <input
+                  className="date-input"
+                  type="date"
+                  id="dateInput"
+                  value={selectedDate.toISOString().split("T")[0]} // Format date to YYYY-MM-DD
+                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                />
+              </span>
+              <SearchField
+                // customstyles={['paddingLeft: 20', 'background: "black"']}
+                onSearch={handleSearch}
+                placeholder={"Search Customer Name"}
+              />
+            </div>
+            <div className="filter-icon-container">
+              <i
+                className="bx bx-filter filter-icon"
+                onClick={toggleFilters}
+                style={{
+                  fontSize: 40,
+                  borderRadius: 10,
+                  backgroundColor: "white",
+                  padding: 5,
+                  cursor: "pointer",
+                }}></i>
+              <span className="filter-text">Filters</span>
+            </div>
           </div>
-          <SearchField
-            onSearch={handleSearch}
-            placeholder={"Search Customer Name"}
-          />
+          {!isLoading &&
+          !isError &&
+          filteredReceipts &&
+          filteredReceipts.length > 0 ? (
+            <div style={{ width: '100%' }}>
+              <CollapsibleTable
+                receipts={filteredReceipts}
+                onFlagChange={handleFlaggedChange}
+              />
+            </div> 
+          ) : (
+            <div>
+              {selectedDate.toISOString().split("T")[0] ===
+              new Date().toISOString().split("T")[0] ? (
+                <h2 style={{ paddingTop: "50%" }}>No Sales Made Today </h2>
+              ) : (
+                <h2 style={{ paddingTop: "50%" }}>
+                  No Sales Made on {selectedDate.toISOString().split("T")[0]}
+                </h2>
+              )}
+            </div>
+          )}
         </div>
-        {!isLoading &&
-        !isError &&
-        filteredReceipts &&
-        filteredReceipts.length > 0 ? (
-          <CollapsibleTable
-            receipts={filteredReceipts}
-            onFlagChange={handleFlaggedChange}
-          />
-        ) : (
-          <div className="content">
-            {selectedDate.toISOString().split("T")[0] ===
-            new Date().toISOString().split("T")[0] ? (
-              <h2 style={{ paddingTop: "50%" }}>No Sales Made Today</h2>
-            ) : (
-              <h2 style={{ paddingTop: "50%" }}>
-                No Sales Made on {selectedDate.toISOString().split("T")[0]}
-              </h2>
-            )}
-          </div>
-        )}
-      </div>
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <MakeSales customers={customerOptions} Products={productOptions} />
+      </TabPanel>
     </div>
   );
 };
