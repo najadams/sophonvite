@@ -98,7 +98,7 @@ export const tableActions = {
       const data = response.data.customers.map((item, index) => ({
         id: item._id,
         index: index + 1,
-        company: item.company,
+        // company: item.company,
         name: item.name,
         phone: item.phone,
         // email: item.email,
