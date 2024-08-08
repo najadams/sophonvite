@@ -78,6 +78,8 @@ const SalesOrders = () => {
   }, [receipts]);
 
   const handleSearch = (term) => {
+    console.log(term);
+    
     setSearchTerm(term);
   };
 
@@ -151,8 +153,7 @@ const SalesOrders = () => {
                 />
               </span>
               <SearchField
-                // customstyles={['paddingLeft: 20', 'background: "black"']}
-                onSearch={handleSearch}
+                onSearch={handleSearch} // Update search term state
                 placeholder={"Search Customer Name"}
               />
             </div>
@@ -170,16 +171,14 @@ const SalesOrders = () => {
               <span className="filter-text">Filters</span>
             </div>
           </div>
-          {!isLoading &&
-          !isError &&
-          filteredReceipts &&
-          filteredReceipts.length > 0 ? (
-            <div style={{ width: '100%' }}>
+          {!isLoading && !isError && receipts && receipts.length > 0 ? (
+            <div style={{ width: "100%" }}>
               <CollapsibleTable
-                receipts={filteredReceipts}
+                receipts={receipts}
+                searchTerm={searchTerm} // Pass search term to CollapsibleTable
                 onFlagChange={handleFlaggedChange}
               />
-            </div> 
+            </div>
           ) : (
             <div>
               {selectedDate.toISOString().split("T")[0] ===
@@ -194,6 +193,7 @@ const SalesOrders = () => {
           )}
         </div>
       </TabPanel>
+
       <TabPanel value={value} index={1}>
         <MakeSales customers={customerOptions} Products={productOptions} />
       </TabPanel>

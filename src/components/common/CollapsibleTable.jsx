@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -33,8 +33,20 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CollapsibleTable({ receipts, onFlagChange }) {
+function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
   const [updatedReceipts, setUpdatedReceipts] = useState(receipts);
+
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = receipts.filter((receipt) =>
+        receipt.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        receipt.workerName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setUpdatedReceipts(filtered);
+    } else {
+      setUpdatedReceipts(receipts);
+    }
+  }, [searchTerm, receipts]);
 
   const handleFlagChange = (id, flagged) => {
     setUpdatedReceipts((prevReceipts) =>
@@ -74,6 +86,8 @@ function CollapsibleTable({ receipts, onFlagChange }) {
 
 CollapsibleTable.propTypes = {
   receipts: PropTypes.array.isRequired,
+  onFlagChange: PropTypes.func.isRequired,
+  searchTerm: PropTypes.string.isRequired,
 };
 
 export default CollapsibleTable;
