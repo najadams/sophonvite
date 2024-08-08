@@ -145,6 +145,7 @@ const MakeAles = ({ customers, Products, handleClose }) => {
                     onChange={(event, newValue) => {
                       if (newValue === "<<<< Add New Customer >>>>") {
                         setNewCustomerDialogOpen(true);
+                        form.setFieldValue(field.name, "")
                       } else {
                         form.setFieldValue(field.name, newValue || "");
                       }
