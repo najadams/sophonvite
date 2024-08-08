@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import SalesRoutes from "./sales/SalesRoutes";
 import DebtsRoutes from "./debts/DebtsRoutes";
 import Debt from "../views/Debt";
+import ReportsRoutes from "./reports/ReportsRoutes";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
 const Customers = lazy(() => import("../views/Customers"));
@@ -44,6 +45,7 @@ const AuthenticatedRoutes = () => {
         element={<WorkerEntry isLoggedIn={isLoggedIn} />}
       />
       <Route path="/sales/*" element={<SalesRoutes />} />
+      <Route path="/reports/*" element={<ReportsRoutes />} />
       <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />
       <Route path="/notification" element={<Notifications />} />
       <Route path="/*" element={<NoPage />} />
