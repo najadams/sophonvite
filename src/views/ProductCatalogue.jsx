@@ -46,7 +46,7 @@ export const TabPanel = (props) => {
   );
 };
 
-export const a11yProps = (index) => {
+export const allyProps = (index) => {
   return {
     id: `full-width-tab-${index}`,
     "aria-controls": `full-width-tabpanel-${index}`,
@@ -78,8 +78,6 @@ const ProductCatalogue = () => {
         <div style={{
           display: 'flex', 
           flexDirection: 'row',
-          // gap: ,
-          // background: 'blue',
           width: '40%'
         }}>
           <Tabs
