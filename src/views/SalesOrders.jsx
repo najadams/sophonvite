@@ -78,8 +78,6 @@ const SalesOrders = () => {
   }, [receipts]);
 
   const handleSearch = (term) => {
-    console.log(term);
-    
     setSearchTerm(term);
   };
 
