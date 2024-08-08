@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
-import UsersCard from "../components/UsersCard"; // Adjust the import path as needed
+import UsersCard from "../components/UsersCard";
 import SearchField from "../hooks/SearchField";
 
 const Debt = () => {
@@ -12,6 +12,7 @@ const Debt = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [showAllDebtors, setShowAllDebtors] = useState(false);
 
   const fetchDebts = async () => {
     try {
@@ -46,9 +47,15 @@ const Debt = () => {
     setShowFilters((prev) => !prev);
   };
 
-  const filteredDebts = debts?.filter((debt) =>
-    debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleShowAllChange = (e) => {
+    setShowAllDebtors(e.target.checked);
+  };
+
+  const filteredDebts = showAllDebtors
+    ? debts
+    : debts?.filter((debt) =>
+        debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
   if (isLoading) return <Loader />;
 
@@ -103,17 +110,11 @@ const Debt = () => {
                 All Debtors:
               </label>
               <input
-                className="date-nput"
+                className="date-input"
                 id="All"
-                style={{
-                  height: 24,
-                  width: 20,
-                  color: "blue",
-                  position: "relative",
-                  top: 5,
-                }}
                 type="checkbox"
-                // onChange={handleDateChange}
+                checked={showAllDebtors}
+                onChange={handleShowAllChange}
               />
             </span>
           </div>

@@ -159,13 +159,13 @@ const Dashboard = () => {
           )}
         </DummyCard>
 
-        <DummyCard title={"Profit Analysis"}>
+        <DummyCard title={"Revenue Analysis"}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
           ) : isOverallError ? (
-            <Typography>Error loading profit data</Typography>
+            <Typography>Error loading Revenue data</Typography>
           ) : overall?.profit.length === 0 ? (
-            <Typography>No Profit data available</Typography>
+            <Typography>No Revenue data available</Typography>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart
