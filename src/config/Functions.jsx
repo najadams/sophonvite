@@ -474,3 +474,27 @@ export const updateAccount = async (data) => {
     throw error;
   }
 };
+
+export const fetchReportData = async (companyId, reportType, filters) => {
+  try {
+    const response = await axios.get(`/api/reports/${companyId}`, {
+      params: {
+        reportType: reportType,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      },
+    });
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching report data:", error);
+    throw new Error("Network response was not ok");
+  }
+};
+
+export const getNextDayDate = () => {
+  const today = new Date();
+  const nextDay = new Date(today);
+  nextDay.setDate(today.getDate() + 1);
+  return nextDay.toISOString().split("T")[0];
+};
