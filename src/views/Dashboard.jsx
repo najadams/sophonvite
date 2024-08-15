@@ -120,7 +120,7 @@ const Dashboard = () => {
           <Widgets title={"Customers"} count={customerCount} />
         </div>
 
-        <DummyCard title={"Overall Sales Analysis"}>
+        <DummyCard title={"Revenue"}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
           ) : isOverallError ? (
@@ -153,7 +153,7 @@ const Dashboard = () => {
           )}
         </DummyCard>
 
-        <DummyCard title={"Revenue Analysis"}>
+        <DummyCard title={"Sales Profit"}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
           ) : isOverallError ? (

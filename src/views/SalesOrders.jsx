@@ -8,9 +8,9 @@ import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
-import { Box, Tabs, Tab, Typography } from "@mui/material";
+import {Tabs, Tab } from "@mui/material";
 import SearchField from "../hooks/SearchField";
-import { TabPanel, a11yProps } from "./ProductCatalogue";
+import { TabPanel, allyProps } from "./ProductCatalogue";
 
 const MakeSales = lazy(() => import("../components/forms/MakeSales"))
 
@@ -110,9 +110,9 @@ const SalesOrders = () => {
           textColor="inherit"
           variant="fullWidth"
           aria-label="full width tabs example">
-          <Tab label="Sales" {...a11yProps(0)} />
-          <Tab label="Make Sales" {...a11yProps(1)} />
-          {/* <Tab label="Groups" {...a11yProps(1)} /> */}
+          <Tab label="Sales" {...allyProps(0)} />
+          <Tab label="Make Sales" {...allyProps(1)} />
+          {/* <Tab label="Groups" {...allyProps(1)} /> */}
         </Tabs>
         <AddItem title={"Make Sales"}>
           <SalesOrderForms

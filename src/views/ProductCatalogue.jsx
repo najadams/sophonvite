@@ -87,10 +87,10 @@ const ProductCatalogue = () => {
             textColor="inherit"
             variant="fullWidth"
             aria-label="full width tabs example">
-            <Tab label="Products" {...a11yProps(0)} />
-            <Tab label="Receive inventory" {...a11yProps(1)} />
-            <Tab label="Reports" {...a11yProps(2)} />
-            <Tab label="Groups" {...a11yProps(3)} />
+            <Tab label="Products" {...allyProps(0)} />
+            <Tab label="Receive inventory" {...allyProps(1)} />
+            <Tab label="Reports" {...allyProps(2)} />
+            <Tab label="Groups" {...allyProps(3)} />
           </Tabs>
         </div>
         <AddItem>
