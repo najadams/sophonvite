@@ -53,7 +53,7 @@ export const Widgets = ({ title, count }) => {
   return (
     <Card
       sx={{
-        width: { xs: "165px", sm: "auto", md: "148px", lg: "272px" },
+        width: { xs: "45%", sm: "23%", mymd: "23%",md: "23%", lg: "272px" },
         height: { xs: "90px", sm: "auto",md: "130px", lg: "106px" },
         margin: 1,
         padding: 0,
@@ -113,13 +113,7 @@ const Dashboard = () => {
       </div>
 
       <div className="content">
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row-reverse",
-          }}>
+        <div className="widgets">
           <Widgets title={"Sales "} count={userCount} />
           <Widgets title={"Employees"} count={userCount} />
           <Widgets title={"Products"} count={productCount} />

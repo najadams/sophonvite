@@ -135,6 +135,13 @@ header .image-text .header-text {
   padding-left: 30px;
 }
 
+.widgets{
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
+}
+
 /* === Chevron === */
 
 
@@ -187,6 +194,11 @@ header .image-text .header-text {
     margin: 20px;
   }
 
+  .widgets{
+    display: flex;
+    justify-content: center;
+    
+  }
   
 .filter-options.visible {
   display: flex;
