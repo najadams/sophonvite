@@ -1,10 +1,8 @@
 import React, { useState, useEffect, lazy } from "react";
-import { Box, Tabs, Tab, CircularProgress, Typography } from "@mui/material";
+import { Tabs, Tab, CircularProgress, Typography } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
-import SearchField from "../hooks/SearchField";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { fetchReportData, getNextDayDate } from "../config/Functions";
 
 // Lazy-loaded components
@@ -28,7 +26,6 @@ const Reports = () => {
   });
   const companyId = useSelector((state) => state.companyState.data.id);
   const matchesMobile = useMediaQuery("(max-width:600px)");
-  const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const salest = [
@@ -100,10 +97,6 @@ const Reports = () => {
     () => fetchReportData(companyId, "debts", filters),
     { enabled: value === 3, keepPreviousData: true }
   );
-
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
 
   const handleDateChange = (e, type) => {
     setFilters({ ...filters, [type]: e.target.value });
@@ -202,7 +195,6 @@ const Reports = () => {
             marginBottom: 10,
           }}>
           <div className={`filter-options ${showFilters ? "visible" : ""}`}>
-            <SearchField onSearch={handleSearch} />
             <span style={{ padding: 10 }}>
               <label
                 htmlFor="startDate"
