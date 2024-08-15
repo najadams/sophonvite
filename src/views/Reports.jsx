@@ -31,6 +31,36 @@ const Reports = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
+  const salest = [
+    {
+      customerName: "John Doe",
+      date: "2024-08-01",
+      receipts: [
+        {
+          receiptId: "123",
+          totalAmountPaid: 100,
+          balance: 20,
+          discount: 10,
+          date: "2024-08-01",
+        },
+      ],
+    },
+    {
+      customerName: "Jane Smith",
+      date: "2024-08-02",
+      receipts: [
+        {
+          receiptId: "124",
+          totalAmountPaid: 200,
+          balance: 30,
+          discount: 15,
+          date: "2024-08-02",
+        },
+      ],
+    },
+  ];
+
+
   const {
     data: salesData,
     isLoading: isSalesLoading,
@@ -96,7 +126,7 @@ const Reports = () => {
             <Typography color="error">Error loading sales report</Typography>
           );
         if (!salesData) return <Typography>No sales data available</Typography>;
-        return <SalesReport salesData={salesData.sales} />;
+        return <SalesReport salesData={salesData.sales} salesTransactions={salesData.salesTransactions}/>;
       case 1:
         if (isPurchasesLoading) return <CircularProgress />;
         if (isPurchasesError)
