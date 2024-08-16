@@ -225,7 +225,7 @@ export const tableActions = {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return error.response?.data?.message || "An error occurred";
     }
   },
@@ -476,21 +476,31 @@ export const updateAccount = async (data) => {
 };
 
 export const fetchReportData = async (companyId, reportType, filters) => {
-  try {
-    const response = await axios.get(`/api/reports/${companyId}`, {
-      params: {
-        reportType: reportType,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-      },
-    });
-    console.log(response.data)
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching report data:", error);
-    throw new Error("Network response was not ok");
+  const { startDate, endDate } = filters;
+  
+  let endpoint;
+
+  switch (reportType) {
+    case "sales":
+      endpoint = `/api/reports/sales?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
+      break;
+    case "purchases":
+      endpoint = `/api/reports/purchases?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
+      break;
+    case "inventory":
+      endpoint = `/api/reports/inventory?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
+      break;
+    case "debts":
+      endpoint = `/api/reports/debts?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
+      break;
+    default:
+      throw new Error("Invalid report type");
   }
+
+  const response = await axios.get(endpoint);
+  return response.data;
 };
+
 
 export const getNextDayDate = () => {
   const today = new Date();
