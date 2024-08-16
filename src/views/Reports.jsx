@@ -115,7 +115,12 @@ const Reports = () => {
         );
       if (!inventoryData)
         return <Typography>No inventory data available</Typography>;
-      return <InventoryReport inventoryItems={inventoryData.invetentory} />;
+      return (
+        <InventoryReport
+          inventoryItems={inventoryData.aggregatedData}
+          inventoryData={inventoryData.inventoryData}
+        />
+      );
     }
 
     if (value === 3) {
