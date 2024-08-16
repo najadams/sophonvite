@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const MakeAles = ({ customers, Products, handleClose }) => {
+const MakeAles = ({ customers, Products }) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -58,17 +58,13 @@ const MakeAles = ({ customers, Products, handleClose }) => {
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
-
-  const handleSubmit = async (values, setSubmitting, resetForm) => {
+    const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
     );
-    values.total = total - values.discount; // Subtract discount from total
-    const balance = values.total - values.amountPaid;
+    values.total = total; // Maintain total before discount
+    const balance = values.total - values.amountPaid - values.discount;
 
     try {
       if (!values.customerName) {
@@ -78,11 +74,15 @@ const MakeAles = ({ customers, Products, handleClose }) => {
       } else {
         setLoading(true);
         setSubmitting(true);
-        await tableActions.addReceipt(values, companyId, workerId);
+        await tableActions.addReceipt(
+          { ...values, balance },
+          companyId,
+          workerId
+        );
         setOpen(true);
         setPrintValues({ ...values, balance }); // Store values for printing
         setTimeout(() => {
-          handleClose();
+          resetForm()
         }, 1000);
       }
     } catch (error) {
@@ -91,7 +91,6 @@ const MakeAles = ({ customers, Products, handleClose }) => {
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => {}, 1000);
     }
   };
 
@@ -274,7 +273,7 @@ const MakeAles = ({ customers, Products, handleClose }) => {
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          <Field name={`products.${index}.price`}>
+                          {/* <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <Input
                                 value={
@@ -286,6 +285,32 @@ const MakeAles = ({ customers, Products, handleClose }) => {
                                 readOnly
                                 inputProps={{
                                   style: { textAlign: "right" },
+                                }}
+                              />
+                            )}
+                          </Field> */}
+                          <Field name={`products.${index}.price`}>
+                            {({ field, form }) => (
+                              <TextField
+                                {...field}
+                                label="Price"
+                                type="number"
+                                fullWidth
+                                InputProps={{ style: { textAlign: "right" } }}
+                                onChange={(event) => {
+                                  const newPrice = parseFloat(
+                                    event.target.value
+                                  );
+                                  setFieldValue(
+                                    `products.${index}.price`,
+                                    newPrice
+                                  );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
+                                  setFieldValue(
+                                    `products.${index}.totalPrice`,
+                                    newTotalPrice
+                                  );
                                 }}
                               />
                             )}

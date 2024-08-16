@@ -68,8 +68,8 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
       (sum, product) => sum + product?.totalPrice,
       0
     );
-    values.total = total - values.discount; // Subtract discount from total
-    const balance = values.total - values.amountPaid;
+    values.total = total; // Subtract discount from total
+    const balance = values.total - (values.amountPaid - values.discount);
 
     try {
       if (!values.customerName) {

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useReactToPrint } from "react-to-print";
 import { capitalizeFirstLetter } from "../../config/Functions";
+import { Receipt } from "@mui/icons-material";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
   const {
