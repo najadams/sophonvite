@@ -91,12 +91,13 @@ function Row({ row, onFlagChange }) {
       products: row.detail,
       total: row.total,
       balance: row.balance,
+      discount: row.discount,
       amountPaid: row.amountPaid,
       date: formatDate(row.date),
       workerName: row.workerName,
     });
-    console.log(row);
     setTimeout(() => {
+      console.log(row.discount);
       setPrintValues(null);
     }, 2000);
   };
@@ -114,6 +115,7 @@ function Row({ row, onFlagChange }) {
             amountPaid={printValues.amountPaid}
             date={printValues.date}
             workerName={printValues.workerName}
+            discount={printValues.discount}
           />
         </div>
       )}
