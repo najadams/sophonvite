@@ -28,36 +28,6 @@ const Reports = () => {
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [showFilters, setShowFilters] = useState(false);
 
-  const salest = [
-    {
-      customerName: "John Doe",
-      date: "2024-08-01",
-      receipts: [
-        {
-          receiptId: "123",
-          totalAmountPaid: 100,
-          balance: 20,
-          discount: 10,
-          date: "2024-08-01",
-        },
-      ],
-    },
-    {
-      customerName: "Jane Smith",
-      date: "2024-08-02",
-      receipts: [
-        {
-          receiptId: "124",
-          totalAmountPaid: 200,
-          balance: 30,
-          discount: 15,
-          date: "2024-08-02",
-        },
-      ],
-    },
-  ];
-
-
   const {
     data: salesData,
     isLoading: isSalesLoading,
@@ -111,48 +81,54 @@ const Reports = () => {
   };
 
   const renderContent = () => {
-    switch (value) {
-      case 0:
-        if (isSalesLoading) return <CircularProgress />;
-        if (isSalesError)
-          return (
-            <Typography color="error">Error loading sales report</Typography>
-          );
-        if (!salesData) return <Typography>No sales data available</Typography>;
-        return <SalesReport salesData={salesData.sales} salesTransactions={salesData.salesTransactions}/>;
-      case 1:
-        if (isPurchasesLoading) return <CircularProgress />;
-        if (isPurchasesError)
-          return (
-            <Typography color="error">
-              Error loading purchases report
-            </Typography>
-          );
-        if (!purchasesData)
-          return <Typography>No purchases data available</Typography>;
-        return <PurchasesReport data={purchasesData.purchases} />;
-      case 2:
-        if (isInventoryLoading) return <CircularProgress />;
-        if (isInventoryError)
-          return (
-            <Typography color="error">
-              Error loading inventory report
-            </Typography>
-          );
-        if (!inventoryData)
-          return <Typography>No inventory data available</Typography>;
-        return <InventoryReport data={inventoryData.inventory} />;
-      case 3:
-        if (isDebtsLoading) return <CircularProgress />;
-        if (isDebtsError)
-          return (
-            <Typography color="error">Error loading debts report</Typography>
-          );
-        if (!debtsData) return <Typography>No debts data available</Typography>;
-        return <DebtsReport data={debtsData.debts} />;
-      default:
-        return null;
+    if (value === 0) {
+      if (isSalesLoading) return <CircularProgress />;
+      if (isSalesError)
+        return (
+          <Typography color="error">Error loading sales report</Typography>
+        );
+      if (!salesData) return <Typography>No sales data available</Typography>;
+      return (
+        <SalesReport
+          salesData={salesData.sales}
+          salesTransactions={salesData.salesTransactions}
+        />
+      );
     }
+
+    if (value === 1) {
+      if (isPurchasesLoading) return <CircularProgress />;
+      if (isPurchasesError)
+        return (
+          <Typography color="error">Error loading purchases report</Typography>
+        );
+      if (!purchasesData)
+        return <Typography>No purchases data available</Typography>;
+      return <PurchasesReport data={purchasesData.purchases} />;
+    }
+
+    if (value === 2) {
+      if (isInventoryLoading) return <CircularProgress />;
+      if (isInventoryError)
+        return (
+          <Typography color="error">Error loading inventory report</Typography>
+        );
+      if (!inventoryData)
+        return <Typography>No inventory data available</Typography>;
+      return <InventoryReport inventoryItems={inventoryData.invetentory} />;
+    }
+
+    if (value === 3) {
+      if (isDebtsLoading) return <CircularProgress />;
+      if (isDebtsError)
+        return (
+          <Typography color="error">Error loading debts report</Typography>
+        );
+      if (!debtsData) return <Typography>No debts data available</Typography>;
+      return <DebtsReport data={debtsData.debts} />;
+    }
+
+    return null;
   };
 
   return (
