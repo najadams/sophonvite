@@ -89,12 +89,6 @@ const SalesOrders = () => {
     setShowFilters((prev) => !prev);
   };
 
-  const filteredReceipts = receipts
-    ? receipts.filter((receipt) =>
-        receipt.customerName.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
-
   if (isLoading) return <Loader />;
 
   return (
