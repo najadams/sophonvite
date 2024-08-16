@@ -120,7 +120,6 @@ const InventoryReports = ({ inventoryItems }) => {
         (total, data) => total + data.totalSalesPrice,
         0
       );
-      console.log(total)
       setTotalCash(total);
     }
   }, [inventoryItems]); // Add inventoryItems as a dependency
