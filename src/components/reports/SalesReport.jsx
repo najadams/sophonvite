@@ -52,7 +52,7 @@ const SummaryCards = ({ salesData }) => {
       <Grid item xs={3}>
         <Card>
           <CardContent>
-            <Typography variant="h6">Total Balance</Typography>
+            <Typography variant="h6">Balance || Amount Owed</Typography>
             <Typography variant="h4">
               ₵{salesData?.totalBalance.toFixed(2)}
             </Typography>
