@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   Grid,
   Paper,
@@ -24,7 +24,7 @@ const InventorySummaryCards = ({ inventoryData }) => {
           <CardContent>
             <Typography variant="h6">Total Items Sold</Typography>
             <Typography variant="h4">
-              ₵{inventoryData?.totalValue.toFixed(2)}
+              ₵{inventoryData?.toFixed(2)}
             </Typography>
           </CardContent>
         </Card>
@@ -112,13 +112,25 @@ const InventoryTable = ({ inventoryItems = [] }) => {
 };
 
 // InventoryReports Component
-const InventoryReports = ({ inventoryData, inventoryItems }) => {
+const InventoryReports = ({ inventoryItems }) => {
+  const [totalCash, setTotalCash] = useState(0);
+  useEffect(() => {
+    if (inventoryItems) {
+      const total = inventoryItems.reduce(
+        (total, data) => total + data.totalSalesPrice,
+        0
+      );
+      console.log(total)
+      setTotalCash(total);
+    }
+  }, [inventoryItems]); // Add inventoryItems as a dependency
+
   return (
-    <div className="content" style={{width: '100%'}}>
+    <div className="content" style={{ width: "100%" }}>
       <Typography variant="h4" gutterBottom>
         Inventory Report
       </Typography>
-      <InventorySummaryCards inventoryData={inventoryData} />
+      <InventorySummaryCards inventoryData={totalCash} />
       <div
         style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
         {/* <SearchField onSearch={setSearchTerm} /> */}

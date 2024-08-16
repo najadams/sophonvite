@@ -118,7 +118,6 @@ const Reports = () => {
       return (
         <InventoryReport
           inventoryItems={inventoryData.aggregatedData}
-          inventoryData={inventoryData.inventoryData}
         />
       );
     }
