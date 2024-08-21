@@ -193,24 +193,24 @@ export const tableActions = {
     }
   },
 
-  addCustomer: async ({ companyId, name, phone, email, address, company }) => {
-    try {
-      const customer = await axios.post(`/api/customer/`, {
-        belongsTo: companyId,
-        name,
-        phone,
-        email,
-        address,
-        company: company,
-      });
-      if (customer.status === 201) {
-        return customer;
-      }
-    } catch (error) {
-      console.log(error);
-      return error.response?.data?.message || "An error occurred";
+ addCustomer: async ({ companyId, name, phone, email, address, company }) => {
+  try {
+    const response = await axios.post(`/api/customer/`, {
+      belongsTo: companyId,
+      name,
+      phone,
+      email,
+      address,
+      company,
+    });
+    if (response.status === 201) {
+      return response.data; // Return the customer data
     }
-  },
+  } catch (error) {
+    console.log(error);
+    return error.response?.data?.message || "An error occurred";
+  }
+},
 
   updateProduct: async ({ id, name, costPrice, salesPrice, onHand }) => {
     try {
