@@ -54,9 +54,19 @@ const MakeAles = ({ customers, Products }) => {
     "<<<< Add New Customer >>>>",
     ...customers,
   ]);
+  const [productOptions, setProductOptions] = useState([
+    "<<<< Add New Product >>>>",
+    ...Products,
+  ]);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
+  const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerCompany, setNewCustomerCompany] = useState("");
+  const [newProductName, setNewProductName] = useState("");
+  const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
+  const [newProductCostPrice, setNewProductCostPrice] = useState("");
+  const [newProductOnhand, setNewProductOnhand] = useState("");
 
     const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
@@ -100,6 +110,7 @@ const MakeAles = ({ customers, Products }) => {
         name: newCustomerName,
         companyId,
       });
+      setNameHolder(newCustomer.name)
       setCustomerOptions((prevOptions) => [
         "<<<< Add New Customer >>>>",
         ...prevOptions.filter(
@@ -108,15 +119,47 @@ const MakeAles = ({ customers, Products }) => {
         `None - ${newCustomer.name}`,
       ]);
       setNewCustomerDialogOpen(false); // Close the dialog
-      setNewCustomerName(`None-${newCustomerName}`); // Clear the input field
+      // setNewCustomerName(""); // Clear the input field
     } catch (error) {
       console.log(error);
       setError("Failed to add new customer");
     }
   };
 
+  const handleNewProductSubmit = async () => {
+    try {
+      const newProduct = await tableActions.addProduct({
+        name: newProductName,
+        salesPrice: newProductSalesPrice,
+        costPrice: newProductCostPrice,
+        onhand: newProductOnhand,
+        companyId,
+      });
+
+      console.log("New Product Added:", newProduct); // Verify the product object
+
+      setProductOptions((prevOptions) => [
+        "<<<< Add New Product >>>>",
+        ...prevOptions.filter(
+          (option) => option !== "<<<< Add New Product >>>>"
+        ),
+        newProduct.name, // Add the new product name to the options
+      ]);
+
+      setNewProductDialogOpen(false); // Close the dialog
+      setNewProductName(""); // Clear the input fields
+      setNewProductSalesPrice("");
+      setNewProductCostPrice("");
+      setNewProductOnhand("");
+    } catch (error) {
+      console.log(error);
+      setError("Failed to add new product");
+    }
+  };
+
+
   return (
-    <div style={{background: ''}}>
+    <div>
       <Formik
         initialValues={{
           customerName: "",
@@ -144,7 +187,7 @@ const MakeAles = ({ customers, Products }) => {
                     onChange={(event, newValue) => {
                       if (newValue === "<<<< Add New Customer >>>>") {
                         setNewCustomerDialogOpen(true);
-                        form.setFieldValue(field.name, "")
+                        form.setFieldValue(field.name, "");
                       } else {
                         form.setFieldValue(field.name, newValue || "");
                       }
@@ -196,21 +239,28 @@ const MakeAles = ({ customers, Products }) => {
                                 options={productOptions}
                                 value={product.name}
                                 onChange={(event, newValue) => {
-                                  form.setFieldValue(field.name, newValue);
-                                  const selectedProduct = Products.find(
-                                    (p) => p.name === newValue
-                                  );
-                                  const newTotalPrice =
-                                    product.quantity *
-                                    selectedProduct?.salesPrice;
-                                  setFieldValue(
-                                    `products.${index}.totalPrice`,
-                                    newTotalPrice
-                                  );
-                                  setFieldValue(
-                                    `products.${index}.price`,
-                                    selectedProduct?.salesPrice || 0
-                                  ); // Update price
+                                  if (
+                                    newValue === "<<<< Add New Product >>>>"
+                                  ) {
+                                    setNewProductDialogOpen(true);
+                                    form.setFieldValue(field.name, "");
+                                  } else {
+                                    form.setFieldValue(field.name, newValue);
+                                    const selectedProduct = Products.find(
+                                      (p) => p.name === newValue
+                                    );
+                                    const newTotalPrice =
+                                      product.quantity *
+                                      selectedProduct?.salesPrice;
+                                    setFieldValue(
+                                      `products.${index}.totalPrice`,
+                                      newTotalPrice
+                                    );
+                                    setFieldValue(
+                                      `products.${index}.price`,
+                                      selectedProduct?.salesPrice || 0
+                                    ); // Update price
+                                  }
                                 }}
                                 renderInput={(params) => (
                                   <TextField
@@ -223,7 +273,7 @@ const MakeAles = ({ customers, Products }) => {
                                     fullWidth
                                   />
                                 )}
-                                autoSelect // Automatically select the first option
+                                autoSelect // not working : supposed to autoselect the first name
                               />
                             )}
                           </Field>
@@ -273,22 +323,6 @@ const MakeAles = ({ customers, Products }) => {
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          {/* <Field name={`products.${index}.price`}>
-                            {({ field }) => (
-                              <Input
-                                value={
-                                  Products.find((p) => p.name === product.name)
-                                    ?.salesPrice
-                                }
-                                style={matchesMobile ? {} : { flex: 1 }}
-                                label="Price"
-                                readOnly
-                                inputProps={{
-                                  style: { textAlign: "right" },
-                                }}
-                              />
-                            )}
-                          </Field> */}
                           <Field name={`products.${index}.price`}>
                             {({ field, form }) => (
                               <TextField
@@ -424,7 +458,7 @@ const MakeAles = ({ customers, Products }) => {
             <div className="bottom_left">
               <Button
                 variant="contained"
-                color="success"
+                color="primary"
                 onClick={() => {
                   submitForm(); // Trigger form submission
                 }}
@@ -434,7 +468,7 @@ const MakeAles = ({ customers, Products }) => {
               </Button>
               <Button
                 variant="contained"
-                color="success"
+                color="secondary"
                 onClick={() => {
                   submitForm(); // Trigger form submission
                 }}
@@ -504,6 +538,7 @@ const MakeAles = ({ customers, Products }) => {
             value={newCustomerName}
             onChange={(e) => setNewCustomerName(e.target.value)}
           />
+         
         </DialogContent>
         <DialogActions>
           <Button
@@ -513,6 +548,57 @@ const MakeAles = ({ customers, Products }) => {
           </Button>
           <Button onClick={handleNewCustomerSubmit} color="primary">
             Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog for adding new products */}
+      <Dialog
+        open={newProductDialogOpen}
+        onClose={() => setNewProductDialogOpen(false)}>
+        <DialogTitle>Add New Product</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the details of the new product.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Product Name"
+            fullWidth
+            value={newProductName}
+            onChange={(e) => setNewProductName(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Sales Price"
+            fullWidth
+            value={newProductSalesPrice}
+            onChange={(e) => setNewProductSalesPrice(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Cost Price"
+            fullWidth
+            value={newProductCostPrice}
+            onChange={(e) => setNewProductCostPrice(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Onhand Available"
+            fullWidth
+            value={newProductOnhand}
+            onChange={(e) => setNewProductOnhand(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setNewProductDialogOpen(false)}
+            color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleNewProductSubmit} color="primary">
+            Add Product
           </Button>
         </DialogActions>
       </Dialog>
