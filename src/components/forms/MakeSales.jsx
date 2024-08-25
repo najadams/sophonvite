@@ -134,9 +134,9 @@ const MakeAles = ({ customers, Products }) => {
     try {
       const data = await tableActions.addProduct({
         name: newProductName,
-        salesPrice: newProductSalesPrice,
         costPrice: newProductCostPrice,
-        onHand: newProductOnhand,
+        salesPrice: newProductSalesPrice,
+        onHhand: newProductOnhand,
         companyId,
       });
 
@@ -271,7 +271,7 @@ const MakeAles = ({ customers, Products }) => {
                                     form.setFieldValue(field.name, "");
                                   } else {
                                     form.setFieldValue(field.name, newValue);
-                                    const selectedProduct = Products.find(
+                                    const selectedProduct = productOptions.find(
                                       (p) => p.name === newValue
                                     );
                                     const newTotalPrice =
@@ -337,7 +337,7 @@ const MakeAles = ({ customers, Products }) => {
                             }}
                             onBlur={(event) => {
                               const value = parseInt(event.target.value);
-                              const selectedProduct = Products.find(
+                              const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
                               if (value > selectedProduct?.onhand) {
