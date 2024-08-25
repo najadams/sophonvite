@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Formik, Field, FieldArray, Form } from "formik";
 import {
   Button,
@@ -55,20 +55,24 @@ const MakeAles = ({ customers, Products }) => {
     ...customers,
   ]);
   const [productOptions, setProductOptions] = useState([
-    "<<<< Add New Product >>>>",
+    {
+      id: 1,
+      name: "<<<< Add New Product >>>>",
+    },
+
     ...Products,
   ]);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
-  const [newCustomerCompany, setNewCustomerCompany] = useState("");
   const [newProductName, setNewProductName] = useState("");
   const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
   const [newProductOnhand, setNewProductOnhand] = useState("");
+  const [nameHolder, setNameHolder] = useState("");
 
-    const handleSubmit = async (values, setSubmitting, resetForm) => {
+  const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
@@ -92,7 +96,7 @@ const MakeAles = ({ customers, Products }) => {
         setOpen(true);
         setPrintValues({ ...values, balance }); // Store values for printing
         setTimeout(() => {
-          resetForm()
+          resetForm();
         }, 1000);
       }
     } catch (error) {
@@ -128,23 +132,38 @@ const MakeAles = ({ customers, Products }) => {
 
   const handleNewProductSubmit = async () => {
     try {
-      const newProduct = await tableActions.addProduct({
+      const data = await tableActions.addProduct({
         name: newProductName,
         salesPrice: newProductSalesPrice,
         costPrice: newProductCostPrice,
-        onhand: newProductOnhand,
+        onHand: newProductOnhand,
         companyId,
       });
 
-      console.log("New Product Added:", newProduct); // Verify the product object
+      const newProduct = data.data;
 
+      // Update product options using a functional state update
       setProductOptions((prevOptions) => [
-        "<<<< Add New Product >>>>",
+        {
+          id: 1,
+          name: "<<<< Add New Product >>>>",
+        },
         ...prevOptions.filter(
-          (option) => option !== "<<<< Add New Product >>>>"
+          (option) => option.name !== "<<<< Add New Product >>>>"
         ),
-        newProduct.name, // Add the new product name to the options
+        {
+          name: newProductName,
+          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
+          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
+        },
       ]);
+
+      console.log(
+        "New product added:",
+        newProduct.name,
+        newProduct.salesprice,
+        newProduct.onhand
+      );
 
       setNewProductDialogOpen(false); // Close the dialog
       setNewProductName(""); // Clear the input fields
@@ -157,6 +176,10 @@ const MakeAles = ({ customers, Products }) => {
     }
   };
 
+  // UseEffect to confirm state update
+  useEffect(() => {
+    console.log("Updated productOptions:", productOptions);
+  }, [productOptions]); // This will run whenever productOptions is updated
 
   return (
     <div>
@@ -215,7 +238,9 @@ const MakeAles = ({ customers, Products }) => {
                 <div
                   style={{ display: "flex", gap: 10, flexDirection: "column" }}>
                   {values.products.map((product, index) => {
-                    const productOptions = Products.map((p) => p.name);
+                    const productItems = productOptions.map(
+                      (p) => p?.name || ""
+                    );
                     return (
                       <div
                         key={index}
@@ -236,7 +261,7 @@ const MakeAles = ({ customers, Products }) => {
                           <Field name={`products.${index}.name`}>
                             {({ field, form }) => (
                               <Autocomplete
-                                options={productOptions}
+                                options={productItems}
                                 value={product.name}
                                 onChange={(event, newValue) => {
                                   if (
@@ -285,10 +310,10 @@ const MakeAles = ({ customers, Products }) => {
                             label="Quantity"
                             type="number"
                             validate={(value) => {
-                              const selectedProduct = Products.find(
+                              const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                              // if (value > selectedProduct?.onhand) {
+                             // if (value > selectedProduct?.onhand) {
                               //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
                               // }
                             }}
@@ -298,9 +323,11 @@ const MakeAles = ({ customers, Products }) => {
                                 `products.${index}.quantity`,
                                 newValue
                               );
-                              const selectedProduct = Products.find(
+                              const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
+                              console.log(selectedProduct);
+                              
                               const newTotalPrice =
                                 newValue * selectedProduct?.salesPrice;
                               setFieldValue(
@@ -329,6 +356,7 @@ const MakeAles = ({ customers, Products }) => {
                                 {...field}
                                 label="Price"
                                 type="number"
+                                style={{ minWidth: 150 }}
                                 fullWidth
                                 InputProps={{ style: { textAlign: "right" } }}
                                 onChange={(event) => {
@@ -538,7 +566,6 @@ const MakeAles = ({ customers, Products }) => {
             value={newCustomerName}
             onChange={(e) => setNewCustomerName(e.target.value)}
           />
-         
         </DialogContent>
         <DialogActions>
           <Button
@@ -585,7 +612,7 @@ const MakeAles = ({ customers, Products }) => {
           />
           <TextField
             margin="dense"
-            label="Onhand Available"
+            label="Available Quantity"
             fullWidth
             value={newProductOnhand}
             onChange={(e) => setNewProductOnhand(e.target.value)}
