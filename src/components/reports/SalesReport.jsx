@@ -14,6 +14,7 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import SearchField from "../../hooks/SearchField";
+import { capitalizeFirstLetter } from "../../config/Functions";
 
 // SummaryCards Component
 const SummaryCards = ({ salesData }) => {
@@ -122,8 +123,8 @@ const SalesTable = ({ salesTransactions = [] }) => {
               <TableCell>
                 {new Date(transaction.date).toLocaleDateString()}
               </TableCell>
-              <TableCell>{transaction.customerName}</TableCell>
-              <TableCell align="right">{transaction.workerName}</TableCell>
+              <TableCell>{capitalizeFirstLetter(transaction.customerName)}</TableCell>
+              <TableCell align="right">{capitalizeFirstLetter(transaction.workerName)}</TableCell>
               <TableCell align="right">{transaction.totalAmount}</TableCell>
               <TableCell align="right">
                 ₵{transaction.totalAmountPaid.toFixed(2)}

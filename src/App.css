@@ -164,6 +164,35 @@ header .image-text .header-text {
   font-size: 22px;
 }
 
+.tabs{
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  justify-content: center;
+}
+
+@media screen and (max-width : 600px) {
+  .widgets{
+    display: flex;
+    justify-content: center;
+    
+  }
+  .filter-options.visible {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  overflow: visible;
+  flex-wrap: wrap;
+  background-color: #1976d2;
+  }
+  .bottom_left {
+  /* position: absolute; */
+  /* bottom: 40px; */
+  right: 40px;
+  display: flex;
+  gap: 1000px;
+}
+}
 
 @media screen and (max-width : 1120px) {
   .sidebar.collapsed{
@@ -193,25 +222,13 @@ header .image-text .header-text {
   .menu-links{
     margin: 20px;
   }
-
-  .widgets{
-    display: flex;
-    justify-content: center;
-    
-  }
   
-.filter-options.visible {
-  display: flex;
-  flex-direction: column;
-  opacity: 1;
-  overflow: visible;
-  flex-wrap: wrap;
+
 }
 .searchspacing {
   margin: 20px;
   background-color: #1976d2;
   width: 20000px;
-}
 }
 
 .menu-links{
@@ -338,6 +355,16 @@ header .image-text .header-text {
   color: #333; /* Set text color */
   background-color: #fff; /* Set background color */
 }
+.checkbox {
+  margin-left: 2px;
+  width: 30px; /* Set width */
+  height: 24px; /* Set height */
+  padding: 10px; /* Add padding */
+  border: 1px solid #ccc; /* Add border */
+  border-radius: 5px; /* Add border-radius for rounded corners */
+  color: #333; /* Set text color */
+  background-color: #fff; /* Set background color */
+}
 
 .pressable{
   display: inline-block;
@@ -376,6 +403,8 @@ header .image-text .header-text {
   transition: all 0.5s ease;
 }
 
+
+
 .filter-options.visible {
   display: flex;
   max-height: 500px; /* Adjust max-height as needed */
@@ -386,7 +415,7 @@ header .image-text .header-text {
 }
 
 .filter-options {
-  display: flex;
+  display: none;
   max-height: 0;
   opacity: 0;
   overflow: hidden;
