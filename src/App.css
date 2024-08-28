@@ -185,9 +185,9 @@ header .image-text .header-text {
   flex-wrap: wrap;
   }
   .bottom_left {
-  /* position: absolute; */
-  /* bottom: 40px; */
-  right: 40px;
+  /* position: relative; */
+  /* top: 40px; */
+  /* right: 40px; */
   display: flex;
   gap: 1000px;
 }
@@ -306,10 +306,10 @@ header .image-text .header-text {
 }
 
 .bottom_left {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
+  position: static;
+  
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
 }
 
