@@ -25,7 +25,7 @@ const Reports = () => {
     endDate: getNextDayDate(),
   });
   const companyId = useSelector((state) => state.companyState.data.id);
-  const matchesMobile = useMediaQuery("(max-width:600px)");
+  // const matchesMobile = useMediaQuery("(max-width:600px)");
   const [showFilters, setShowFilters] = useState(false);
 
   const {
@@ -141,13 +141,7 @@ const Reports = () => {
         <div>
           <h1 style={{ fontWeight: 200 }}>Reports</h1>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "60%",
-            justifyContent: "center",
-          }}>
+        <div className="tabs">
           <Tabs
             value={value}
             onChange={handleChange}
@@ -174,7 +168,7 @@ const Reports = () => {
             justifyContent: "space-between",
             marginBottom: 10,
           }}>
-          <div className={`filter-options ${showFilters ? "visible" : ""}`}>
+          <div style={{display: 'flex'}} className={`filter-options ${showFilters ? "visible" : ""}`}>
             <span style={{ padding: 10 }}>
               <label
                 htmlFor="startDate"
