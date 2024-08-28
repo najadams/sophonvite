@@ -20,7 +20,7 @@ import { capitalizeFirstLetter } from "../../config/Functions";
 const SummaryCards = ({ salesData }) => {
   return (
     <Grid container spacing={2}>
-      <Grid item xs={3}>
+      <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6">Total Sales</Typography>
@@ -30,7 +30,7 @@ const SummaryCards = ({ salesData }) => {
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6">Total Discounts</Typography>
@@ -40,7 +40,7 @@ const SummaryCards = ({ salesData }) => {
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6">Total Amount Paid</Typography>
@@ -50,7 +50,7 @@ const SummaryCards = ({ salesData }) => {
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6">Balance || Amount Owed</Typography>

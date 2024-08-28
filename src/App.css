@@ -307,7 +307,6 @@ header .image-text .header-text {
 
 .bottom_left {
   position: static;
-  
   display: flex;
   justify-content: flex-end;
   gap: 10px;
