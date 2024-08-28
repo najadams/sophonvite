@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const MakeAles = ({ customers, Products }) => {
+const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpdate }) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -70,7 +70,6 @@ const MakeAles = ({ customers, Products }) => {
   const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
   const [newProductOnhand, setNewProductOnhand] = useState("");
-  const [nameHolder, setNameHolder] = useState("");
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
@@ -114,7 +113,6 @@ const MakeAles = ({ customers, Products }) => {
         name: newCustomerName,
         companyId,
       });
-      setNameHolder(newCustomer.name)
       setCustomerOptions((prevOptions) => [
         "<<<< Add New Customer >>>>",
         ...prevOptions.filter(
@@ -123,7 +121,14 @@ const MakeAles = ({ customers, Products }) => {
         `None - ${newCustomer.name}`,
       ]);
       setNewCustomerDialogOpen(false); // Close the dialog
-      // setNewCustomerName(""); // Clear the input field
+      setNewCustomerName(""); // Clear the input field
+      handleCustomerUpdate((prevOptions) => [
+        // "<<<< Add New Customer >>>>",
+        ...prevOptions.filter(
+          (option) => option !== "<<<< Add New Customer >>>>"
+        ),
+        `None - ${newCustomer.name}`,
+      ]);
     } catch (error) {
       console.log(error);
       setError("Failed to add new customer");
@@ -158,12 +163,20 @@ const MakeAles = ({ customers, Products }) => {
         },
       ]);
 
-      console.log(
-        "New product added:",
-        newProduct.name,
-        newProduct.salesprice,
-        newProduct.onhand
-      );
+      handleProductUpdate((prevOptions) => [
+        {
+          id: 1,
+          name: "<<<< Add New Product >>>>",
+        },
+        ...prevOptions.filter(
+          (option) => option.name !== "<<<< Add New Product >>>>"
+        ),
+        {
+          name: newProductName,
+          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
+          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
+        },
+      ]);
 
       setNewProductDialogOpen(false); // Close the dialog
       setNewProductName(""); // Clear the input fields
@@ -175,11 +188,6 @@ const MakeAles = ({ customers, Products }) => {
       setError("Failed to add new product");
     }
   };
-
-  // UseEffect to confirm state update
-  useEffect(() => {
-    console.log("Updated productOptions:", productOptions);
-  }, [productOptions]); // This will run whenever productOptions is updated
 
   return (
     <div>
@@ -304,7 +312,7 @@ const MakeAles = ({ customers, Products }) => {
                           </Field>
 
                           <Field
-                            style={{ paddingRight: 10, flex: 1, width: 150 }}
+                            style={{ paddingRight: 0, flex: 1, width: '50%', minWidth: 150 }}
                             as={TextField}
                             name={`products.${index}.quantity`}
                             label="Quantity"
@@ -313,7 +321,7 @@ const MakeAles = ({ customers, Products }) => {
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                             // if (value > selectedProduct?.onhand) {
+                              // if (value > selectedProduct?.onhand) {
                               //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
                               // }
                             }}
@@ -327,7 +335,7 @@ const MakeAles = ({ customers, Products }) => {
                                 (p) => p.name === product.name
                               );
                               console.log(selectedProduct);
-                              
+
                               const newTotalPrice =
                                 newValue * selectedProduct?.salesPrice;
                               setFieldValue(
@@ -650,4 +658,4 @@ const MakeAles = ({ customers, Products }) => {
   );
 };
 
-export default MakeAles;
+export default MakeSales;
