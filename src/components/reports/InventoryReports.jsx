@@ -19,13 +19,11 @@ import { Padding } from "@mui/icons-material";
 const InventorySummaryCards = ({ inventoryData }) => {
   return (
     <Grid container spacing={2}>
-      <Grid item xs={3}>
+      <Grid item xs={4} sm={3} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6">Total Items Sold</Typography>
-            <Typography variant="h4">
-              ₵{inventoryData?.toFixed(2)}
-            </Typography>
+            <Typography variant="h4">₵{inventoryData?.toFixed(2)}</Typography>
           </CardContent>
         </Card>
       </Grid>
