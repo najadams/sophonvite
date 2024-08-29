@@ -6,6 +6,7 @@ import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
 import UsersCard from "../components/UsersCard";
 import SearchField from "../hooks/SearchField";
+import { useMediaQuery } from "@mui/material";
 
 const Debt = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -13,6 +14,7 @@ const Debt = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAllDebtors, setShowAllDebtors] = useState(false);
+  const matchesTablet = useMediaQuery("(max-width:600px)");
 
   const fetchDebts = async () => {
     try {
@@ -68,56 +70,22 @@ const Debt = () => {
       </div>
 
       <div className="content">
+        <div className="widgets">
+          <Widgets title={"Customers"} count={debts?.length || 0} />
+          <Widgets
+            title={"Total Amount"}
+            count={`₵${
+              debts?.reduce((total, debt) => total + debt.amount, 0) || 0
+            }`}
+          />
+        </div>
         <div
           style={{
-            display: "flex",
+            // display: "flex",
             width: "100%",
-            flexWrap: "wrap",
-            flexDirection: "row-reverse",
             alignItems: "flex-end",
             justifyContent: "space-between",
-            marginBottom: 10,
           }}>
-          <div style={{ display: "flex" }}>
-            <Widgets title={"Customers"} count={debts?.length || 0} />
-            <Widgets
-              title={"Total Amount"}
-              count={`₵${
-                debts?.reduce((total, debt) => total + debt.amount, 0) || 0
-              }`}
-            />
-          </div>
-          <div className={`filter-options ${showFilters ? "visible" : ""}`}>
-            <SearchField onSearch={handleSearch} />
-            <span style={{ padding: 10 }}>
-              <label
-                htmlFor="dateInput"
-                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                Select Date:
-              </label>
-              <input
-                className="date-input"
-                type="date"
-                id="dateInput"
-                value={selectedDate.toISOString().split("T")[0]}
-                onChange={handleDateChange}
-              />
-            </span>
-            <span style={{ padding: 10 }}>
-              <label
-                htmlFor="All"
-                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                All Debtors:
-              </label>
-              <input
-                className="date-input"
-                id="All"
-                type="checkbox"
-                checked={showAllDebtors}
-                onChange={handleShowAllChange}
-              />
-            </span>
-          </div>
           <div className="filter-icon-container">
             <i
               className="bx bx-filter filter-icon"
@@ -131,30 +99,70 @@ const Debt = () => {
               }}></i>
             <span className="filter-text">Filters</span>
           </div>
-        </div>
-        {!isLoading && !isError && filteredDebts && filteredDebts.length > 0 ? (
-          filteredDebts.map((debt) => (
-            <UsersCard
-              key={debt.id}
-              name={`₵${debt.amount}`}
-              companyFrom={debt.customerName}
-              onClick={() => console.log(`Debt ID: ${debt.id}`)}
-            />
-          ))
-        ) : (
-          <div className="content">
-            {selectedDate.toISOString().split("T")[0] ===
-            new Date().toISOString().split("T")[0] ? (
-              <h2 style={{ paddingTop: "50%" }}>No Debts Acquired Today</h2>
-            ) : (
-              <h2 style={{ paddingTop: "50%" }}>
-                No Debts Acquired from{" "}
-                {selectedDate.toISOString().split("T")[0]} to today
-              </h2>
-            )}
+          <div className={`filter-options ${showFilters ? "visible" : ""}`}>
+            <span style={{ padding: 10 }}>
+              <label
+                htmlFor="All"
+                style={{ marginLeft: 2, fontSize: "larger", font: "icon" }}>
+                All Debtors:
+              </label>
+              <input
+                className="checkbox"
+                id="All"
+                type="checkbox"
+                checked={showAllDebtors}
+                onChange={handleShowAllChange}
+              />
+            </span>
+            <span style={{ display: "flex" }}>
+              {/* <label
+                htmlFor="search"
+                style={{
+                  background: "blue",
+                }}>
+                lkdsfjlkjs
+              </label> */}
+              <SearchField placeholder={"Search Debtor"} onSearch={handleSearch} />
+            </span>
+            <span style={{ padding: 10, flex: 1 }}>
+              <label
+                htmlFor="dateInput"
+                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
+                Select Date:
+              </label>
+              <input
+                className="date-input"
+                type="date"
+                id="dateInput"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={handleDateChange}
+              />
+            </span>
           </div>
-        )}
+        </div>
       </div>
+      {!isLoading && !isError && filteredDebts && filteredDebts.length > 0 ? (
+        filteredDebts.map((debt) => (
+          <UsersCard
+            key={debt.id}
+            name={`₵${debt.amount}`}
+            companyFrom={debt.customerName}
+            onClick={() => console.log(`Debt ID: ${debt.id}`)}
+          />
+        ))
+      ) : (
+        <div className="content">
+          {selectedDate.toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0] ? (
+            <h2 style={{ paddingTop: "100px" }}>No Debts Acquired Today</h2>
+          ) : (
+            <h2 style={{ paddingTop: 100 }}>
+              No Debts Acquired from {selectedDate.toISOString().split("T")[0]}{" "}
+              to today
+            </h2>
+          )}
+        </div>
+      )}
     </div>
   );
 };

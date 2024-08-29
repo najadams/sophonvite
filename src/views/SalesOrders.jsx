@@ -8,11 +8,11 @@ import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
-import {Tabs, Tab } from "@mui/material";
+import { Tabs, Tab } from "@mui/material";
 import SearchField from "../hooks/SearchField";
 import { TabPanel, allyProps } from "./ProductCatalogue";
 
-const MakeSales = lazy(() => import("../components/forms/MakeSales"))
+const MakeSales = lazy(() => import("../components/forms/MakeSales"));
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -48,7 +48,7 @@ const SalesOrders = () => {
 
   const fetchReceipts = async () => {
     try {
-      const formattedDate = selectedDate.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+      const formattedDate = selectedDate.toISOString().split("T")[0];
       const response = await axios.get(
         `/api/receipts/${companyId}?date=${formattedDate}`
       );
@@ -87,6 +87,13 @@ const SalesOrders = () => {
 
   const toggleFilters = () => {
     setShowFilters((prev) => !prev);
+  };
+
+  const newCustomer = (newCustomerOption) => {
+    setCustomerOptions(newCustomerOption);
+  };
+  const newProduct = (newProductOption) => {
+    setProductOptions(newProductOption);
   };
 
   if (isLoading) return <Loader />;
@@ -187,7 +194,12 @@ const SalesOrders = () => {
       </TabPanel>
 
       <TabPanel value={value} index={1}>
-        <MakeSales customers={customerOptions} Products={productOptions} />
+        <MakeSales
+          customers={customerOptions}
+          Products={productOptions}
+          handleCustomerUpdate={newCustomer}
+          handleProductUpdate={newProduct}
+        />
       </TabPanel>
     </div>
   );
