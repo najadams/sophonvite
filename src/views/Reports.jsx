@@ -96,7 +96,22 @@ const Reports = () => {
       );
     }
 
-    if (value === 1) {
+       if (value === 1) {
+         if (isInventoryLoading) return <CircularProgress />;
+         if (isInventoryError)
+           return (
+             <Typography color="error">
+               Error loading inventory report
+             </Typography>
+           );
+         if (!inventoryData)
+           return <Typography>No inventory data available</Typography>;
+         return (
+           <InventoryReport inventoryItems={inventoryData.aggregatedData} />
+         );
+       }
+
+    if (value === 2) {
       if (isPurchasesLoading) return <CircularProgress />;
       if (isPurchasesError)
         return (
@@ -105,21 +120,6 @@ const Reports = () => {
       if (!purchasesData)
         return <Typography>No purchases data available</Typography>;
       return <PurchasesReport data={purchasesData.purchases} />;
-    }
-
-    if (value === 2) {
-      if (isInventoryLoading) return <CircularProgress />;
-      if (isInventoryError)
-        return (
-          <Typography color="error">Error loading inventory report</Typography>
-        );
-      if (!inventoryData)
-        return <Typography>No inventory data available</Typography>;
-      return (
-        <InventoryReport
-          inventoryItems={inventoryData.aggregatedData}
-        />
-      );
     }
 
     if (value === 3) {
@@ -150,8 +150,8 @@ const Reports = () => {
             variant="fullWidth"
             aria-label="full width tabs example">
             <Tab label="Sales" />
-            <Tab label="Purchases" />
             <Tab label="Inventory" />
+            <Tab label="Purchases" />
             <Tab label="Debts" />
           </Tabs>
         </div>
