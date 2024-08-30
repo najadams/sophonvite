@@ -15,9 +15,8 @@ const SearchField = ({ onSearch, placeholder, customstyles }) => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (debouncedTerm) {
-      onSearch(debouncedTerm);
-    }
+    // Check if debouncedTerm is empty, if so, trigger onSearch with an empty string or a value that returns all data
+    onSearch(debouncedTerm.trim());
   }, [debouncedTerm, onSearch]);
 
   const handleSearch = (event) => {
@@ -43,7 +42,7 @@ const SearchField = ({ onSearch, placeholder, customstyles }) => {
         boxShadow: 1,
         maxWidth: 280,
         padding: 10,
-        ...customstyles
+        ...customstyles,
       }}>
       <i
         className="bx bx-search-alt icon"
@@ -51,7 +50,7 @@ const SearchField = ({ onSearch, placeholder, customstyles }) => {
       <input
         type="search"
         className="date-input"
-        placeholder= {placeholder || "Search..."}
+        placeholder={placeholder || "Search..."}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
