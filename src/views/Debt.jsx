@@ -14,14 +14,16 @@ const Debt = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAllDebtors, setShowAllDebtors] = useState(false);
+  const [compressCards, setCompressCards] = useState(false);
   const matchesTablet = useMediaQuery("(max-width:600px)");
 
   const fetchDebts = async () => {
     try {
       const formattedDate = selectedDate.toISOString().split("T")[0];
-      const response = await axios.get(
-        `/api/debts/${companyId}?date=${formattedDate}`
-      );
+      const url = showAllDebtors
+        ? `/api/debts/${companyId}/all`
+        : `/api/debts/${companyId}?date=${formattedDate}`;
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       console.error("Error fetching debts:", error.message);
@@ -33,9 +35,13 @@ const Debt = () => {
     data: debts,
     isLoading,
     isError,
-  } = useQuery(["debts", companyId, selectedDate], fetchDebts, {
+  } = useQuery(["debts", companyId, selectedDate, showAllDebtors], fetchDebts, {
     refetchOnWindowFocus: true,
   });
+
+  const toggleCompressCards = () => {
+    setCompressCards((prev) => !prev);
+  };
 
   const handleDateChange = (e) => {
     setSelectedDate(new Date(e.target.value));
@@ -53,11 +59,25 @@ const Debt = () => {
     setShowAllDebtors(e.target.checked);
   };
 
-  const filteredDebts = showAllDebtors
-    ? debts
-    : debts?.filter((debt) =>
-        debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const groupDebtsByCustomer = (debts) => {
+    const grouped = debts.reduce((acc, debt) => {
+      if (!acc[debt.customerName]) {
+        acc[debt.customerName] = { ...debt };
+      } else {
+        acc[debt.customerName].amount += debt.amount;
+      }
+      return acc;
+    }, {});
+    return Object.values(grouped);
+  };
+
+  const filteredDebts = debts?.filter((debt) =>
+    debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const displayedDebts = compressCards
+    ? groupDebtsByCustomer(filteredDebts)
+    : filteredDebts;
 
   if (isLoading) return <Loader />;
 
@@ -71,17 +91,17 @@ const Debt = () => {
 
       <div className="content">
         <div className="widgets">
-          <Widgets title={"Customers"} count={debts?.length || 0} />
+          <Widgets title={"Customers"} count={displayedDebts?.length || 0} />
           <Widgets
             title={"Total Amount"}
             count={`₵${
-              debts?.reduce((total, debt) => total + debt.amount, 0) || 0
+              displayedDebts?.reduce((total, debt) => total + debt.amount, 0) ||
+              0
             }`}
           />
         </div>
         <div
           style={{
-            // display: "flex",
             width: "100%",
             alignItems: "flex-end",
             justifyContent: "space-between",
@@ -99,6 +119,9 @@ const Debt = () => {
               }}></i>
             <span className="filter-text">Filters</span>
           </div>
+          <button onClick={toggleCompressCards}>
+            {compressCards ? "Show Individual Debts" : "Compress Cards"}
+          </button>
           <div className={`filter-options ${showFilters ? "visible" : ""}`}>
             <span style={{ padding: 10 }}>
               <label
@@ -115,14 +138,10 @@ const Debt = () => {
               />
             </span>
             <span style={{ display: "flex" }}>
-              {/* <label
-                htmlFor="search"
-                style={{
-                  background: "blue",
-                }}>
-                lkdsfjlkjs
-              </label> */}
-              <SearchField placeholder={"Search Debtor"} onSearch={handleSearch} />
+              <SearchField
+                placeholder={"Search Debtor"}
+                onSearch={handleSearch}
+              />
             </span>
             <span style={{ padding: 10, flex: 1 }}>
               <label
@@ -141,8 +160,8 @@ const Debt = () => {
           </div>
         </div>
       </div>
-      {!isLoading && !isError && filteredDebts && filteredDebts.length > 0 ? (
-        filteredDebts.map((debt) => (
+      {!isLoading && !isError && displayedDebts && displayedDebts.length > 0 ? (
+        displayedDebts.map((debt) => (
           <UsersCard
             key={debt.id}
             name={`₵${debt.amount}`}
