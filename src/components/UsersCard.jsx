@@ -2,7 +2,7 @@ import React from 'react'
 import './UsersCard.css'
 import { capitalizeFirstLetter } from '../config/Functions';
 
-const UsersCard = ({ name, companyFrom, onClick}) => {
+const UsersCard = ({ name, customerName, onClick}) => {
   return (
       <div class="card-client pressable" onClick={onClick}>
         <div class="user-picture">
@@ -12,7 +12,7 @@ const UsersCard = ({ name, companyFrom, onClick}) => {
         </div>
         <p class="name-client">
           {" "}
-          {capitalizeFirstLetter(companyFrom)}
+          {capitalizeFirstLetter(customerName)}
           <span>{capitalizeFirstLetter(name)}</span>
         </p>
         <div class="social-media">

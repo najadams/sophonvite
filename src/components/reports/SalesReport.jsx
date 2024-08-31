@@ -123,9 +123,15 @@ const SalesTable = ({ salesTransactions = [] }) => {
               <TableCell>
                 {new Date(transaction.date).toLocaleDateString()}
               </TableCell>
-              <TableCell>{capitalizeFirstLetter(transaction.customerName)}</TableCell>
-              <TableCell align="right">{capitalizeFirstLetter(transaction.workerName)}</TableCell>
-              <TableCell align="right">{transaction.totalAmount}</TableCell>
+              <TableCell>
+                {capitalizeFirstLetter(transaction.customerName)}
+              </TableCell>
+              <TableCell align="right">
+                {capitalizeFirstLetter(transaction.workerName)}
+              </TableCell>
+              <TableCell align="right">
+                ₵{transaction.totalAmount.toFixed(2)}
+              </TableCell>
               <TableCell align="right">
                 ₵{transaction.totalAmountPaid.toFixed(2)}
               </TableCell>

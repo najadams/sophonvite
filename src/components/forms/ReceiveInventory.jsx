@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useQuery } from "react-query";
 
 const validationSchema = Yup.object().shape({
   products: Yup.array().of(
@@ -48,13 +49,13 @@ const ReceiveInvetory = ({
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
   const today = new Date().toLocaleDateString();
-  // const [productOptions, setProductOptions] = useState([
-  //   {
-  //     id: 1,
-  //     name: "<<<< Add New Product >>>>",
-  //   },
-  //   ...Products,
-  // ]);
+  const [productOptions, setProductOptions] = useState([
+    {
+      id: 1,
+      name: "<<<< Add New Product >>>>",
+    },
+    ...Products,
+  ]);
 
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newProductName, setNewProductName] = useState("");
@@ -82,7 +83,6 @@ const ReceiveInvetory = ({
           workerId
         );
         setOpen(true);
-        setPrintValues({ ...values, balance }); // Store values for printing
         setTimeout(() => {
           resetForm();
         }, 1000);
@@ -120,7 +120,7 @@ const ReceiveInvetory = ({
         ),
         {
           name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
+          costPrice: parseFloat(newProductCostPrice) || 0, // Ensure numeric value
           onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
         },
       ]);
@@ -135,7 +135,7 @@ const ReceiveInvetory = ({
         ),
         {
           name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
+          costPrice: parseFloat(newProductCostPrice) || 0, // Ensure numeric value
           onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
         },
       ]);
@@ -151,10 +151,26 @@ const ReceiveInvetory = ({
     }
   };
 
+  const {
+    data: suppliers,
+    isLoading: isCountsLoading,
+    isError: isCountsError,
+  } = useQuery(
+    ["counts", companyId],
+    () => tableActions.fetchSuppliers(companyId),
+    {
+      enabled: !!companyId,
+    }
+  );
+
   return (
     <div>
+      <div className="heading" style={{ background: "none" }}>
+        <h1 style={{ fontWeight: 200 }}>Receive Items with Bill</h1>
+      </div>
       <Formik
         initialValues={{
+          supplierName: "",
           products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
           total: 0,
           amountPaid: "",
@@ -166,6 +182,38 @@ const ReceiveInvetory = ({
         }}>
         {({ values, submitForm, setFieldValue, isSubmitting, resetForm }) => (
           <Form className="form" style={{ margin: 10 }}>
+            <Field name="supplierName">
+              {({ field, form }) => {
+                const hasError = Boolean(
+                  form.errors.supplierName && form.touched.supplierName
+                );
+                return (
+                  <Autocomplete
+                    {...field}
+                    options={capitalizeFirstLetter(supplierOptions)}
+                    value={field.value}
+                    onChange={(event, newValue) => {
+                      if (newValue === "<<<< Add New Customer >>>>") {
+                        setNewCustomerDialogOpen(true);
+                        form.setFieldValue(field.name, "");
+                      } else {
+                        form.setFieldValue(field.name, newValue || "");
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        style={{ paddingBottom: 10 }}
+                        label="Customer Name"
+                        fullWidth
+                        error={hasError}
+                        helperText={hasError ? form.errors.supplierName : ""}
+                      />
+                    )}
+                  />
+                );
+              }}
+            </Field>
             <FieldArray name="products">
               {({ push, remove }) => (
                 <div
@@ -209,14 +257,14 @@ const ReceiveInvetory = ({
                                     );
                                     const newTotalPrice =
                                       product.quantity *
-                                      selectedProduct?.salesPrice;
+                                      selectedProduct?.costPrice;
                                     setFieldValue(
                                       `products.${index}.totalPrice`,
                                       newTotalPrice
                                     );
                                     setFieldValue(
                                       `products.${index}.price`,
-                                      selectedProduct?.salesPrice || 0
+                                      selectedProduct?.costPrice || 0
                                     ); // Update price
                                   }
                                 }}
@@ -264,10 +312,9 @@ const ReceiveInvetory = ({
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                              console.log(selectedProduct);
 
                               const newTotalPrice =
-                                newValue * selectedProduct?.salesPrice;
+                                newValue * selectedProduct?.costPrice;
                               setFieldValue(
                                 `products.${index}.totalPrice`,
                                 newTotalPrice
@@ -278,12 +325,6 @@ const ReceiveInvetory = ({
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                              if (value > selectedProduct?.onhand) {
-                                setModalMessage(
-                                  `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
-                                );
-                                setModalOpen(true);
-                              }
                             }}
                           />
                         </div>
@@ -430,16 +471,6 @@ const ReceiveInvetory = ({
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                {loading ? <CircularProgress /> : "Save and Print"}
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  submitForm(); // Trigger form submission
-                }}
-                disabled={loading || isSubmitting} // Disable button when loading or submitting
-              >
                 {loading ? <CircularProgress /> : "Save"}
               </Button>
             </div>
@@ -499,17 +530,17 @@ const ReceiveInvetory = ({
           />
           <TextField
             margin="dense"
-            label="Sales Price"
-            fullWidth
-            value={newProductSalesPrice}
-            onChange={(e) => setNewProductSalesPrice(e.target.value)}
-          />
-          <TextField
-            margin="dense"
             label="Cost Price"
             fullWidth
             value={newProductCostPrice}
             onChange={(e) => setNewProductCostPrice(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Sales Price"
+            fullWidth
+            value={newProductSalesPrice}
+            onChange={(e) => setNewProductSalesPrice(e.target.value)}
           />
           <TextField
             margin="dense"
@@ -530,7 +561,6 @@ const ReceiveInvetory = ({
           </Button>
         </DialogActions>
       </Dialog>
-
     </div>
   );
 };
