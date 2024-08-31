@@ -165,7 +165,7 @@ const Debt = () => {
           <UsersCard
             key={debt.id}
             name={`₵${debt.amount}`}
-            companyFrom={debt.customerName}
+            customerName={debt.customerName}
             onClick={() => console.log(`Debt ID: ${debt.id}`)}
           />
         ))

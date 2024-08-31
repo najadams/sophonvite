@@ -89,7 +89,7 @@ const ProductCatalogue = () => {
             aria-label="full width tabs example">
             <Tab label="Products" {...allyProps(0)} />
             <Tab label="Receive inventory" {...allyProps(1)} />
-            <Tab label="Reports" {...allyProps(2)} />
+            <Tab label="Receive Inventory" {...allyProps(2)} />
             <Tab label="Groups" {...allyProps(3)} />
           </Tabs>
         </div>
@@ -108,7 +108,7 @@ const ProductCatalogue = () => {
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
-          <ReceiveInventory />
+          <ReceiveInventory Products={products} />
       </TabPanel>
       <TabPanel value={value} index={2}>
         <AddItem>
