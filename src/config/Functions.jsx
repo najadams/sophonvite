@@ -377,6 +377,16 @@ export const tableActions = {
       throw new Error(error.response.data.message || "Failed to fetch counts");
     }
   },
+  fetchSuppliers: async (companyId) => {
+    try {
+      const response = await axios.get(`/suppliers/${companyId}`);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      throw new Error(error.response.data.message || "Failed to fetch counts");
+    }
+  },
   fetchSalesData : async (companyId) => {
   try {
     // Fetch receipts data
