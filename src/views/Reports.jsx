@@ -45,7 +45,7 @@ const Reports = () => {
   } = useQuery(
     ["purchases", companyId, filters],
     () => fetchReportData(companyId, "purchases", filters),
-    { enabled: value === 1, keepPreviousData: true }
+    { enabled: value === 2, keepPreviousData: true }
   );
 
   const {
@@ -55,7 +55,7 @@ const Reports = () => {
   } = useQuery(
     ["inventory", companyId, filters],
     () => fetchReportData(companyId, "inventory", filters),
-    { enabled: value === 2, keepPreviousData: true }
+    { enabled: value === 1, keepPreviousData: true }
   );
 
   const {
