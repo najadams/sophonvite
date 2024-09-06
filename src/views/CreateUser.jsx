@@ -67,19 +67,25 @@ const CreateUser = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
+            setError(""); // Reset error message
             try {
               // handle form submission
               console.log(values);
-              // await tableActions.addWorker({ companyId, ...values });
+              await tableActions.addWorker({ companyId, ...values });
               setShowAlert(true);
               setTimeout(() => {
-                setShowAlert(false)
+                setShowAlert(false);
                 resetForm();
               }, 1000);
-              setSubmitting(false);
-            } catch (error) {
-              console.log(error);
+            } catch (err) {
+              // Capture error message from the server
+              setError(
+                err ||
+                  "An error occurred while creating the user."
+              );
+              console.log(err);
             }
+            setSubmitting(false); // Ensure submitting is stopped
           }}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
@@ -149,7 +155,8 @@ const CreateUser = () => {
                   Create User
                 </Button>
               </Box>
-              {showAlert && (
+              {/* Error Alert */}
+              {error && (
                 <div
                   style={{
                     position: "fixed",
@@ -158,7 +165,24 @@ const CreateUser = () => {
                     transform: "translateX(-50%)",
                     zIndex: 1000,
                   }}>
-                  <Alert variant="filled" severity="success">User created successfully!</Alert>
+                  <Alert variant="filled" severity="error">
+                    {error}
+                  </Alert>
+                </div>
+              )}
+              {/* Success Alert */}
+              {showAlert && !error && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: "80px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 1000,
+                  }}>
+                  <Alert variant="filled" severity="success">
+                    User created successfully!
+                  </Alert>
                 </div>
               )}
             </Form>
