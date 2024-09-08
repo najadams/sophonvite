@@ -43,6 +43,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [print, setPrint] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const matchesMobile = useMediaQuery("(max-width:600px)");
@@ -93,7 +94,9 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           workerId
         );
         setOpen(true);
-        setPrintValues({ ...values, balance }); // Store values for printing
+        if (print) {
+          setPrintValues({ ...values, balance }); // Store values for printing
+        }
         setTimeout(() => {
           resetForm();
         }, 1000);
@@ -496,6 +499,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                 variant="contained"
                 color="primary"
                 onClick={() => {
+                  setPrint(true)
                   submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
