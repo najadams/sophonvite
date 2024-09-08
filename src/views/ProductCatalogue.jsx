@@ -7,8 +7,7 @@ import axios from "../config/index";
 import { useSelector } from "react-redux";
 import Loader from "../components/common/Loader";
 import { Box, Tabs, Tab, Typography } from "@mui/material";
-
-const ReceiveInventory = lazy(() => import('../components/forms/ReceiveInventory'))
+import ReceiveInventory from "../components/forms/ReceiveInventory";
 
 const fetchProducts = async (companyId) => {
   try {
@@ -89,8 +88,8 @@ const ProductCatalogue = () => {
             aria-label="full width tabs example">
             <Tab label="Products" {...allyProps(0)} />
             <Tab label="Receive inventory" {...allyProps(1)} />
-            <Tab label="Receive Inventory" {...allyProps(2)} />
-            <Tab label="Groups" {...allyProps(3)} />
+            {/* <Tab label="Receive Inventory" {...allyProps(2)} /> */}
+            {/* <Tab label="Groups" {...allyProps(2)} /> */}
           </Tabs>
         </div>
         <AddItem>
@@ -110,11 +109,11 @@ const ProductCatalogue = () => {
       <TabPanel value={value} index={1}>
           <ReceiveInventory Products={products} />
       </TabPanel>
-      <TabPanel value={value} index={2}>
+      {/* <TabPanel value={value} index={2}>
         <AddItem>
           <ProductForm />
         </AddItem>
-      </TabPanel>
+      </TabPanel> */}
     </div>
   );
 };
