@@ -48,7 +48,13 @@ const ReceiveInvetory = ({
   const [modalMessage, setModalMessage] = useState("");
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
-  const today = new Date().toLocaleDateString();
+  
+  const [supplierOptions, setSupplierOptions] = useState([
+    {
+      id: 1,
+      name: "<<<< Add New Supplier >>>>",
+    },
+  ]);
   const [productOptions, setProductOptions] = useState([
     {
       id: 1,
@@ -58,17 +64,22 @@ const ReceiveInvetory = ({
   ]);
 
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
+  const [newSupplierDialogOpen, setNewSupplierDialogOpen] = useState(false);
   const [newProductName, setNewProductName] = useState("");
   const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
   const [newProductOnhand, setNewProductOnhand] = useState("");
 
+  const [newSupplierName, setNewSupplierName] = useState("");
+  const [newSupplierCompany, setNewSupplierCompany] = useState("");
+  const [newSupplierContact, setNewSupplierContact] = useState("");
+  
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
     );
-    values.total = total; // Maintain total before discount
+    values.total = total; 
     const balance = values.total - values.amountPaid - values.discount;
 
     try {
@@ -150,18 +161,60 @@ const ReceiveInvetory = ({
       setError("Failed to add new product");
     }
   };
+  const handleNewSupplierSubmit = async () => {
+    try {
+      const data = await tableActions.addSupplier({
+        name: newSupplierName,
+        costPrice: newSupplierCompany,
+        salesPrice: newSupplierContact,
+        companyId,
+      });
 
-  const {
-    data: suppliers,
-    isLoading: isCountsLoading,
-    isError: isCountsError,
-  } = useQuery(
-    ["counts", companyId],
-    () => tableActions.fetchSuppliers(companyId),
-    {
-      enabled: !!companyId,
+      const newProduct = data.data;
+
+      // Update product options using a functional state update
+      setSupplierOptions((prevOptions) => [
+        "<<<< Add New Supplier >>>>",
+        ...prevOptions.filter(
+          (option) => option.name !== "<<<< Add New Supplier >>>>"
+        ),
+        newSupplierName,
+      ]);
+
+      setNewSupplierDialogOpen(false); // Close the dialog
+      setNewSupplierName(""); // Clear the input fields
+      setNewSupplierCompany("");
+      setNewSupplierContact("");
+    } catch (error) {
+      console.log(error);
+      setError("Failed to add new Supplier");
     }
-  );
+  };
+
+ const {
+   data: suppliers,
+   isLoading: isSuppliersLoading,
+   isError: isSuppliersError,
+   error: suppliersError, // Capture error
+ } = useQuery(
+   ["suppliers", companyId],
+   () => tableActions.fetchSuppliersNames(companyId),
+   {
+     enabled: !!companyId,
+     onError: (error) => {
+       console.error("Error fetching suppliers:", error);
+     },
+   }
+   );
+  
+  useEffect(() => {
+    if (suppliers) {
+      setSupplierOptions([
+        "<<<< Add New Supplier >>>>",
+        ...suppliers
+      ]);
+    }
+  }, [suppliers]);
 
   return (
     <div>
@@ -193,8 +246,8 @@ const ReceiveInvetory = ({
                     options={capitalizeFirstLetter(supplierOptions)}
                     value={field.value}
                     onChange={(event, newValue) => {
-                      if (newValue === "<<<< Add New Customer >>>>") {
-                        setNewCustomerDialogOpen(true);
+                      if (newValue === "<<<< Add New Supplier >>>>") {
+                        setNewSupplierDialogOpen(true);
                         form.setFieldValue(field.name, "");
                       } else {
                         form.setFieldValue(field.name, newValue || "");
@@ -204,7 +257,7 @@ const ReceiveInvetory = ({
                       <TextField
                         {...params}
                         style={{ paddingBottom: 10 }}
-                        label="Customer Name"
+                        label="Supplier Name"
                         fullWidth
                         error={hasError}
                         helperText={hasError ? form.errors.supplierName : ""}
@@ -393,9 +446,9 @@ const ReceiveInvetory = ({
                       });
                     }}
                     disabled={
-                      values.products.length > 0 &&
+                      values.products?.length > 0 &&
                       !Object.values(
-                        values.products[values.products.length - 1]
+                        values.products[values.products?.length - 1]
                       ).every(Boolean)
                     }>
                     Add Product
@@ -490,27 +543,6 @@ const ReceiveInvetory = ({
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
 
-      {/* Modal for insufficient inventory */}
-      <Dialog
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">
-          {"Insufficient Inventory"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {modalMessage}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalOpen(false)} color="primary">
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Dialog for adding new products */}
       <Dialog
         open={newProductDialogOpen}
@@ -558,6 +590,52 @@ const ReceiveInvetory = ({
           </Button>
           <Button onClick={handleNewProductSubmit} color="primary">
             Add Product
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      {/* Dialog for adding new supplier */}
+      <Dialog
+        open={newSupplierDialogOpen}
+        onClose={() => setNewSupplierDialogOpen(false)}>
+        <DialogTitle>Add Supplier</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Details of the new Suppler.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Supplier's Company"
+            fullWidth
+            value={newSupplierCompany}
+            onChange={(e) => setNewSupplierCompany(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Suppliers Name"
+            fullWidth
+            value={newSupplierName}
+            onChange={(e) => setNewSupplierName(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Contact"
+            fullWidth
+            type="int"
+            value={newSupplierContact}
+            onChange={(e) => setNewSupplierContact(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setNewSupplierDialogOpen(false)}
+            color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleNewSupplierSubmit} color="primary">
+            Add Supplier
           </Button>
         </DialogActions>
       </Dialog>
