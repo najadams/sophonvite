@@ -2,10 +2,10 @@ import React from 'react'
 import './UsersCard.css'
 import { capitalizeFirstLetter } from '../config/Functions';
 
-const UsersCard = ({ name, customerName, date, onClick}) => {
+const UsersCard = ({ main, sub, top, contact, onClick}) => {
   return (
     <div class="card-client pressable" onClick={onClick}>
-        <span>{date}</span>
+        <span>{top}</span>
         <div class="user-picture">
           <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
             <path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"></path>
@@ -13,8 +13,8 @@ const UsersCard = ({ name, customerName, date, onClick}) => {
         </div>
         <p class="name-client">
           {" "}
-          {capitalizeFirstLetter(customerName)}
-          <span>{capitalizeFirstLetter(name)}</span>
+          {capitalizeFirstLetter(sub)}
+          <span>{capitalizeFirstLetter(main)}</span>
         </p>
         <div class="social-media">
           <a href="#">
@@ -38,7 +38,7 @@ const UsersCard = ({ name, customerName, date, onClick}) => {
               </g>
             </svg>
 
-            <span class="tooltip-social">Phone</span>
+          <span class="tooltip-social">{contact || 'Phone'}</span>
           </a>
           <a href="#">
             <svg
