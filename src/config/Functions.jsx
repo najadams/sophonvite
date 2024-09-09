@@ -111,7 +111,9 @@ export const tableActions = {
   fetchCustomersNames: async (companyId) => {
     try {
       const response = await axios.get(`/api/customers/${companyId}`);
-      const data = response.data.customers.map((item) => (capitalizeFirstLetter(`${item?.company || "None"} - ${item?.name}`)));
+      const data = response.data.customers.map((item) =>
+        capitalizeFirstLetter(`${item?.company || "None"} - ${item?.name}`)
+      );
       return data;
     } catch (error) {
       throw new Error("Failed to fetch customers");
@@ -129,7 +131,7 @@ export const tableActions = {
         salesPrice: item.salesprice,
         onHand: item.onhand,
       }));
-      // const page = response.page 
+      // const page = response.page
       return data;
     } catch (error) {
       throw new Error("Failed to fetch products");
@@ -168,49 +170,52 @@ export const tableActions = {
       return error.response?.data?.message || "An error occured";
     }
   },
-  updateCompanyData : async ({ companyId, ...details }) => {
+  updateCompanyData: async ({ companyId, ...details }) => {
     try {
       // Prepare the payload by filtering out empty values
       const updateFields = {};
       for (const [key, value] of Object.entries(details)) {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null && value !== "") {
           updateFields[key] = value;
         }
       }
 
-      const submissionData = {companyId, ...updateFields}
+      const submissionData = { companyId, ...updateFields };
       // Send the PATCH request to update the company details
-      const response = await axios.patch(`/update/${companyId}`, submissionData);
+      const response = await axios.patch(
+        `/update/${companyId}`,
+        submissionData
+      );
 
       // Check if the update was successful
       if (response.status === 200) {
-        return response.data;  // Return the updated company data
+        return response.data; // Return the updated company data
       }
     } catch (error) {
       console.log(error);
       // return error.response?.data?.message || "An error occurred";
-      throw new Error(error.response?.data?.message || "Ann error occured")
+      throw new Error(error.response?.data?.message || "Ann error occured");
     }
   },
 
- addCustomer: async ({ companyId, name, phone, email, address, company }) => {
-  try {
-    const response = await axios.post(`/api/customer/`, {
-      belongsTo: companyId,
-      name,
-      phone,
-      email,
-      address,
-      company,
-    });
-    if (response.status === 201) {
-      return response.data; // Return the customer data
+  addCustomer: async ({ companyId, name, phone, email, address, company }) => {
+    try {
+      const response = await axios.post(`/api/customer/`, {
+        belongsTo: companyId,
+        name,
+        phone,
+        email,
+        address,
+        company,
+      });
+      if (response.status === 201) {
+        return response.data; // Return the customer data
+      }
+    } catch (error) {
+      console.log(error);
+      return error.response?.data?.message || "An error occurred";
     }
-  } catch (error) {
-    console.log(error);
-    return error.response?.data?.message || "An error occurred";
-  }
-},
+  },
 
   updateProduct: async ({ id, name, costPrice, salesPrice, onHand }) => {
     try {
@@ -300,7 +305,7 @@ export const tableActions = {
       throw new Error(error.response?.data?.message || "An error occurred");
     }
   },
-  addVendor: async (values, companyId,) => {
+  addVendor: async (values, companyId) => {
     try {
       const response = await axios.post("/api/vendor/", {
         ...values,
@@ -322,7 +327,7 @@ export const tableActions = {
     }
   },
 
-  fetchReceipts : async (companyId, selectedDate) => {
+  fetchReceipts: async (companyId, selectedDate) => {
     try {
       const response = await axios.get(
         `/api/receipts/${companyId}?date=${selectedDate}`
@@ -335,28 +340,26 @@ export const tableActions = {
     }
   },
   fetchDebt: async (companyId, selectedDate, selectedDuration) => {
-  try {
-    let url = `/api/debts/${companyId}?`;
+    try {
+      let url = `/api/debts/${companyId}?`;
 
-    if (selectedDate) {
-      const formattedDate = selectedDate.toISOString().split("T")[0];
-      url += `date=${formattedDate}&`;
-      console.log(formattedDate)
+      if (selectedDate) {
+        const formattedDate = selectedDate.toISOString().split("T")[0];
+        url += `date=${formattedDate}&`;
+        console.log(formattedDate);
+      }
+
+      if (selectedDuration) {
+        url += `duration=${selectedDuration}`;
+      }
+
+      const response = await axios.get(url);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching debts:", error);
+      throw error;
     }
-
-    if (selectedDuration) {
-      url += `duration=${selectedDuration}`;
-    }
-
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching debts:", error);
-    throw error;
-  }
-}
-,
-
+  },
   fetchWorkers: async (companyId) => {
     try {
       const response = await axios.get(`api/workers/${companyId}`);
@@ -381,7 +384,7 @@ export const tableActions = {
     try {
       const response = await axios.get(`api/suppliers/${companyId}`);
       if (response.status === 200) {
-        return response.data.map( data => capitalizeFirstLetter(data.names));
+        return response.data.map((data) => capitalizeFirstLetter(data.supplierName));
       }
     } catch (error) {
       throw new Error(error.response.data.message || "Failed to fetch counts");
@@ -397,44 +400,70 @@ export const tableActions = {
       throw new Error(error.response.data.message || "Failed to fetch counts");
     }
   },
-  fetchSalesData : async (companyId) => {
-  try {
-    // Fetch receipts data
-    const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
-    const receipts = receiptsResponse.data;
+  addSupplier: async ({
+    companyId,
+    companyName,
+    supplierName,
+    contact,
+  }) => {
+    try {
+      const response = await axios.post(`/api/supplier/${companyId}`, {
+        companyId,
+        companyName,
+        supplierName,
+        contact,
+      });
 
-    // Process daily data
-    const { labels, salesData, dailyData } = processDailyData(receipts);
+      if (response.status === 201) {
+        // Return the data from the response
+        return response.data;
+      } else {
+        // Handle unexpected status codes
+        throw new Error(`Unexpected status code: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(error);
+      // Throw the error so the calling function can handle it
+      throw error?.response?.data?.message;
+    }
+  },
+  fetchSalesData: async (companyId) => {
+    try {
+      // Fetch receipts data
+      const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
+      const receipts = receiptsResponse.data;
 
-    // Calculate profits for each day using historical prices stored in receipts
-    const profitData = labels.map((day) => {
-      const dayReceipts = dailyData[day].details;
-      return calculateProfit([{ detail: dayReceipts }]);
-    });
+      // Process daily data
+      const { labels, salesData, dailyData } = processDailyData(receipts);
 
-    // Calculate top purchased products
-    const topProducts = calculateTopPurchasedProducts(receipts);
-    // adding data for the pie graph
-    const profitable5 = topProducts.slice(0, 5)
+      // Calculate profits for each day using historical prices stored in receipts
+      const profitData = labels.map((day) => {
+        const dayReceipts = dailyData[day].details;
+        return calculateProfit([{ detail: dayReceipts }]);
+      });
 
-    // Combine labels and data into a single array of objects for Recharts
-    const sales = labels.map((label, index) => ({
-      month: label,
-      totalSales: salesData[index],
-    }));
+      // Calculate top purchased products
+      const topProducts = calculateTopPurchasedProducts(receipts);
+      // adding data for the pie graph
+      const profitable5 = topProducts.slice(0, 5);
 
-    const profit = labels.map((label, index) => ({
-      month: label,
-      totalProfit: profitData[index],
-    }));
+      // Combine labels and data into a single array of objects for Recharts
+      const sales = labels.map((label, index) => ({
+        month: label,
+        totalSales: salesData[index],
+      }));
 
+      const profit = labels.map((label, index) => ({
+        month: label,
+        totalProfit: profitData[index],
+      }));
 
-    return { sales, profit, topProducts , profitable5};
-  } catch (error) {
-    console.error("Error fetching sales data", error);
-    throw new Error("Failed to fetch sales data");
-  }
-},
+      return { sales, profit, topProducts, profitable5 };
+    } catch (error) {
+      console.error("Error fetching sales data", error);
+      throw new Error("Failed to fetch sales data");
+    }
+  },
 };
 
 export const capitalizeFirstLetter = (str) => {
