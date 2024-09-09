@@ -35,7 +35,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const ReceiveInvetory = ({
+const ReceiveInventory = ({
   Products,
   handleProductUpdate,
 }) => {
@@ -164,10 +164,10 @@ const ReceiveInvetory = ({
   const handleNewSupplierSubmit = async () => {
     try {
       const data = await tableActions.addSupplier({
-        name: newSupplierName,
-        costPrice: newSupplierCompany,
-        salesPrice: newSupplierContact,
         companyId,
+        supplierName: newSupplierName,
+        companyName: newSupplierCompany,
+        contact: newSupplierContact,
       });
 
       const newProduct = data.data;
@@ -219,7 +219,7 @@ const ReceiveInvetory = ({
   return (
     <div>
       <div className="heading" style={{ background: "none" }}>
-        <h1 style={{ fontWeight: 200 }}>Receive Items with Bill</h1>
+        <h1 style={{ fontWeight: 200 }}>Receive Items / Restock </h1>
       </div>
       <Formik
         initialValues={{
@@ -623,7 +623,7 @@ const ReceiveInvetory = ({
             margin="dense"
             label="Contact"
             fullWidth
-            type="int"
+            type="number"
             value={newSupplierContact}
             onChange={(e) => setNewSupplierContact(e.target.value)}
           />
@@ -643,4 +643,4 @@ const ReceiveInvetory = ({
   );
 };
 
-export default ReceiveInvetory;
+export default ReceiveInventory;
