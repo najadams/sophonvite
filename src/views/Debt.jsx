@@ -202,8 +202,8 @@ const Debt = () => {
           compressCards ? (
             <UsersCard
               key={debt.id}
-              name={`₵${debt.amount}`}
-              customerName={debt.customerName}
+              main={`₵${debt.amount}`}
+              sub={debt.customerName}
               onClick={() => handleCardClick(debt)}
               additionalInfo={`Debt Date: ${new Date(
                 debt.date
@@ -212,9 +212,9 @@ const Debt = () => {
           ) : (
             <UsersCard
               key={debt.id}
-              date={new Date(debt.date).toLocaleDateString()}
-              name={`₵${debt.amount}`}
-              customerName={debt.customerName}
+              top={new Date(debt.date).toLocaleDateString()}
+              main={`₵${debt.amount}`}
+              sub={debt.customerName}
               onClick={() => handleCardClick(debt)}
               additionalInfo={`Debt Date: ${new Date(
                 debt.date
