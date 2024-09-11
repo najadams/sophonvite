@@ -413,7 +413,7 @@ export const tableActions = {
 
       if (response.status === 201) {
         // Return the data from the response
-        return response.data;
+        return response.data; // use data, not message
       } else {
         // Handle unexpected status codes
         throw new Error(`Unexpected status code: ${response.status}`);
@@ -421,9 +421,10 @@ export const tableActions = {
     } catch (error) {
       console.error(error);
       // Throw the error so the calling function can handle it
-      throw error?.response?.data?.message;
+      throw error?.response?.data?.message || "Failed to add supplier";
     }
   },
+
   restock: async (values, companyId, supplierName) => {
     try {
       const response = await axios.post(`/api/restock/${companyId}`, {

@@ -161,35 +161,70 @@ const ReceiveInventory = ({
       setError("Failed to add new product");
     }
   };
-  const handleNewSupplierSubmit = async () => {
-    try {
-      const data = await tableActions.addSupplier({
-        companyId,
-        supplierName: newSupplierName,
-        companyName: newSupplierCompany,
-        contact: newSupplierContact,
-      });
+  // const handleNewSupplierSubmit = async () => {
+  //   try {
+  //     const data = await tableActions.addSupplier({
+  //       companyId,
+  //       supplierName: newSupplierName,
+  //       companyName: newSupplierCompany,
+  //       contact: newSupplierContact,
+  //     });
 
-      const newProduct = data.data;
+  //     const newProduct = data.data;
 
-      // Update product options using a functional state update
-      setSupplierOptions((prevOptions) => [
-        "<<<< Add New Supplier >>>>",
-        ...prevOptions.filter(
-          (option) => option.name !== "<<<< Add New Supplier >>>>"
-        ),
-        newSupplierName,
-      ]);
+  //     // Update product options using a functional state update
+  //     setSupplierOptions((prevOptions) => [
+  //       "<<<< Add New Supplier >>>>",
+  //       ...prevOptions.filter(
+  //         (option) => option.name !== "<<<< Add New Supplier >>>>"
+  //       ),
+  //       newSupplierName,
+  //     ]);
 
-      setNewSupplierDialogOpen(false); // Close the dialog
-      setNewSupplierName(""); // Clear the input fields
-      setNewSupplierCompany("");
-      setNewSupplierContact("");
-    } catch (error) {
-      console.log(error);
-      setError("Failed to add new Supplier");
-    }
-  };
+  //     setNewSupplierDialogOpen(false); // Close the dialog
+  //     setNewSupplierName(""); // Clear the input fields
+  //     setNewSupplierCompany("");
+  //     setNewSupplierContact("");
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("Failed to add new Supplier");
+  //   }
+  // };
+const handleNewSupplierSubmit = async () => {
+  try {
+    const data = await tableActions.addSupplier({
+      companyId,
+      supplierName: newSupplierName,
+      companyName: newSupplierCompany,
+      contact: newSupplierContact,
+    });
+
+    console.log("Supplier added successfully:", data); // Check if this logs
+
+    const newSupplier = data?.data; // Make sure data is as expected
+
+    // Update supplier options using a functional state update
+    setSupplierOptions((prevOptions) => [
+      "<<<< Add New Supplier >>>>",
+      ...prevOptions.filter(
+        (option) => option !== "<<<< Add New Supplier >>>>"
+      ),
+      newSupplierName,
+    ]);
+
+    // Close the dialog
+    console.log("this should not work")
+    setNewSupplierDialogOpen(false);
+
+    // Clear the input fields
+    setNewSupplierName("");
+    setNewSupplierCompany("");
+    setNewSupplierContact("");
+  } catch (error) {
+    console.log("Error adding supplier:", error);
+    setError("Failed to add new Supplier");
+  }
+};
 
  const {
    data: suppliers,
