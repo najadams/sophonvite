@@ -384,7 +384,9 @@ export const tableActions = {
     try {
       const response = await axios.get(`api/suppliers/${companyId}`);
       if (response.status === 200) {
-        return response.data.map((data) => capitalizeFirstLetter(data.supplierName));
+        return response.data.map((data) =>
+          capitalizeFirstLetter(data.supplierName)
+        );
       }
     } catch (error) {
       throw new Error(error.response.data.message || "Failed to fetch counts");
@@ -400,12 +402,7 @@ export const tableActions = {
       throw new Error(error.response.data.message || "Failed to fetch counts");
     }
   },
-  addSupplier: async ({
-    companyId,
-    companyName,
-    supplierName,
-    contact,
-  }) => {
+  addSupplier: async ({ companyId, companyName, supplierName, contact }) => {
     try {
       const response = await axios.post(`/api/supplier/${companyId}`, {
         companyId,
@@ -425,6 +422,26 @@ export const tableActions = {
       console.error(error);
       // Throw the error so the calling function can handle it
       throw error?.response?.data?.message;
+    }
+  },
+  restock: async (values, companyId, supplierName) => {
+    try {
+      const response = await axios.post(`/api/restock/${companyId}`, {
+        ...values,
+        companyId: companyId,
+      });
+      if (response.status === 200 || response.status === 201) {
+        // Successful response
+        return response.data;
+      } else {
+        // Handle unexpected status codes
+        console.error("Unexpected status code:", response.status);
+        return "Unexpected status code";
+      }
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+      throw new Error(error.response?.data?.message || "An error occurred");
     }
   },
   fetchSalesData: async (companyId) => {
