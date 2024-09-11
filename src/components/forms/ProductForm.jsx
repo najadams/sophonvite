@@ -27,7 +27,7 @@ const ProductForm = ({ data, editMutation }) => {
 
   return (
     <div>
-      <h1>Product Information</h1>
+      <h1 style={{marginBottom: 30}}>Product Information</h1>
       <Formik
         initialValues={
           data || {
@@ -103,11 +103,12 @@ const ProductForm = ({ data, editMutation }) => {
               name="salesPrice"
             />
             <br />
-            <Field
+           <Field
               component={TextField}
               type="number"
               label="onHand"
               name="onHand"
+              disabled={data}
             />
             <br />
             {isSubmitting && <LinearProgress />}
