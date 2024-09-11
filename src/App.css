@@ -207,7 +207,7 @@ header .image-text .header-text {
     height: 100vh;
     overflow-x: scroll;
     position: absolute;
-    padding-top: 50px;
+    padding-top: 0px;
     background-color: white;
     z-index: 200;
   }
@@ -232,6 +232,7 @@ header .image-text .header-text {
 
 .menu-links{
     padding-top: 50px;
+    /* margin: 20px; */
   }
 /* =====Main Pages ==== */
 .title{
