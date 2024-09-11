@@ -75,6 +75,7 @@ const ReceiveInventory = ({
   const [newSupplierContact, setNewSupplierContact] = useState("");
   
   const handleSubmit = async (values, setSubmitting, resetForm) => {
+    console.log(values)
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
@@ -88,10 +89,9 @@ const ReceiveInventory = ({
       } else {
         setLoading(true);
         setSubmitting(true);
-        await tableActions.addReceipt(
+        await tableActions.restock(
           { ...values, balance },
           companyId,
-          workerId
         );
         setOpen(true);
         setTimeout(() => {
@@ -244,6 +244,7 @@ const ReceiveInventory = ({
                   <Autocomplete
                     {...field}
                     options={capitalizeFirstLetter(supplierOptions)}
+                    autoHighlight
                     value={field.value}
                     onChange={(event, newValue) => {
                       if (newValue === "<<<< Add New Supplier >>>>") {
@@ -296,6 +297,7 @@ const ReceiveInventory = ({
                             {({ field, form }) => (
                               <Autocomplete
                                 options={productItems}
+                                autoHighlight
                                 value={product.name}
                                 onChange={(event, newValue) => {
                                   if (
@@ -574,13 +576,13 @@ const ReceiveInventory = ({
             value={newProductSalesPrice}
             onChange={(e) => setNewProductSalesPrice(e.target.value)}
           />
-          <TextField
+          {/* <TextField
             margin="dense"
             label="Available Quantity"
             fullWidth
             value={newProductOnhand}
             onChange={(e) => setNewProductOnhand(e.target.value)}
-          />
+          /> */}
         </DialogContent>
         <DialogActions>
           <Button

@@ -216,6 +216,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                 return (
                   <Autocomplete
                     {...field}
+                    autoHighlight
                     options={capitalizeFirstLetter(customerOptions)}
                     value={field.value}
                     onChange={(event, newValue) => {
@@ -272,8 +273,9 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                           <Field name={`products.${index}.name`}>
                             {({ field, form }) => (
                               <Autocomplete
+                                autoHighlight
                                 options={productItems}
-                                value={product.name}
+                                value={capitalizeFirstLetter(product.name)}
                                 onChange={(event, newValue) => {
                                   if (
                                     newValue === "<<<< Add New Product >>>>"
