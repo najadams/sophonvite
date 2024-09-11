@@ -75,9 +75,8 @@ const ProductCatalogue = () => {
           <h1 style={{ fontWeight: 200 }}>Products</h1>
         </div>
         <div style={{
-          display: 'flex', 
-          flexDirection: 'row',
-          width: '40%'
+          display: 'block', 
+          width: '40%',
         }}>
           <Tabs
             value={value}

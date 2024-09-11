@@ -104,17 +104,19 @@ const SalesOrders = () => {
         <div>
           <h1 style={{ fontWeight: 200 }}>Sales</h1>
         </div>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          indicatorColor="secondary"
-          textColor="inherit"
-          variant="fullWidth"
-          aria-label="full width tabs example">
-          <Tab label="Sales" {...allyProps(0)} />
-          <Tab label="Make Sales" {...allyProps(1)} />
-          {/* <Tab label="Groups" {...allyProps(1)} /> */}
-        </Tabs>
+        <div style={{width : '40%'}}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="secondary"
+            textColor="inherit"
+            variant="fullWidth"
+            aria-label="full width tabs example">
+            <Tab label="Sales" {...allyProps(0)} />
+            <Tab label="Make Sales" {...allyProps(1)} />
+            {/* <Tab label="Groups" {...allyProps(1)} /> */}
+          </Tabs>
+        </div>
         <AddItem title={"Make Sales"}>
           <SalesOrderForms
             customers={customerOptions}
