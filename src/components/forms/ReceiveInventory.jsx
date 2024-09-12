@@ -27,7 +27,8 @@ const validationSchema = Yup.object().shape({
       quantity: Yup.number()
         .required("Quantity is required")
         .min(1, "Quantity must be at least 1"),
-      price: Yup.number().required("Price is required"),
+      costPrice: Yup.number().required("Cost Price is required"),
+      salesPrice: Yup.number().required("Sales Price is required"),
     })
   ),
   total: Yup.number().required(),
@@ -230,7 +231,7 @@ const ReceiveInventory = ({
       <Formik
         initialValues={{
           supplierName: "",
-          products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
+          products: [{ name: "", quantity: "", totalPrice: 0, costPrice: 0, salesPrice: 0 }],
           total: 0,
           amountPaid: "",
           discount: 0,
@@ -324,9 +325,13 @@ const ReceiveInventory = ({
                                       newTotalPrice
                                     );
                                     setFieldValue(
-                                      `products.${index}.price`,
+                                      `products.${index}.costPrice`,
                                       selectedProduct?.costPrice || 0
-                                    ); // Update price
+                                    ); 
+                                    setFieldValue(
+                                      `products.${index}.salesPrice`,
+                                      selectedProduct?.salesPrice || 0
+                                    );
                                   }
                                 }}
                                 renderInput={(params) => (
@@ -390,13 +395,13 @@ const ReceiveInventory = ({
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          <Field name={`products.${index}.price`}>
+                          <Field name={`products.${index}.costPrice`}>
                             {({ field, form }) => (
                               <TextField
                                 {...field}
-                                label="Price"
+                                label="Cost Price"
                                 type="number"
-                                style={{ minWidth: 150 }}
+                                style={{ minWidth: 120 }}
                                 fullWidth
                                 InputProps={{ style: { textAlign: "right" } }}
                                 onChange={(event) => {
@@ -405,6 +410,33 @@ const ReceiveInventory = ({
                                   );
                                   setFieldValue(
                                     `products.${index}.price`,
+                                    newPrice
+                                  );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
+                                  setFieldValue(
+                                    `products.${index}.totalPrice`,
+                                    newTotalPrice
+                                  );
+                                }}
+                              />
+                            )}
+                          </Field>
+                          <Field name={`products.${index}.salesPrice`}>
+                            {({ field, form }) => (
+                              <TextField
+                                {...field}
+                                label="Sales Price"
+                                type="number"
+                                style={{ minWidth: 120 }}
+                                fullWidth
+                                InputProps={{ style: { textAlign: "right" } }}
+                                onChange={(event) => {
+                                  const newPrice = parseFloat(
+                                    event.target.value
+                                  );
+                                  setFieldValue(
+                                    `products.${index}.salesPrice`,
                                     newPrice
                                   );
                                   const newTotalPrice =
@@ -450,7 +482,8 @@ const ReceiveInventory = ({
                         name: "",
                         quantity: "",
                         totalPrice: 0,
-                        price: 0,
+                        costPrice: 0,
+                        salesPrice: 0,
                       });
                     }}
                     disabled={
@@ -572,6 +605,7 @@ const ReceiveInventory = ({
             margin="dense"
             label="Cost Price"
             fullWidth
+            type="number"
             value={newProductCostPrice}
             onChange={(e) => setNewProductCostPrice(e.target.value)}
           />
@@ -580,6 +614,7 @@ const ReceiveInventory = ({
             label="Sales Price"
             fullWidth
             value={newProductSalesPrice}
+            type="number"
             onChange={(e) => setNewProductSalesPrice(e.target.value)}
           />
           {/* <TextField
@@ -602,16 +637,13 @@ const ReceiveInventory = ({
         </DialogActions>
       </Dialog>
 
-
       {/* Dialog for adding new supplier */}
       <Dialog
         open={newSupplierDialogOpen}
         onClose={() => setNewSupplierDialogOpen(false)}>
         <DialogTitle>Add Supplier</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Details of the new Suppler.
-          </DialogContentText>
+          <DialogContentText>Details of the new Suppler.</DialogContentText>
           <TextField
             autoFocus
             margin="dense"
