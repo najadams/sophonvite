@@ -161,36 +161,7 @@ const ReceiveInventory = ({
       setError("Failed to add new product");
     }
   };
-  // const handleNewSupplierSubmit = async () => {
-  //   try {
-  //     const data = await tableActions.addSupplier({
-  //       companyId,
-  //       supplierName: newSupplierName,
-  //       companyName: newSupplierCompany,
-  //       contact: newSupplierContact,
-  //     });
-
-  //     const newProduct = data.data;
-
-  //     // Update product options using a functional state update
-  //     setSupplierOptions((prevOptions) => [
-  //       "<<<< Add New Supplier >>>>",
-  //       ...prevOptions.filter(
-  //         (option) => option.name !== "<<<< Add New Supplier >>>>"
-  //       ),
-  //       newSupplierName,
-  //     ]);
-
-  //     setNewSupplierDialogOpen(false); // Close the dialog
-  //     setNewSupplierName(""); // Clear the input fields
-  //     setNewSupplierCompany("");
-  //     setNewSupplierContact("");
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError("Failed to add new Supplier");
-  //   }
-  // };
-const handleNewSupplierSubmit = async () => {
+  const handleNewSupplierSubmit = async () => {
   try {
     const data = await tableActions.addSupplier({
       companyId,
