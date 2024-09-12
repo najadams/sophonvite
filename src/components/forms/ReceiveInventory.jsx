@@ -93,6 +93,7 @@ const ReceiveInventory = ({
         await tableActions.restock(
           { ...values, balance },
           companyId,
+          workerId
         );
         setOpen(true);
         setTimeout(() => {
