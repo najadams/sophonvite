@@ -6,7 +6,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
 import FlagIcon from "@mui/icons-material/Flag";
-import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag"; 
+import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
@@ -38,14 +38,13 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme, flagged }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: flagged ? "#ffebee" : '#fff', // Light red for flagged rows
+    backgroundColor: flagged ? "#ffebee" : "#fff", // Light red for flagged rows
   },
   "&:last-child td, &:last-child th": {
     border: 0,
   },
   backgroundColor: flagged ? "#ffebee" : "inherit", // Apply background color for flagged rows
 }));
-
 
 function Row({ row, onFlagChange }) {
   const [open, setOpen] = React.useState(false);
@@ -196,9 +195,9 @@ function Row({ row, onFlagChange }) {
                         {capitalizeFirstLetter(item.name)}
                       </TableCell>
                       <TableCell align="right">{item.quantity}</TableCell>
-                      <TableCell align="right">{item.salesprice}</TableCell>
+                      <TableCell align="right">{item.salesPrice}</TableCell>
                       <TableCell align="right">
-                        {item.salesprice * item.quantity}
+                        {item.salesPrice * item.quantity}
                       </TableCell>
                     </StyledTableRow>
                   ))}

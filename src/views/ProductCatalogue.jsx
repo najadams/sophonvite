@@ -16,8 +16,8 @@ const fetchProducts = async (companyId) => {
       id: item._id,
       index: index + 1,
       name: item.name,
-      costPrice: item.costprice,
-      salesPrice: item.salesprice,
+      costPrice: item.costPrice,
+      salesPrice: item.salesPrice,
       onHand: item.onhand,
     }));
     return data;
@@ -74,10 +74,11 @@ const ProductCatalogue = () => {
         <div>
           <h1 style={{ fontWeight: 200 }}>Products</h1>
         </div>
-        <div style={{
-          display: 'block', 
-          width: '40%',
-        }}>
+        <div
+          style={{
+            display: "block",
+            width: "40%",
+          }}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -106,7 +107,7 @@ const ProductCatalogue = () => {
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
-          <ReceiveInventory Products={products} />
+        <ReceiveInventory Products={products} />
       </TabPanel>
       {/* <TabPanel value={value} index={2}>
         <AddItem>

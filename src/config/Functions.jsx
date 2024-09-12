@@ -1,4 +1,4 @@
-import axios from './index'
+import axios from "./index";
 
 const processDailyData = (receipts) => {
   const dailyData = receipts.reduce((acc, receipt) => {
@@ -30,7 +30,7 @@ const calculateProfit = (receipts) => {
     let receiptProfit = 0;
 
     for (const item of receipt.detail) {
-      const itemProfit = (item.salesprice - item.costprice) * item.quantity;
+      const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
       receiptProfit += itemProfit;
     }
 
@@ -46,7 +46,7 @@ function calculateTopsProfit(receipts) {
   receipts.forEach((receipt) => {
     receipt.detail.forEach((product) => {
       const profit =
-        (product.salesprice - product.costprice) * product.quantity;
+        (product.salesPrice - product.costPrice) * product.quantity;
 
       if (productProfits[product.name]) {
         productProfits[product.name] += profit;
@@ -62,7 +62,6 @@ function calculateTopsProfit(receipts) {
   }));
 }
 
-
 const calculateTopPurchasedProducts = (receipts) => {
   // Accumulate the total quantity and profit of each product across all receipts
   const productCounts = receipts.reduce((acc, receipt) => {
@@ -72,7 +71,7 @@ const calculateTopPurchasedProducts = (receipts) => {
       }
       acc[item.name].quantity += item.quantity;
       acc[item.name].profit +=
-        (item.salesprice - item.costprice) * item.quantity;
+        (item.salesPrice - item.costPrice) * item.quantity;
     });
     return acc;
   }, {});
@@ -127,8 +126,8 @@ export const tableActions = {
         id: item._id,
         index: index + 1,
         name: item.name,
-        costPrice: item.costprice,
-        salesPrice: item.salesprice,
+        costPrice: item.costPrice,
+        salesPrice: item.salesPrice,
         onHand: item.onhand,
       }));
       // const page = response.page
@@ -143,7 +142,7 @@ export const tableActions = {
       const data = response.data.products.map((item) => ({
         id: item._id,
         name: item.name,
-        salesPrice: item.salesprice,
+        salesPrice: item.salesPrice,
         onhand: item.onhand,
       }));
       return data;
@@ -222,8 +221,8 @@ export const tableActions = {
       const product = await axios.patch(`/api/product/${id}`, {
         id,
         name,
-        costprice: costPrice,
-        salesprice: salesPrice,
+        costPrice: costPrice,
+        salesPrice: salesPrice,
         onhand: onHand,
       });
       if (product.status === 200) {
@@ -240,8 +239,8 @@ export const tableActions = {
       const product = await axios.post(`/api/product/`, {
         companyId,
         name,
-        costprice: costPrice,
-        salesprice: salesPrice,
+        costPrice: costPrice,
+        salesPrice: salesPrice,
         onhand: onHand,
       });
       if (product.status === 201) {
@@ -488,7 +487,8 @@ export const capitalizeFirstLetter = (str) => {
   if (typeof str === "string") {
     return str
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   }
   return str;
 };
@@ -513,12 +513,10 @@ export const serverAid = {
   },
 };
 
-
-
 export const updateAccount = async (data) => {
   try {
     const response = await axios.post("/api/updateworker", data);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error updating account:", error); // Log the error
     throw error;
@@ -527,7 +525,7 @@ export const updateAccount = async (data) => {
 
 export const fetchReportData = async (companyId, reportType, filters) => {
   const { startDate, endDate } = filters;
-  
+
   let endpoint;
 
   switch (reportType) {
@@ -550,7 +548,6 @@ export const fetchReportData = async (companyId, reportType, filters) => {
   const response = await axios.get(endpoint);
   return response.data;
 };
-
 
 export const getNextDayDate = () => {
   const today = new Date();

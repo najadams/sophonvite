@@ -34,7 +34,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           flexDirection: "column",
           alignItems: "center",
           width: "100%",
-          gap: 4
+          gap: 4,
         }}>
         <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
           {capitalizeFirstLetter(company.companyName)}!
@@ -89,7 +89,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                   padding: "5px",
                   textAlign: "center",
                 }}>
-                ₵{product.price ? product.price : product.salesprice}
+                ₵{product.price ? product.price : product.salesPrice}
               </td>
               <td
                 style={{
@@ -99,14 +99,14 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 ₵
                 {product.price
                   ? product.price * product.quantity
-                  : product.salesprice * product.quantity}
+                  : product.salesPrice * product.quantity}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       <hr style={{ height: 5, backgroundColor: "black" }} />
-      <div style={{ fontSize: 15}}>
+      <div style={{ fontSize: 15 }}>
         {company.taxRate && (
           <p style={{ textAlign: "left", marginTop: "20px" }}>
             <strong>Tax %: {company.taxRate}</strong>
@@ -129,7 +129,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           </p>
         )}
       </div>
-      <hr style={{ height: 5, backgroundColor: "black"  }} />
+      <hr style={{ height: 5, backgroundColor: "black" }} />
       <div
         style={{
           paddingTop: 5,
