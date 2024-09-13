@@ -76,7 +76,7 @@ const ReceiveInventory = ({
   const [newSupplierContact, setNewSupplierContact] = useState("");
   
   const handleSubmit = async (values, setSubmitting, resetForm) => {
-    console.log(values)
+    console.log(workerId)
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
@@ -91,9 +91,8 @@ const ReceiveInventory = ({
         setLoading(true);
         setSubmitting(true);
         await tableActions.restock(
-          { ...values, balance },
+          { ...values, balance, workerId },
           companyId,
-          workerId
         );
         setOpen(true);
         setTimeout(() => {
@@ -328,7 +327,7 @@ const ReceiveInventory = ({
                                     setFieldValue(
                                       `products.${index}.costPrice`,
                                       selectedProduct?.costPrice || 0
-                                    ); 
+                                    );
                                     setFieldValue(
                                       `products.${index}.salesPrice`,
                                       selectedProduct?.salesPrice || 0
@@ -352,52 +351,32 @@ const ReceiveInventory = ({
                           </Field>
 
                           <Field
-                            style={{
-                              paddingRight: 0,
-                              flex: 1,
-                              width: "50%",
-                              minWidth: 150,
-                            }}
                             as={TextField}
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number"
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-                              // if (value > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
-                              // }
-                            }}
                             onChange={(event) => {
-                              const newValue = parseInt(event.target.value);
+                              const newQuantity = parseInt(event.target.value);
                               setFieldValue(
                                 `products.${index}.quantity`,
-                                newValue
-                              );
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
+                                newQuantity
                               );
 
+                              const currentCostPrice =
+                                values.products[index].costPrice || 0;
                               const newTotalPrice =
-                                newValue * selectedProduct?.costPrice;
+                                newQuantity * currentCostPrice;
+
                               setFieldValue(
                                 `products.${index}.totalPrice`,
                                 newTotalPrice
-                              );
-                            }}
-                            onBlur={(event) => {
-                              const value = parseInt(event.target.value);
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
                               );
                             }}
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
                           <Field name={`products.${index}.costPrice`}>
-                            {({ field, form }) => (
+                            {({ field }) => (
                               <TextField
                                 {...field}
                                 label="Cost Price"
@@ -413,8 +392,12 @@ const ReceiveInventory = ({
                                     `products.${index}.costPrice`,
                                     newPrice
                                   );
+
+                                  const currentQuantity =
+                                    values.products[index].quantity || 0;
                                   const newTotalPrice =
-                                    product.quantity * newPrice;
+                                    currentQuantity * newPrice;
+
                                   setFieldValue(
                                     `products.${index}.totalPrice`,
                                     newTotalPrice
@@ -423,6 +406,7 @@ const ReceiveInventory = ({
                               />
                             )}
                           </Field>
+
                           <Field name={`products.${index}.salesPrice`}>
                             {({ field, form }) => (
                               <TextField
@@ -566,7 +550,7 @@ const ReceiveInventory = ({
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
               >
-                {loading ? <CircularProgress /> : "Save"}
+                {loading ? <CircularProgress /> : "Restock"}
               </Button>
             </div>
           </Form>
