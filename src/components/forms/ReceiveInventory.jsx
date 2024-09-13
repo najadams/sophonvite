@@ -410,7 +410,7 @@ const ReceiveInventory = ({
                                     event.target.value
                                   );
                                   setFieldValue(
-                                    `products.${index}.price`,
+                                    `products.${index}.costPrice`,
                                     newPrice
                                   );
                                   const newTotalPrice =
