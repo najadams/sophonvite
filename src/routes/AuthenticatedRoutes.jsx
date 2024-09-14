@@ -7,6 +7,7 @@ import SalesRoutes from "./sales/SalesRoutes";
 import DebtsRoutes from "./debts/DebtsRoutes";
 import ReportsRoutes from "./reports/ReportsRoutes";
 import VendorsRoutes from "./vendors/VendorsRoutes";
+import ViewReceipt from "../views/ViewReceipt";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
 const Customers = lazy(() => import("../views/Customers"));
@@ -37,6 +38,7 @@ const AuthenticatedRoutes = () => {
       <Route path="/transactions" element={<Transactions />} />
       <Route path="/vendors/*" element={<VendorsRoutes />} />
       <Route path="/debt/*" element={<DebtsRoutes />} />
+      <Route path="/receipts/:receiptId" element={<ViewReceipt  />} />
       <Route
         path="/account"
         element={<WorkerEntry isLoggedIn={isLoggedIn} />}
