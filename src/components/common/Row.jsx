@@ -66,9 +66,11 @@ function Row({ row, onFlagChange }) {
   };
 
   const handleView = () => {
+    console.log(row);
     handleMenuClose();
-    navigate(`/receipts/${row._id}`);
+    navigate(`/receipts/${row._id}`, { state: { row } });
   };
+ 
 
   const handleFlag = async () => {
     handleMenuClose();
@@ -96,7 +98,6 @@ function Row({ row, onFlagChange }) {
       workerName: row.workerName,
     });
     setTimeout(() => {
-      console.log(row.discount);
       setPrintValues(null);
     }, 2000);
   };
