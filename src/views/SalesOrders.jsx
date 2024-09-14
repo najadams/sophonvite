@@ -17,7 +17,7 @@ const MakeSales = lazy(() => import("../components/forms/MakeSales"));
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(0); // for managing tabs
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +29,6 @@ const SalesOrders = () => {
       const response = await tableActions.fetchCustomersNames(companyId);
       setCustomerOptions(response);
     };
-
     fetchCustomers();
   }, [companyId]);
 
@@ -38,14 +37,10 @@ const SalesOrders = () => {
       const response = await tableActions.fetchProductNames(companyId);
       setProductOptions(response);
     };
-
     fetchProducts();
   }, [companyId]);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
+  // Fetch receipts using React Query
   const fetchReceipts = async () => {
     try {
       const formattedDate = selectedDate.toISOString().split("T")[0];
@@ -65,7 +60,8 @@ const SalesOrders = () => {
     isError,
     refetch,
   } = useQuery(["receipts", companyId, selectedDate], fetchReceipts, {
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    enabled: value === 0, // Only fetch when in the "Sales" tab
   });
 
   useEffect(() => {
@@ -77,12 +73,17 @@ const SalesOrders = () => {
     }
   }, [receipts]);
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+
+    // Refetch receipts when switching back to the "Sales" tab
+    if (newValue === 0) {
+      refetch();
+    }
   };
 
-  const handleFlaggedChange = () => {
-    refetch();
+  const handleSearch = (term) => {
+    setSearchTerm(term);
   };
 
   const toggleFilters = () => {
@@ -104,7 +105,7 @@ const SalesOrders = () => {
         <div>
           <h1 style={{ fontWeight: 200 }}>Sales</h1>
         </div>
-        <div style={{width : '40%'}}>
+        <div style={{ width: "40%" }}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -114,7 +115,6 @@ const SalesOrders = () => {
             aria-label="full width tabs example">
             <Tab label="Sales" {...allyProps(0)} />
             <Tab label="Make Sales" {...allyProps(1)} />
-            {/* <Tab label="Groups" {...allyProps(1)} /> */}
           </Tabs>
         </div>
         <AddItem title={"Make Sales"}>
@@ -177,14 +177,14 @@ const SalesOrders = () => {
               <CollapsibleTable
                 receipts={receipts}
                 searchTerm={searchTerm} // Pass search term to CollapsibleTable
-                onFlagChange={handleFlaggedChange}
+                onFlagChange={refetch}
               />
             </div>
           ) : (
             <div>
               {selectedDate.toISOString().split("T")[0] ===
               new Date().toISOString().split("T")[0] ? (
-                <h2 style={{ paddingTop: "50%" }}>No Sales Made Today </h2>
+                <h2 style={{ paddingTop: "50%" }}>No Sales Made Today</h2>
               ) : (
                 <h2 style={{ paddingTop: "50%" }}>
                   No Sales Made on {selectedDate.toISOString().split("T")[0]}
