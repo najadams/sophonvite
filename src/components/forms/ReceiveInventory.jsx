@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Alert,
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
@@ -227,11 +228,24 @@ const ReceiveInventory = ({
     <div>
       <div className="heading" style={{ background: "none" }}>
         <h1 style={{ fontWeight: 200 }}>Receive Items / Restock </h1>
+        {open && (
+          <Alert variant="filled" severity={alert.type} onClose={() => setOpen(false)}>
+            Restock successful
+          </Alert>
+        )}
       </div>
       <Formik
         initialValues={{
           supplierName: "",
-          products: [{ name: "", quantity: "", totalPrice: 0, costPrice: 0, salesPrice: 0 }],
+          products: [
+            {
+              name: "",
+              quantity: "",
+              totalPrice: 0,
+              costPrice: 0,
+              salesPrice: 0,
+            },
+          ],
           total: 0,
           amountPaid: "",
           discount: 0,
@@ -561,13 +575,6 @@ const ReceiveInventory = ({
           {error}
         </Typography>
       )}
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={() => setOpen(false)}
-        message={"Sales successfully Recorded"}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      />
 
       {/* Dialog for adding new products */}
       <Dialog
