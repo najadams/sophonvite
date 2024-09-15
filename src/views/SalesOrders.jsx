@@ -11,8 +11,7 @@ import { Widgets } from "./Dashboard";
 import { Tabs, Tab } from "@mui/material";
 import SearchField from "../hooks/SearchField";
 import { TabPanel, allyProps } from "./ProductCatalogue";
-
-const MakeSales = lazy(() => import("../components/forms/MakeSales"));
+import MakeSales from "../components/forms/MakeSales"
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
