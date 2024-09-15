@@ -54,7 +54,7 @@ export const Widgets = ({ title, count }) => {
     <Card
       sx={{
         width: { xs: "45%", sm: "23%", mymd: "23%",md: "23%", lg: "272px" },
-        height: { xs: "90px", sm: "auto",md: "130px", lg: "106px" },
+        height: { xs: "90px", sm: "auto",md: "90px", lg: "100px" },
         margin: 1,
         padding: 0,
       }}>
