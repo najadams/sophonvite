@@ -317,7 +317,12 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                           </Field>
 
                           <Field
-                            style={{ paddingRight: 0, flex: 1, width: '50%', minWidth: 150 }}
+                            style={{
+                              paddingRight: 0,
+                              flex: 1,
+                              width: "50%",
+                              minWidth: 150,
+                            }}
                             as={TextField}
                             name={`products.${index}.quantity`}
                             label="Quantity"
@@ -331,29 +336,51 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                               // }
                             }}
                             onChange={(event) => {
-                              const newValue = parseInt(event.target.value);
+                              const newQuantity = parseInt(
+                                event.target.value,
+                                10
+                              );
+
+                              // First, set the new quantity value
                               setFieldValue(
                                 `products.${index}.quantity`,
-                                newValue
+                                newQuantity
                               );
+
+                              // Find the selected product
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                              console.log(selectedProduct);
 
-                              const newTotalPrice =
-                                newValue * selectedProduct?.salesPrice;
-                              setFieldValue(
-                                `products.${index}.totalPrice`,
-                                newTotalPrice
-                              );
+                              // Ensure we have a valid selected product
+                              if (selectedProduct) {
+                                // Get the current price from the field or fallback to the selected product's sales price
+                                const currentPrice =
+                                  values.products[index].price ||
+                                  selectedProduct.salesPrice;
+
+                                // Calculate the new total price based on quantity and price
+                                const newTotalPrice =
+                                  newQuantity * currentPrice;
+
+                                // Set the new total price
+                                setFieldValue(
+                                  `products.${index}.totalPrice`,
+                                  newTotalPrice
+                                );
+                              }
                             }}
                             onBlur={(event) => {
-                              const value = parseInt(event.target.value);
+                              const value = parseInt(event.target.value, 10);
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-                              if (value > selectedProduct?.onhand) {
+
+                              // Check if the quantity exceeds available stock
+                              if (
+                                selectedProduct &&
+                                value > selectedProduct.onhand
+                              ) {
                                 setModalMessage(
                                   `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
                                 );
@@ -363,7 +390,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          <Field name={`products.${index}.price`}>
+                          {/* <Field name={`products.${index}.price`}>
                             {({ field, form }) => (
                               <TextField
                                 {...field}
@@ -380,6 +407,37 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                                     `products.${index}.price`,
                                     newPrice
                                   );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
+                                  setFieldValue(
+                                    `products.${index}.totalPrice`,
+                                    newTotalPrice
+                                  );
+                                }}
+                              />
+                            )}
+                          </Field> */}
+                          <Field name={`products.${index}.price`}>
+                            {({ field }) => (
+                              <TextField
+                                {...field}
+                                label="Price"
+                                type="number"
+                                style={{ minWidth: 150 }}
+                                fullWidth
+                                InputProps={{ style: { textAlign: "right" } }}
+                                onChange={(event) => {
+                                  const newPrice = parseFloat(
+                                    event.target.value
+                                  );
+
+                                  // First, set the new price in the form state
+                                  setFieldValue(
+                                    `products.${index}.price`,
+                                    newPrice
+                                  );
+
+                                  // Then calculate and set the new total price
                                   const newTotalPrice =
                                     product.quantity * newPrice;
                                   setFieldValue(
