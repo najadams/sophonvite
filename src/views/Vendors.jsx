@@ -6,6 +6,7 @@ import { useQuery } from "react-query";
 import { tableActions } from "../config/Functions";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // For navigation
+import Loader from "../components/common/Loader";
 
 const Vendors = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -22,11 +23,11 @@ const Vendors = () => {
   );
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return <div className="content">Error: {error.message}</div>;
   }
 
   const handleCardClick = (vendorId) => {
