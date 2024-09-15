@@ -608,7 +608,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)} color="primary">
+          <Button autoFocus onClick={() => setModalOpen(false)} color="primary">
             OK
           </Button>
         </DialogActions>
