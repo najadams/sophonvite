@@ -568,7 +568,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
               </Button>
               <Button
                 variant="contained"
-                color="secondary"
+                color="success"
                 onClick={() => {
                   submitForm(); // Trigger form submission
                 }}
