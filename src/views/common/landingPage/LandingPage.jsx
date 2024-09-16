@@ -75,11 +75,11 @@ export default function LandingPage() {
           <Features />
           <Divider />
           {/* <Testimonials /> */}
-          <Divider />
+          {/* <Divider /> */}
           <Highlights />
-          <Divider />
+          {/* <Divider /> */}
           <Pricing />
-          <Divider />
+          {/* <Divider /> */}
           {/* <FAQ /> */}
           <Divider />
           <Footer />

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useQuery, useMutation } from "react-query";
+import { useQuery, useMutation, QueryClient, QueryClientProvider } from "react-query";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 
 const Debt = () => {
+  const queryClient = new QueryClient();
   const companyId = useSelector((state) => state.companyState.data.id);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,13 +46,23 @@ const Debt = () => {
     refetchOnWindowFocus: true,
   });
 
-  const formattedDate = (date) => {
-    return new Date(date).toLocaleString();
-  };
+ const paymentMutation = useMutation(
+   async ({ debtId, amount }) => {
+     return await axios.post(`/api/debts/${debtId}/pay`, { amount });
+   },
+   {
+     onSuccess: () => {
+       // Refetch debts to reflect the updated payment
+       queryClient.invalidateQueries("debts");
+     },
+     onError: (error) => {
+       console.error("Payment failed: ", error);
+       alert("Error processing the payment, please try again.");
+     },
+   }
+ );
 
-  const paymentMutation = useMutation(async ({ debtId, amount }) => {
-    return await axios.post(`/api/debts/${debtId}/pay`, { amount });
-  });
+
 
   const toggleCompressCards = () => {
     setCompressCards((prev) => !prev);
@@ -80,13 +91,36 @@ const Debt = () => {
   };
 
   const handlePayment = async () => {
-    await paymentMutation.mutateAsync({
-      debtId: selectedDebt.id,
-      amount: paymentAmount,
-    });
-    setPaymentDialogOpen(false);
-    setPaymentAmount('');
+    try {
+      if (!selectedDebt?.id || !paymentAmount) {
+        alert("Please select a debt and enter a valid payment amount.");
+        return;
+      }
+
+
+      // Ensure that the payment does not exceed the balance
+      // if (paymentAmount > selectedDebt.amount) {
+      //   alert("Payment amount exceeds the outstanding balance.");
+      //   return;
+      // }
+
+      // Trigger the mutation to make the payment
+      await paymentMutation.mutateAsync({
+        debtId: selectedDebt.id,
+        amount: paymentAmount,
+      });
+
+      // Close the payment dialog and reset the payment amount
+      setPaymentDialogOpen(false);
+      setPaymentAmount("");
+
+      alert("Payment successful!");
+    } catch (error) {
+      console.error("Error during payment: ", error);
+    }
   };
+
+
 
   const groupDebtsByCustomer = (debts) => {
     const grouped = debts.reduce((acc, debt) => {
@@ -115,176 +149,183 @@ const Debt = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <div className="page">
-      <div className="heading" style={{ padding: 10 }}>
-        <div>
-          <h1 style={{ fontWeight: 200 }}>Debt Acquired</h1>
+    <QueryClientProvider client={queryClient}>
+      <div className="page">
+        <div className="heading" style={{ padding: 10 }}>
+          <div>
+            <h1 style={{ fontWeight: 200 }}>Debt Acquired</h1>
+          </div>
         </div>
-      </div>
 
-      <div className="content">
-        <div className="widgets">
-          <Widgets title={"Customers"} count={displayedDebts?.length || 0} />
-          <Widgets
-            title={"Total Amount"}
-            count={`₵${
-              displayedDebts?.reduce((total, debt) => total + debt.amount, 0) ||
-              0
-            }`}
-          />
-        </div>
-        <div
-          style={{
-            width: "100%",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-          }}>
-          <div className="filter-icon-container">
-            <i
-              className="bx bx-filter filter-icon"
-              onClick={toggleFilters}
-              style={{
-                fontSize: 40,
-                borderRadius: 10,
-                backgroundColor: "white",
-                padding: 5,
-                cursor: "pointer",
-              }}></i>
-            <span className="filter-text">Filters</span>
-          </div>
-          {debts.length > 0 ? (
-            <Button variant={"outlined"} onClick={toggleCompressCards}>
-              {compressCards ? "Show Individual Debts" : "Compress Cards"}
-            </Button>
-          ) : (
-            ""
-          )}
-          <div className={`filter-options ${showFilters ? "visible" : ""}`}>
-            <span style={{ padding: 10 }}>
-              <label
-                htmlFor="All"
-                style={{ marginLeft: 2, fontSize: "larger", font: "icon" }}>
-                All Debtors:
-              </label>
-              <input
-                className="checkbox"
-                id="All"
-                type="checkbox"
-                checked={showAllDebtors}
-                onChange={handleShowAllChange}
-              />
-            </span>
-            <span style={{ display: "flex" }}>
-              <SearchField
-                placeholder={"Search Debtor"}
-                onSearch={handleSearch}
-              />
-            </span>
-            <span style={{ padding: 10, flex: 1 }}>
-              <label
-                htmlFor="dateInput"
-                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                Select Date:
-              </label>
-              <input
-                className="date-input"
-                type="date"
-                id="dateInput"
-                value={selectedDate.toISOString().split("T")[0]}
-                onChange={handleDateChange}
-              />
-            </span>
-          </div>
-        </div>
-      </div>
-      {!isLoading && !isError && displayedDebts && displayedDebts.length > 0 ? (
-        displayedDebts.map((debt) =>
-          compressCards ? (
-            <UsersCard
-              key={debt.id}
-              main={`₵${debt.amount}`}
-              sub={debt.customerName}
-              onClick={() => handleCardClick(debt)}
-              additionalInfo={`Debt Date: ${new Date(
-                debt.date
-              ).toLocaleDateString()}`}
-            />
-          ) : (
-            <UsersCard
-              key={debt.id}
-              top={new Date(debt.date).toLocaleDateString()}
-              main={`₵${debt.amount}`}
-              sub={debt.customerName}
-              onClick={() => handleCardClick(debt)}
-              additionalInfo={`Debt Date: ${new Date(
-                debt.date
-              ).toLocaleDateString()}`}
-            />
-          )
-        )
-      ) : (
         <div className="content">
-          {selectedDate.toISOString().split("T")[0] ===
-          new Date().toISOString().split("T")[0] ? (
-            <h2 style={{ paddingTop: "100px" }}>No Debts Acquired Today</h2>
-          ) : (
-            <h2 style={{ paddingTop: 100 }}>
-              No Debts Acquired from {selectedDate.toISOString().split("T")[0]}{" "}
-              to today
-            </h2>
-          )}
+          <div className="widgets">
+            <Widgets title={"Customers"} count={displayedDebts?.length || 0} />
+            <Widgets
+              title={"Total Amount"}
+              count={`₵${
+                displayedDebts?.reduce(
+                  (total, debt) => total + debt.amount,
+                  0
+                ) || 0
+              }`}
+            />
+          </div>
+          <div
+            style={{
+              width: "100%",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+            }}>
+            <div className="filter-icon-container">
+              <i
+                className="bx bx-filter filter-icon"
+                onClick={toggleFilters}
+                style={{
+                  fontSize: 40,
+                  borderRadius: 10,
+                  backgroundColor: "white",
+                  padding: 5,
+                  cursor: "pointer",
+                }}></i>
+              <span className="filter-text">Filters</span>
+            </div>
+            {debts.length > 0 ? (
+              <Button variant={"outlined"} onClick={toggleCompressCards}>
+                {compressCards ? "Show Individual Debts" : "Compress Cards"}
+              </Button>
+            ) : (
+              ""
+            )}
+            <div className={`filter-options ${showFilters ? "visible" : ""}`}>
+              <span style={{ padding: 10 }}>
+                <label
+                  htmlFor="All"
+                  style={{ marginLeft: 2, fontSize: "larger", font: "icon" }}>
+                  All Debtors:
+                </label>
+                <input
+                  className="checkbox"
+                  id="All"
+                  type="checkbox"
+                  checked={showAllDebtors}
+                  onChange={handleShowAllChange}
+                />
+              </span>
+              <span style={{ display: "flex" }}>
+                <SearchField
+                  placeholder={"Search Debtor"}
+                  onSearch={handleSearch}
+                />
+              </span>
+              <span style={{ padding: 10, flex: 1 }}>
+                <label
+                  htmlFor="dateInput"
+                  style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
+                  Select Date:
+                </label>
+                <input
+                  className="date-input"
+                  type="date"
+                  id="dateInput"
+                  value={selectedDate.toISOString().split("T")[0]}
+                  onChange={handleDateChange}
+                />
+              </span>
+            </div>
+          </div>
         </div>
-      )}
-      <Dialog
-        open={paymentDialogOpen}
-        onClose={() => setPaymentDialogOpen(false)}
-        aria-labelledby="debt-payment-title"
-        aria-describedby="debt-payment-description">
-        <DialogTitle id="debt-payment-title">
-          {"Clear Customer Debt"}
-        </DialogTitle>
-        <DialogContent>
-          {/* Display Amount Owed (non-editable) */}
-          <TextField
-            margin="dense"
-            label="Amount Owed"
-            type="number"
-            fullWidth
-            variant="standard"
-            value={selectedDebt?.amount || 0}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-          {/* Input for Amount Paid */}
-          <TextField
-            margin="dense"
-            label="Amount Paid"
-            type="number"
-            fullWidth
-            variant="standard"
-            value={paymentAmount}
-            onChange={(e) => setPaymentAmount(Number(e.target.value))}
-          />
-          {/* Display Balance */}
-          <TextField
-            margin="dense"
-            label="Balance Left"
-            type="number"
-            fullWidth
-            variant="standard"
-            value={calculateBalance()}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handlePayment()}>Submit Payment</Button>
-          <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+        {!isLoading &&
+        !isError &&
+        displayedDebts &&
+        displayedDebts.length > 0 ? (
+          displayedDebts.map((debt) =>
+            compressCards ? (
+              <UsersCard
+                key={debt.id}
+                main={`₵${debt.amount}`}
+                sub={debt.customerName}
+                onClick={() => handleCardClick(debt)}
+                additionalInfo={`Debt Date: ${new Date(
+                  debt.date
+                ).toLocaleDateString()}`}
+              />
+            ) : (
+              <UsersCard
+                key={debt.id}
+                top={new Date(debt.date).toLocaleDateString()}
+                main={`₵${debt.amount}`}
+                sub={debt.customerName}
+                onClick={() => handleCardClick(debt)}
+                additionalInfo={`Debt Date: ${new Date(
+                  debt.date
+                ).toLocaleDateString()}`}
+              />
+            )
+          )
+        ) : (
+          <div className="content">
+            {selectedDate.toISOString().split("T")[0] ===
+            new Date().toISOString().split("T")[0] ? (
+              <h2 style={{ paddingTop: "100px" }}>No Debts Acquired Today</h2>
+            ) : (
+              <h2 style={{ paddingTop: 100 }}>
+                No Debts Acquired from{" "}
+                {selectedDate.toISOString().split("T")[0]} to today
+              </h2>
+            )}
+          </div>
+        )}
+        <Dialog
+          open={paymentDialogOpen}
+          onClose={() => setPaymentDialogOpen(false)}
+          aria-labelledby="debt-payment-title"
+          aria-describedby="debt-payment-description">
+          <DialogTitle id="debt-payment-title">
+            {"Clear Customer Debt"}
+          </DialogTitle>
+          <DialogContent>
+            {/* Display Amount Owed (non-editable) */}
+            <TextField
+              margin="dense"
+              label="Amount Owed"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={selectedDebt?.amount || 0}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+            {/* Input for Amount Paid */}
+            <TextField
+              margin="dense"
+              label="Amount Paid"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={paymentAmount}
+              onChange={(e) => setPaymentAmount(Number(e.target.value))}
+            />
+            {/* Display Balance */}
+            <TextField
+              margin="dense"
+              label="Balance Left"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={calculateBalance()}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => handlePayment()}>Submit Payment</Button>
+            <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </QueryClientProvider>
   );
 };
 

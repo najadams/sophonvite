@@ -102,7 +102,7 @@ export default function Pricing() {
                 background:
                   tier.title === "Professional"
                     ? "linear-gradient(#033363, #021F3B)"
-                    : undefined,
+                    : "#E0F2F1"
               }}>
               <CardContent>
                 <Box
