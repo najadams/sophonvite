@@ -55,7 +55,8 @@ export default function Features() {
 
   return (
     <Container id="features" sx={{
-      pt: 0, py: { xs: 8, sm: 16 },
+      py: { xs: 8, sm: 16, },
+      pb: 0
     }}>
       <Grid container spacing={6}>
         <Grid item xs={12} md={6}>

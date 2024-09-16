@@ -72,7 +72,7 @@ export default function Pricing() {
           width: { sm: "100%", md: "60%" },
           textAlign: { sm: "left", md: "center" },
         }}>
-        <Typography component="h2" variant="h4" color="text.primary">
+        <Typography component="h2" variant="h3" color="text.primary">
           Pricing
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -102,7 +102,7 @@ export default function Pricing() {
                 background:
                   tier.title === "Professional"
                     ? "linear-gradient(#033363, #021F3B)"
-                    : "#E0F2F1"
+                    : "#E0F2F1",
               }}>
               <CardContent>
                 <Box

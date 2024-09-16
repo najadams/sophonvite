@@ -65,15 +65,26 @@ export default function LandingPage() {
 
   return (
     // <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
-    <div className="page" style={{height: '100vh',padding : 0, margin :0 , backgroundColor : 'inherit'}}>
+    <div
+      className="page"
+      style={{
+        height: "100vh",
+        padding: 0,
+        margin: 0,
+        backgroundColor: "inherit",
+      }}>
       <ThemeProvider theme={defaultTheme}>
         <CssBaseline />
         <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
-        <Hero /> 
-        <Box sx={{ bgcolor: "background.default" }}>
+        <Hero />
+
+        <Box
+          sx={{
+            bgcolor: "background.default",
+          }}>
           {/* <LogoCollection /> */}
           <Features />
-          <Divider />
+          {/* <Divider /> */}
           {/* <Testimonials /> */}
           {/* <Divider /> */}
           <Highlights />

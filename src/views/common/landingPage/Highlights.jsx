@@ -58,19 +58,23 @@ export default function Highlights() {
       sx={{
         pt: { xs: 4, sm: 12 },
         // pb: { xs: 8, sm: 16 },
-        marginLeft: "5%",
-        marginRight: "5%",
+        marginLeft: "0",
+        marginRight: "0",
         color: "black",
         backgroundSize: "100%",
+        // bgcolor: "background.default",
+        // width: '90vw'
       }}>
       <Card
         style={{
-          padding: "20px",
+          paddingTop: "5%",
+          paddingBottom: "10%",
           backgroundColor: "#E0F2F1", // Light shade of green
           borderRadius: "10px",
           //   maxWidth: "60  0px",
           margin: "0 auto",
-          fontFamily: "Montserat, Lato, sans-serif", // Modern font family
+          fontSize: 32,
+          fontFamily: "Montserrat, Lato, sans-serif", // Modern font family
         }}>
         <Container
           sx={{
@@ -85,10 +89,12 @@ export default function Highlights() {
               width: { sm: "100%", md: "60%" },
               textAlign: { sm: "left", md: "center" },
             }}>
-            <Typography component="h2" variant="h4">
+            <Typography component="h2" variant="h4" sx={{
+              pb: {xs: 2, sm: 3, md: 5}
+            }}>
               Highlights
             </Typography>
-            <Typography variant="body1" sx={{ color: "black.400" }}>
+            <Typography variant="body1" sx={{ color: "black.400", fontFamily: 'Poppins' }}>
               Explore why our product stands out: adaptability, durability,
               user-friendly design, and innovation. Enjoy reliable customer
               support and precision in every detail.
@@ -109,7 +115,7 @@ export default function Highlights() {
                     border: "1px solid",
                     borderColor: "grey.800",
                     // opacity: .8,
-                    color: 'white',
+                    color: "white",
                     background: "linear-gradient(#033363, #021F3B)",
                     backgroundColor: "white.900",
                   }}>
