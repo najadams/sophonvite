@@ -13,7 +13,16 @@ import {
   TableContainer,
   TableSortLabel,
 } from "@mui/material";
-import { Padding } from "@mui/icons-material";
+
+const capitalizeFirstLetter = (str) => {
+  if (typeof str === "string") {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+  return str;
+};
 
 // Inventory Summary Cards Component
 const InventorySummaryCards = ({ inventoryData }) => {
@@ -95,7 +104,7 @@ const InventoryTable = ({ inventoryItems = [] }) => {
         <TableBody>
           {sortedItems.map((item) => (
             <TableRow key={item._id}>
-              <TableCell>{item.name}</TableCell>
+              <TableCell>{capitalizeFirstLetter(item.name)}</TableCell>
               <TableCell align="right">{item.totalQuantity || 0}</TableCell>
               <TableCell align="right">
                 ₵{item.totalSalesPrice?.toFixed(2)}
