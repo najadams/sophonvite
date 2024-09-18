@@ -352,7 +352,7 @@ const ReceiveInventory = ({
                                   <TextField
                                     style={{
                                       flex: 1,
-                                      width: matchesMobile ? 150 : 400,
+                                      width: matchesMobile ? 150 :350,
                                     }}
                                     {...params}
                                     label="Product Name"
@@ -366,6 +366,8 @@ const ReceiveInventory = ({
 
                           <Field
                             as={TextField}
+                            fullWidth
+                            style={{minWidth: 120}}
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number"
