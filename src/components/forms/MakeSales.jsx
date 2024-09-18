@@ -671,6 +671,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           <TextField
             margin="dense"
             label="Sales Price"
+            type="number"
             fullWidth
             value={newProductSalesPrice}
             onChange={(e) => setNewProductSalesPrice(e.target.value)}
@@ -678,6 +679,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           <TextField
             margin="dense"
             label="Cost Price"
+            type="number"
             fullWidth
             value={newProductCostPrice}
             onChange={(e) => setNewProductCostPrice(e.target.value)}
@@ -685,6 +687,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           <TextField
             margin="dense"
             label="Available Quantity"
+            type="number"
             fullWidth
             value={newProductOnhand}
             onChange={(e) => setNewProductOnhand(e.target.value)}
