@@ -116,12 +116,13 @@ const SalesOrders = () => {
             <Tab label="Make Sales" {...allyProps(1)} />
           </Tabs>
         </div>
-        <AddItem title={"Make Sales"}>
+        {/* <AddItem title={"Make Sales"}>
           <SalesOrderForms
             customers={customerOptions}
             Products={productOptions}
           />
-        </AddItem>
+        </AddItem> */}
+        <div className="dot" style={{paddingRight: 4}}>.</div>
       </div>
 
       <TabPanel value={value} index={0}>

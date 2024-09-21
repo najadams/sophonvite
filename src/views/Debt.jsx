@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useQuery, useMutation, QueryClient, QueryClientProvider } from "react-query";
+import {
+  useQuery,
+  useMutation,
+  QueryClient,
+  QueryClientProvider,
+} from "react-query";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
@@ -13,7 +18,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Snackbar,
   TextField,
+  Typography,
 } from "@mui/material";
 
 const Debt = () => {
@@ -21,12 +28,13 @@ const Debt = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showAllDebtors, setShowAllDebtors] = useState(false);
   const [compressCards, setCompressCards] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
-  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentAmount, setPaymentAmount] = useState("");
   const matchesTablet = useMediaQuery("(max-width:600px)");
 
   const fetchDebts = async () => {
@@ -46,23 +54,21 @@ const Debt = () => {
     refetchOnWindowFocus: true,
   });
 
- const paymentMutation = useMutation(
-   async ({ debtId, amount }) => {
-     return await axios.post(`/api/debts/${debtId}/pay`, { amount });
-   },
-   {
-     onSuccess: () => {
-       // Refetch debts to reflect the updated payment
-       queryClient.invalidateQueries("debts");
-     },
-     onError: (error) => {
-       console.error("Payment failed: ", error);
-       alert("Error processing the payment, please try again.");
-     },
-   }
- );
-
-
+  const paymentMutation = useMutation(
+    async ({ debtId, amount }) => {
+      return await axios.post(`/api/debts/${debtId}/pay`, { amount });
+    },
+    {
+      onSuccess: () => {
+        // Refetch debts to reflect the updated payment
+        queryClient.invalidateQueries("debts");
+      },
+      onError: (error) => {
+        console.error("Payment failed: ", error);
+        alert("Error processing the payment, please try again.");
+      },
+    }
+  );
 
   const toggleCompressCards = () => {
     setCompressCards((prev) => !prev);
@@ -85,8 +91,8 @@ const Debt = () => {
   };
 
   const handleCardClick = (debt) => {
-    setSelectedDebt(debt); 
-    setPaymentAmount('');
+    setSelectedDebt(debt);
+    setPaymentAmount("");
     setPaymentDialogOpen(true);
   };
 
@@ -96,14 +102,6 @@ const Debt = () => {
         alert("Please select a debt and enter a valid payment amount.");
         return;
       }
-
-
-      // Ensure that the payment does not exceed the balance
-      // if (paymentAmount > selectedDebt.amount) {
-      //   alert("Payment amount exceeds the outstanding balance.");
-      //   return;
-      // }
-
       // Trigger the mutation to make the payment
       await paymentMutation.mutateAsync({
         debtId: selectedDebt.id,
@@ -114,13 +112,11 @@ const Debt = () => {
       setPaymentDialogOpen(false);
       setPaymentAmount("");
 
-      alert("Payment successful!");
+      setOpen(true);
     } catch (error) {
       console.error("Error during payment: ", error);
     }
   };
-
-
 
   const groupDebtsByCustomer = (debts) => {
     const grouped = debts.reduce((acc, debt) => {
@@ -170,6 +166,27 @@ const Debt = () => {
               }`}
             />
           </div>
+          <Snackbar
+            open={open}
+            autoHideDuration={3000} // Set the time in milliseconds (e.g., 3000 = 3 seconds)
+            onClose={() => setOpen(false)} // Handle closing the Snackbar
+            message="Payment Successfully made!"
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "green", // Custom background color
+                color: "#fff", // Custom text color
+                padding: "10px",
+                borderRadius: "4px",
+                fontFamily: "Arial, sans-serif", // Custom font
+              }}>
+              <Typography variant="body1" style={{ fontFamily: "cursive" }}>
+                Payment made Successfully!
+              </Typography>
+            </div>
+          </Snackbar>
           <div
             style={{
               width: "100%",
