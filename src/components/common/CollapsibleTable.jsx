@@ -64,7 +64,7 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: "61vh" }}>
+    <TableContainer component={Paper} className="hide-scrollbar" sx={{ maxHeight: "61vh" }}>
       <Table stickyHeader aria-label="collapsible table">
         <TableHead>
           <TableRow>
