@@ -37,15 +37,21 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
   const [updatedReceipts, setUpdatedReceipts] = useState(receipts);
 
   useEffect(() => {
+    let filteredReceipts = receipts;
+
+    // Filter receipts based on searchTerm
     if (searchTerm) {
-      const filtered = receipts.filter((receipt) =>
-        receipt.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receipt.workerName.toLowerCase().includes(searchTerm.toLowerCase())
+      filteredReceipts = receipts.filter(
+        (receipt) =>
+          receipt.customerName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          receipt.workerName.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setUpdatedReceipts(filtered);
-    } else {
-      setUpdatedReceipts(receipts);
     }
+
+    // Reverse the order of the filtered receipts so that the latest comes first
+    setUpdatedReceipts(filteredReceipts.slice().reverse());
   }, [searchTerm, receipts]);
 
   const handleFlagChange = (id, flagged) => {
