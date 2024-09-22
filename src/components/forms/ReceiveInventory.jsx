@@ -47,7 +47,8 @@ const ReceiveInventory = ({
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [isSubmittingSupplier, setIsSubmittingSupplier] = useState(false);
+  const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
   
@@ -112,6 +113,7 @@ const ReceiveInventory = ({
 
   const handleNewProductSubmit = async () => {
     try {
+      setIsSubmittingProduct(true)
       const data = await tableActions.addProduct({
         name: newProductName,
         costPrice: newProductCostPrice,
@@ -164,7 +166,8 @@ const ReceiveInventory = ({
     }
   };
   const handleNewSupplierSubmit = async () => {
-  try {
+    try {
+      setIsSubmittingSupplier(true);
     const data = await tableActions.addSupplier({
       companyId,
       supplierName: newSupplierName,
@@ -229,7 +232,10 @@ const ReceiveInventory = ({
       <div className="heading" style={{ background: "none" }}>
         <h1 style={{ fontWeight: 200 }}>Receive Items / Restock </h1>
         {open && (
-          <Alert variant="filled" severity={alert.type} onClose={() => setOpen(false)}>
+          <Alert
+            variant="filled"
+            severity={alert.type}
+            onClose={() => setOpen(false)}>
             Restock successful
           </Alert>
         )}
@@ -352,7 +358,7 @@ const ReceiveInventory = ({
                                   <TextField
                                     style={{
                                       flex: 1,
-                                      width: matchesMobile ? 150 :350,
+                                      width: matchesMobile ? 150 : 350,
                                     }}
                                     {...params}
                                     label="Product Name"
@@ -367,7 +373,7 @@ const ReceiveInventory = ({
                           <Field
                             as={TextField}
                             fullWidth
-                            style={{minWidth: 120}}
+                            style={{ minWidth: 120 }}
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number"
@@ -625,9 +631,12 @@ const ReceiveInventory = ({
             color="primary">
             Cancel
           </Button>
-          <Button onClick={handleNewProductSubmit} color="primary">
+          {!isSubmittingProduct ?
+            (<Button onClick={handleNewProductSubmit} color="primary">
             Add Product
-          </Button>
+            </Button>) : (
+              <CircularProgress />
+          )}
         </DialogActions>
       </Dialog>
 
@@ -668,9 +677,13 @@ const ReceiveInventory = ({
             color="primary">
             Cancel
           </Button>
-          <Button onClick={handleNewSupplierSubmit} color="primary">
-            Add Supplier
-          </Button>
+          {isSubmittingSupplier ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Button onClick={handleNewSupplierSubmit} color="primary">
+              Add Supplier
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

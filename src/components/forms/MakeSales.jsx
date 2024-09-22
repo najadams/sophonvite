@@ -15,7 +15,7 @@ import {
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
+import { capitalizeFirstLetter, tableActions, updateOnhandAfterSale } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
@@ -93,6 +93,8 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           companyId,
           workerId
         );
+        const newData = updateOnhandAfterSale(productOptions, values)
+        setProductOptions(newData);
         setOpen(true);
         if (print) {
           setPrintValues({ ...values, balance }); // Store values for printing

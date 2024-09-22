@@ -283,7 +283,7 @@ export const tableActions = {
     }
   },
 
-  addReceipt: async (values, companyId, workerId) => {
+    addReceipt: async (values, companyId, workerId) => {
     try {
       const response = await axios.post("/api/receipt/", {
         ...values,
@@ -555,3 +555,20 @@ export const getNextDayDate = () => {
   nextDay.setDate(today.getDate() + 1);
   return nextDay.toISOString().split("T")[0];
 };
+
+export const updateOnhandAfterSale = (productOptions, values, allowBelowZero = true) => {
+  values.products.forEach(soldItem => {
+    const productToUpdate = productOptions.find(
+      product => product.name === soldItem.name
+    );
+    if (productToUpdate) {
+      productToUpdate.onhand -= soldItem.quantity
+      console.log("Before update:", productToUpdate);
+    }
+
+    if (productToUpdate.onhand < 0 && allowBelowZero) {
+      productToUpdate.onhand = 0;
+    }
+  });
+  return productOptions
+}
