@@ -128,7 +128,7 @@ const TableCreater = ({ companyId, data, type }) => {
       }
     },
     {
-      staleTime: 1000 * 60 * 5, // The data will be considered fresh for 5 minutes
+      staleTimxe: 1000 * 30 * 1, // The data will be considered fresh for 5 minutes
       cacheTime: 1000 * 60 * 30, // The data will be cached for 30 minutes
       retry: 1, // Retry once if the data fetching fails
     }
