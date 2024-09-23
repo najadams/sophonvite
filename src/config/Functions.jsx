@@ -578,7 +578,7 @@ export const updateValuesAfterRestock = (products, values) => {
     );
     if (productToUpdate) {
       productToUpdate.onHand += receivedItem.quantity
-      productToUpdate.costPrice = receivedItem.quantity
+      productToUpdate.costPrice = receivedItem.costPrice
       productToUpdate.salesPrice = receivedItem.salesPrice
     }
 
