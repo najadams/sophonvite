@@ -450,12 +450,6 @@ const ReceiveInventory = ({
                                     `products.${index}.salesPrice`,
                                     newPrice
                                   );
-                                  const newTotalPrice =
-                                    product.quantity * newPrice;
-                                  setFieldValue(
-                                    `products.${index}.totalPrice`,
-                                    newTotalPrice
-                                  );
                                 }}
                               />
                             )}
