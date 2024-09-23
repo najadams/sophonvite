@@ -13,8 +13,8 @@ const UsersCard = ({ main, sub, top, contact, onClick}) => {
         </div>
         <p class="name-client">
           {" "}
-          {capitalizeFirstLetter(sub)}
-          <span>{capitalizeFirstLetter(main)}</span>
+          {capitalizeFirstLetter(sub) || "🚚"}
+          <span>{capitalizeFirstLetter(main) || "🙎‍♂️"}</span>
         </p>
         <div class="social-media">
           <a href="#">
