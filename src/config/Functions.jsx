@@ -563,12 +563,25 @@ export const updateOnhandAfterSale = (productOptions, values, allowBelowZero = t
     );
     if (productToUpdate) {
       productToUpdate.onhand -= soldItem.quantity
-      console.log("Before update:", productToUpdate);
     }
 
-    if (productToUpdate.onhand < 0 && allowBelowZero) {
-      productToUpdate.onhand = 0;
-    }
+    // if (productToUpdate.onhand < 0 && allowBelowZero) {
+    //   productToUpdate.onhand = 0;
+    // }
   });
   return productOptions
+}
+export const updateValuesAfterRestock = (products, values) => {
+  values.products.forEach(receivedItem => {
+    const productToUpdate = products.find(
+      product => product.name === receivedItem.name
+    );
+    if (productToUpdate) {
+      productToUpdate.onHand += receivedItem.quantity
+      productToUpdate.costPrice = receivedItem.quantity
+      productToUpdate.salesPrice = receivedItem.salesPrice
+    }
+
+  });
+  return products
 }

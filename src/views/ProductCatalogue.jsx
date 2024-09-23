@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useState } from "react";
 import { useQuery } from "react-query";
 import ProductForm from "../components/forms/ProductForm";
 import TableCreater from "../components/common/TableCreater";
@@ -54,12 +54,17 @@ export const allyProps = (index) => {
 
 const ProductCatalogue = () => {
   const [value, setValue] = React.useState(0);
+  const [products, setProducts] = useState([])
+  // const myFunc = (product) => console.log("from parent ", product)
+  // myFunc()
   const companyId = useSelector((state) => state.companyState.data.id);
   const {
-    data: products,
     isLoading,
     isError,
-  } = useQuery(["api/products", companyId], () => fetchProducts(companyId));
+  } = useQuery(["api/products", companyId], () => fetchProducts(companyId),
+    {
+    onSuccess: (data) => setProducts(data)
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -99,7 +104,7 @@ const ProductCatalogue = () => {
 
       <TabPanel value={value} index={0}>
         {products.length > 0 ? (
-          <TableCreater companyId={companyId} type="products" />
+          <TableCreater companyId={companyId} type={'products'} data={products} />
         ) : (
           <div className="content">
             <h2>Add Products to Get Started</h2>
@@ -107,7 +112,7 @@ const ProductCatalogue = () => {
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <ReceiveInventory Products={products} />
+        <ReceiveInventory Products={products} setProducts={setProducts} />
       </TabPanel>
       {/* <TabPanel value={value} index={2}>
         <AddItem>

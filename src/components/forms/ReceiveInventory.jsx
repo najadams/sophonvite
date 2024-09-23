@@ -16,7 +16,7 @@ import {
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
+import { capitalizeFirstLetter, tableActions, updateValuesAfterRestock } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useQuery } from "react-query";
@@ -40,6 +40,7 @@ const validationSchema = Yup.object().shape({
 const ReceiveInventory = ({
   Products,
   handleProductUpdate,
+  setProducts
 }) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
@@ -96,6 +97,9 @@ const ReceiveInventory = ({
           { ...values, balance, workerId },
           companyId,
         );
+        const newProductsData = updateValuesAfterRestock(productOptions, values)
+        console.log(newProductsData)
+        // setProducts(newProductsData);
         setOpen(true);
         setTimeout(() => {
           resetForm();
@@ -103,7 +107,7 @@ const ReceiveInventory = ({
       }
     } catch (error) {
       console.log(error);
-      setError(error);
+      setError(error || error.toString());
     } finally {
       setSubmitting(false);
       setLoading(false);
