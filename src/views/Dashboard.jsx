@@ -28,7 +28,7 @@ const DummyCard = ({ children, title, sx }) => (
     sx={{
       width: { xs: "100%", sm: "400px", md: "367px" },
       height: { xs: "auto", sm: "400px" },
-      margin: 2,
+      margin: {xs : .4, sm : .5, md: .5, lg: 1},
       flexGrow: 1,
       ...sx,
     }}>
@@ -165,7 +165,7 @@ const Dashboard = () => {
               <LineChart
                 data={overall.profit}
                 margin={{
-                  top: 10,
+                  top: 5,
                   right: 30,
                   left: 0,
                   bottom: 0,
