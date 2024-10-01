@@ -21,7 +21,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useQueryClient, useMutation } from "react-query";
-import { tableActions } from "../../config/Functions";
+import { tableActions, updateValuesAfterEdit } from "../../config/Functions";
 import { useMediaQuery } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
@@ -89,6 +89,7 @@ const TableCreater = ({ companyId, data, type }) => {
     } else {
       deleteCustomerMutation.mutate(deleteRow.id);
     }
+    setData((prevData) => prevData.filter((row) => row.id !== deleteRow.id));
     setDeleteRow(null); // Reset delete row state after deletion
   };
 
@@ -175,9 +176,11 @@ const TableCreater = ({ companyId, data, type }) => {
   const editProductMutation = useMutation(
     (values) => axios.patch(`/api/product/${values.id}`, values),
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         queryClient.invalidateQueries(["api/products", companyId]);
-        fetchData();
+        const values = data.data.product
+        const newData = updateValuesAfterEdit(Data, values);
+        setData(newData);
       },
       onError: (error) => {
         console.error("Failed to edit product:", error);
@@ -186,17 +189,23 @@ const TableCreater = ({ companyId, data, type }) => {
   );
 
   const editCustomerMutation = useMutation(
-    (values) => axios.patch(`/api/customer/${values.id}`, values),
+    (values) => {
+      return axios.patch(`/api/customer/${values.id}`, values);
+    },
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         queryClient.invalidateQueries(["api/customers", companyId]);
         fetchData();
       },
       onError: (error) => {
-        console.error("Failed to edit customer:", error);
+        console.error(
+          "Failed to edit customer:",
+          error.response?.data || error.message
+        );
       },
     }
   );
+
 
   if (isError) {
     return { error };
@@ -262,7 +271,11 @@ const TableCreater = ({ companyId, data, type }) => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}>
-        <MenuItem onClick={handleEditOpen}>
+        <MenuItem
+          onClick={() => {
+            handleEditOpen();
+            handleMenuClose(); // Ensure menu closes when edit is selected
+          }}>
           <EditButton>
             {type === "products" ? (
               <ProductForm
@@ -277,10 +290,11 @@ const TableCreater = ({ companyId, data, type }) => {
             )}
           </EditButton>
         </MenuItem>
+
         <MenuItem
           onClick={() => {
-            handleMenuClose();
-            handleDelete(selectedRow);
+            handleMenuClose(); // Close the menu first
+            handleDelete(selectedRow); // Call the delete handler
           }}>
           Delete
         </MenuItem>
