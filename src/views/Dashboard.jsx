@@ -26,9 +26,9 @@ import {
 const DummyCard = ({ children, title, sx }) => (
   <Box
     sx={{
-      width: { xs: "100%", sm: "400px", md: "367px" },
+      width: { xs: "100%", sm: "400px", md: "450px" },
       height: { xs: "auto", sm: "400px" },
-      margin: {xs : .4, sm : .5, md: .5, lg: 1},
+      margin: {xs : .4, sm : .5, md: .5, lg: .7},
       flexGrow: 1,
       ...sx,
     }}>
