@@ -28,7 +28,15 @@ const validationSchema = Yup.object().shape({
       name: Yup.string().required("Product name is required"),
       quantity: Yup.number()
         .required("Quantity is required")
-        .min(1, "Quantity must be at least 1"),
+        .test(
+          "is-valid-fraction",
+          "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
+          (value) => {
+            if (value < 0.25) return false; // Ensure at least 1/4 (0.25) as the minimum
+            return true;
+          }
+        )
+        .min(0.25, "Quantity must be at least 1/4"), // Allow for fractional quantities like 1/4 (0.25)
       price: Yup.number().required("Price is required"),
     })
   ),
@@ -36,6 +44,7 @@ const validationSchema = Yup.object().shape({
   amountPaid: Yup.number().required("Amount Paid should not be empty"),
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
+
 
 const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpdate }) => {
   const worker = useSelector((state) => state.userState.currentUser);
@@ -318,7 +327,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                             )}
                           </Field>
 
-                          <Field
+                          {/* <Field
                             style={{
                               paddingRight: 0,
                               flex: 1,
@@ -329,6 +338,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number"
+                            step="any"
                             validate={(value) => {
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
@@ -389,36 +399,92 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                                 setModalOpen(true);
                               }
                             }}
+                          /> */}
+                          <Field
+                            style={{
+                              paddingRight: 0,
+                              flex: 1,
+                              width: "50%",
+                              minWidth: 150,
+                            }}
+                            as={TextField}
+                            name={`products.${index}.quantity`}
+                            label="Quantity"
+                            type="number" // Use "number" to ensure numeric keyboard on mobile
+                            step="any" // Allow for decimal values
+                            validate={(value) => {
+                              const selectedProduct = productOptions.find(
+                                (p) => p.name === product.name
+                              );
+
+                              const numericValue = parseFloat(value);
+
+                              // Ensure the quantity is at least 0.25 (or 1/4)
+                              if (numericValue < 0.25) {
+                                return "Quantity must be at least 1/4";
+                              }
+
+                              // Optional: Validate against available stock
+                              // if (numericValue > selectedProduct?.onhand) {
+                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
+                              // }
+
+                              return undefined;
+                            }}
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              const newQuantity = parseFloat(value);
+
+                              // First, set the new quantity value
+                              setFieldValue(
+                                `products.${index}.quantity`,
+                                newQuantity
+                              );
+
+                              // Find the selected product
+                              const selectedProduct = productOptions.find(
+                                (p) => p.name === product.name
+                              );
+
+                              // Ensure we have a valid selected product
+                              if (selectedProduct) {
+                                // Get the current price from the field or fallback to the selected product's sales price
+                                const currentPrice =
+                                  values.products[index].price ||
+                                  selectedProduct.salesPrice;
+
+                                // Calculate the new total price based on quantity and price
+                                const newTotalPrice =
+                                  newQuantity * currentPrice;
+
+                                // Set the new total price
+                                setFieldValue(
+                                  `products.${index}.totalPrice`,
+                                  newTotalPrice
+                                );
+                              }
+                            }}
+                            onBlur={(event) => {
+                              const value = parseFloat(event.target.value);
+
+                              const selectedProduct = productOptions.find(
+                                (p) => p.name === product.name
+                              );
+
+                              // Check if the quantity exceeds available stock
+                              if (
+                                selectedProduct &&
+                                value > selectedProduct.onhand
+                              ) {
+                                setModalMessage(
+                                  `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
+                                );
+                                setModalOpen(true);
+                              }
+                            }}
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          {/* <Field name={`products.${index}.price`}>
-                            {({ field, form }) => (
-                              <TextField
-                                {...field}
-                                label="Price"
-                                type="number"
-                                style={{ minWidth: 150 }}
-                                fullWidth
-                                InputProps={{ style: { textAlign: "right" } }}
-                                onChange={(event) => {
-                                  const newPrice = parseFloat(
-                                    event.target.value
-                                  );
-                                  setFieldValue(
-                                    `products.${index}.price`,
-                                    newPrice
-                                  );
-                                  const newTotalPrice =
-                                    product.quantity * newPrice;
-                                  setFieldValue(
-                                    `products.${index}.totalPrice`,
-                                    newTotalPrice
-                                  );
-                                }}
-                              />
-                            )}
-                          </Field> */}
                           <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <TextField
