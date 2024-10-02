@@ -69,8 +69,6 @@ const CreateUser = () => {
             setSubmitting(true);
             setError(""); // Reset error message
             try {
-              // handle form submission
-              console.log(values);
               await tableActions.addWorker({ companyId, ...values });
               setShowAlert(true);
               setTimeout(() => {
@@ -83,6 +81,9 @@ const CreateUser = () => {
                 err ||
                   "An error occurred while creating the user."
               );
+              setTimeout(() => {
+                setError("")
+              }, 2000);
               console.log(err);
             }
             setSubmitting(false); // Ensure submitting is stopped

@@ -260,9 +260,10 @@ export const tableActions = {
     privileges,
   }) => {
     try {
+      const smallName = name.toLowerCase()
       const response = await axios.post(`/api/worker/`, {
         companyId,
-        name,
+        name: smallName,
         username,
         contact,
         password,
