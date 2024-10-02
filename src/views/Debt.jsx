@@ -22,6 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Balance } from "@mui/icons-material";
 
 const Debt = () => {
   const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const Debt = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showAllDebtors, setShowAllDebtors] = useState(false);
   const [compressCards, setCompressCards] = useState(false);
@@ -107,10 +109,29 @@ const Debt = () => {
         debtId: selectedDebt.id,
         amount: paymentAmount,
       });
+      const updatedDebts = debts.map((debt) => {
+        return (
+          debt.id === selectedDebt.id
+            ? (
+              debt.amount -= paymentAmount
+            )
+            : debt
+          );
+        })
+        
+        setSubmitting(true)
+
+      // Update the state with the new debts list
+      queryClient.setQueryData(
+        ["debts", companyId, selectedDate, showAllDebtors],
+        updatedDebts
+      );
+
 
       // Close the payment dialog and reset the payment amount
       setPaymentDialogOpen(false);
       setPaymentAmount("");
+      setSubmitting(false)
 
       setOpen(true);
     } catch (error) {
@@ -337,8 +358,8 @@ const Debt = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => handlePayment()}>Submit Payment</Button>
             <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => handlePayment()}>Submit Payment</Button>
           </DialogActions>
         </Dialog>
       </div>
