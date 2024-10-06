@@ -101,6 +101,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
           companyId,
           workerId
         );
+        console.log(values)
         const newData = updateOnhandAfterSale(productOptions, values)
         setProductOptions(newData);
         setOpen(true);
@@ -150,11 +151,12 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
 
   const handleNewProductSubmit = async () => {
     try {
+      console.log(newProductOnhand)
       const data = await tableActions.addProduct({
         name: newProductName,
         costPrice: newProductCostPrice,
         salesPrice: newProductSalesPrice,
-        onHhand: newProductOnhand,
+        onHand: newProductOnhand,
         companyId,
       });
 
