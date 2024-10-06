@@ -99,7 +99,7 @@ export const tableActions = {
         index: index + 1,
         // company: item.company,
         name: item.name,
-        phone: item.phone,
+        phone: item.phone ? "0"+item.phone : null,
         // email: item.email,
       }));
       return data;
