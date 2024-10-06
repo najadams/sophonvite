@@ -179,7 +179,6 @@ const TableCreater = ({ companyId, data, type }) => {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["api/products", companyId]);
         const values = data.data.product
-        console.log(Data.slice(1,2))
         const newData = updateValuesAfterEdit(Data, values);
         setData(newData);
       },
