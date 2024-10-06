@@ -19,7 +19,6 @@ import { capitalizeFirstLetter, tableActions, updateOnhandAfterSale } from "../.
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
-import { useReactToPrint } from "react-to-print";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),

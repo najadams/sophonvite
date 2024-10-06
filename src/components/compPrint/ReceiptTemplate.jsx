@@ -46,9 +46,9 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         {company.momo && <h5>Momo: {company.momo}</h5>}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
-      <p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
-        <strong>Customer:</strong> <strong>{customerName}</strong>
-      </p>
+      {<p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
+        <strong>Customer:</strong> <strong>{capitalizeFirstLetter(customerName)}</strong>
+      </p>}
       <p>
         <strong>Cashier: </strong>
         {capitalizeFirstLetter(workerName)}
