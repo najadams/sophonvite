@@ -33,16 +33,6 @@ const SummaryCards = ({ salesData }) => {
       <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
-            <Typography variant="h6">Total Discounts</Typography>
-            <Typography variant="h4">
-              ₵{salesData?.totalDiscounts.toFixed(2)}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid item xs={6} sm={6} md={3}>
-        <Card>
-          <CardContent>
             <Typography variant="h6">Total Amount Paid</Typography>
             <Typography variant="h4">
               ₵{salesData?.totalAmountPaid.toFixed(2)}
@@ -53,9 +43,19 @@ const SummaryCards = ({ salesData }) => {
       <Grid item xs={6} sm={6} md={3}>
         <Card>
           <CardContent>
-            <Typography variant="h6">Balance || Amount Owed</Typography>
+            <Typography variant="h6">Balance Owed</Typography>
             <Typography variant="h4">
               ₵{salesData?.totalBalance.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={6} sm={6} md={3}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Total Discounts</Typography>
+            <Typography variant="h4">
+              ₵{salesData?.totalDiscounts.toFixed(2)}
             </Typography>
           </CardContent>
         </Card>
