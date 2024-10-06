@@ -592,6 +592,7 @@ export const updateValuesAfterEdit = (Data, values) => {
       product => product.name === values.name
     );
     if (productToUpdate) {
+      productToUpdate.name = values.name
       productToUpdate.costPrice = values.costPrice
       productToUpdate.salesPrice = values.salesPrice
     }
