@@ -587,11 +587,12 @@ export const updateValuesAfterRestock = (products, values) => {
   return products
 }
 export const updateValuesAfterEdit = (Data, values) => {
-
     const productToUpdate = Data.find(
-      product => product.name === values.name
+      product => product.id === values._id
     );
-    if (productToUpdate) {
+    console.log(productToUpdate)
+  if (productToUpdate) {
+    console.log("done")
       productToUpdate.name = values.name
       productToUpdate.costPrice = values.costPrice
       productToUpdate.salesPrice = values.salesPrice
