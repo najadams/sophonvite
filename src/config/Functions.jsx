@@ -592,7 +592,6 @@ export const updateValuesAfterEdit = (Data, values) => {
     );
     console.log(productToUpdate)
   if (productToUpdate) {
-    console.log("done")
       productToUpdate.name = values.name
       productToUpdate.costPrice = values.costPrice
       productToUpdate.salesPrice = values.salesPrice

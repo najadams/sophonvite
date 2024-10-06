@@ -282,17 +282,19 @@ const Debt = () => {
                 key={debt.id}
                 main={`₵${debt.amount}`}
                 sub={debt.customerName}
+                contact={debt.contact}
                 onClick={() => handleCardClick(debt)}
                 additionalInfo={`Debt Date: ${new Date(
                   debt.date
                 ).toLocaleDateString()}`}
-              />
-            ) : (
-              <UsersCard
+                />
+              ) : (
+                <UsersCard
                 key={debt.id}
                 top={new Date(debt.date).toLocaleDateString()}
                 main={`₵${debt.amount}`}
                 sub={debt.customerName}
+                contact={debt.contact}
                 onClick={() => handleCardClick(debt)}
                 additionalInfo={`Debt Date: ${new Date(
                   debt.date

@@ -79,7 +79,7 @@ const ReceiveInventory = ({
   const [newSupplierContact, setNewSupplierContact] = useState("");
   
   const handleSubmit = async (values, setSubmitting, resetForm) => {
-    console.log(workerId)
+    console.log(values)
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
