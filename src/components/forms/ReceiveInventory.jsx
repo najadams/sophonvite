@@ -172,35 +172,34 @@ const ReceiveInventory = ({
   const handleNewSupplierSubmit = async () => {
     try {
       setIsSubmittingSupplier(true);
-    const data = await tableActions.addSupplier({
-      companyId,
-      supplierName: newSupplierName,
-      companyName: newSupplierCompany,
-      contact: newSupplierContact,
-    });
-
-    console.log("Supplier added successfully:", data); // Check if this logs
-
-    const newSupplier = data?.data; // Make sure data is as expected
-
-    // Update supplier options using a functional state update
-    setSupplierOptions((prevOptions) => [
-      "<<<< Add New Supplier >>>>",
-      ...prevOptions.filter(
-        (option) => option !== "<<<< Add New Supplier >>>>"
-      ),
-      newSupplierName,
-    ]);
-
-    // Close the dialog
-    console.log("this should not work")
-    setNewSupplierDialogOpen(false);
-
-    // Clear the input fields
-    setNewSupplierName("");
-    setNewSupplierCompany("");
-    setNewSupplierContact("");
-  } catch (error) {
+      const data = await tableActions.addSupplier({
+        companyId,
+        supplierName: newSupplierName,
+        companyName: newSupplierCompany,
+        contact: newSupplierContact,
+      });
+      
+      
+      const newSupplier = data?.data; // Make sure data is as expected
+      
+      // Update supplier options using a functional state update
+      setSupplierOptions((prevOptions) => [
+        "<<<< Add New Supplier >>>>",
+        ...prevOptions.filter(
+          (option) => option !== "<<<< Add New Supplier >>>>"
+        ),
+        newSupplierName,
+      ]);
+      
+      // Close the dialog
+      setNewSupplierDialogOpen(false);
+      
+      // Clear the input fields
+      setNewSupplierName("");
+      setNewSupplierCompany("");
+      setNewSupplierContact("");
+    } catch (error) {
+    setIsSubmittingSupplier(false);
     console.log("Error adding supplier:", error);
     setError("Failed to add new Supplier");
   }
