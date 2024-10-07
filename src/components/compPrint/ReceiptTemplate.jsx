@@ -65,10 +65,10 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         }}>
         <thead>
           <tr>
-            <th style={{ padding: "5px", font: "caption" }}>Qty</th>
-            <th style={{ padding: "8px", font: "caption" }}>Product</th>
-            <th style={{ padding: "5px", font: "caption" }}>Price</th>
-            <th style={{ padding: "5px", font: "caption" }}>Total</th>
+            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Qty</th>
+            <th style={{ padding: "8px", font: "caption", border: '1px solid' }}>Product</th>
+            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Price</th>
+            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -78,16 +78,18 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 style={{
                   padding: "5px",
                   textAlign: "center",
+                  border: '0.3px solid'
                 }}>
                 {product.quantity}
               </td>
-              <td style={{ padding: "8px", textAlign: "center", font: "icon" }}>
+              <td style={{ padding: "8px", textAlign: "center", font: "icon", border: '1px solid'}}>
                 {capitalizeFirstLetter(product.name)}
               </td>
               <td
                 style={{
                   padding: "5px",
                   textAlign: "center",
+                  border: '0.3px solid'
                 }}>
                 ₵{product.price ? product.price : product.salesPrice}
               </td>
@@ -95,6 +97,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 style={{
                   padding: "5px",
                   textAlign: "center",
+                  border: '0.3px solid'
                 }}>
                 ₵
                 {product.price
