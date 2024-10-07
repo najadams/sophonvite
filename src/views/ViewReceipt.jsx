@@ -11,8 +11,6 @@ const ViewReceipt = () => {
   // Ensure that row exists before proceeding
   if (!row) {
     return <Typography variant="h6">No receipt details available</Typography>;
-  } else {
-      console.log(row)
   }
 
   const {
@@ -39,7 +37,7 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
           padding: "20px",
           backgroundColor: "#E0F2F1", // Light shade of green
           borderRadius: "10px",
-        //   maxWidth: "60  0px",
+          //   maxWidth: "60  0px",
           margin: "0 auto",
           fontFamily: "'Roboto', sans-serif", // Modern font family
         }}>
@@ -79,15 +77,15 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
 
         {/* Customer Info */}
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={6} sm={4} md={4}>
             <Typography variant="subtitle1" color={primaryColor}>
               Customer:
             </Typography>
-            <Typography variant="body1" style={{ fontWeight: "bold" }}>
-              {customerName}
+            <Typography variant="body1">
+              {capitalizeFirstLetter(customerName)}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={6} sm={4} md={4}>
             <Typography variant="subtitle1" color={primaryColor}>
               Cashier:
             </Typography>
@@ -95,7 +93,7 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
               {capitalizeFirstLetter(workerName)}
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={4} md={4}>
             <Typography variant="subtitle1" color={primaryColor}>
               Date:
             </Typography>
