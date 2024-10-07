@@ -151,13 +151,14 @@ const Debt = () => {
     return Object.values(grouped);
   };
 
-  const filteredDebts = debts?.filter((debt) =>
-    debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDebts =
+    debts?.filter((debt) =>
+      debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   const displayedDebts = compressCards
-    ? groupDebtsByCustomer(filteredDebts)
-    : filteredDebts;
+    ? groupDebtsByCustomer(filteredDebts || []) // Fallback to empty array
+    : filteredDebts || [];
 
   const calculateBalance = () => {
     return selectedDebt?.amount - paymentAmount;
