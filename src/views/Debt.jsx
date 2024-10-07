@@ -21,6 +21,7 @@ import {
   Snackbar,
   TextField,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { Balance } from "@mui/icons-material";
 
@@ -105,6 +106,7 @@ const Debt = () => {
         return;
       }
       // Trigger the mutation to make the payment
+      setSubmitting(true)
       await paymentMutation.mutateAsync({
         debtId: selectedDebt.id,
         amount: paymentAmount,
@@ -119,8 +121,6 @@ const Debt = () => {
           );
         })
         
-        setSubmitting(true)
-
       // Update the state with the new debts list
       queryClient.setQueryData(
         ["debts", companyId, selectedDate, showAllDebtors],
@@ -132,10 +132,11 @@ const Debt = () => {
       setPaymentDialogOpen(false);
       setPaymentAmount("");
       setSubmitting(false)
-
+      
       setOpen(true);
     } catch (error) {
       console.error("Error during payment: ", error);
+      setSubmitting(false)
     }
   };
 
@@ -277,7 +278,13 @@ const Debt = () => {
         !isError &&
         displayedDebts &&
         displayedDebts.length > 0 ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: 'center' }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 5,
+              justifyContent: "center",
+            }}>
             {displayedDebts.map((debt) =>
               compressCards ? (
                 <UsersCard
@@ -291,17 +298,17 @@ const Debt = () => {
                   ).toLocaleDateString()}`}
                 />
               ) : (
-                  <UsersCard
-                    key={debt.contact}
-                    top={new Date(debt.date).toLocaleDateString()}
-                    main={`₵${debt.amount}`}
-                    sub={debt.customerName}
-                    contact={debt.contact}
-                    onClick={() => handleCardClick(debt)}
-                    additionalInfo={`Debt Date: ${new Date(
-                      debt.date
-                    ).toLocaleDateString()}`}
-                  />
+                <UsersCard
+                  key={debt.contact}
+                  top={new Date(debt.date).toLocaleDateString()}
+                  main={`₵${debt.amount}`}
+                  sub={debt.customerName}
+                  contact={debt.contact}
+                  onClick={() => handleCardClick(debt)}
+                  additionalInfo={`Debt Date: ${new Date(
+                    debt.date
+                  ).toLocaleDateString()}`}
+                />
               )
             )}
           </div>
@@ -365,7 +372,11 @@ const Debt = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
-            <Button onClick={() => handlePayment()}>Submit Payment</Button>
+            {submitting ? (
+              <CircularProgress />
+            ) : (
+              <Button onClick={() => handlePayment()}>Submit Payment</Button>
+            )}
           </DialogActions>
         </Dialog>
       </div>
