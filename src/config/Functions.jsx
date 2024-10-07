@@ -69,9 +69,9 @@ const calculateTopPurchasedProducts = (receipts) => {
       if (!acc[item.name]) {
         acc[item.name] = { quantity: 0, profit: 0 };
       }
-      acc[item.name].quantity += item.quantity;
+      acc[item.name].quantity += Math.abs(item.quantity);
       acc[item.name].profit +=
-        (item.salesPrice - item.costPrice) * item.quantity;
+        Math.abs((item.salesPrice - item.costPrice) * item.quantity);
     });
     return acc;
   }, {});
