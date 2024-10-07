@@ -276,45 +276,48 @@ const Debt = () => {
         !isError &&
         displayedDebts &&
         displayedDebts.length > 0 ? (
-          displayedDebts.map((debt) =>
-            compressCards ? (
-              <UsersCard
-                key={debt.id}
-                main={`₵${debt.amount}`}
-                sub={debt.customerName}
-                contact={debt.contact}
-                onClick={() => handleCardClick(debt)}
-                additionalInfo={`Debt Date: ${new Date(
-                  debt.date
-                ).toLocaleDateString()}`}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: 'center' }}>
+            {displayedDebts.map((debt) =>
+              compressCards ? (
+                <UsersCard
+                  key={debt.id}
+                  main={`₵${debt.amount}`}
+                  sub={debt.customerName}
+                  contact={debt.contact}
+                  onClick={() => handleCardClick(debt)}
+                  additionalInfo={`Debt Date: ${new Date(
+                    debt.date
+                  ).toLocaleDateString()}`}
                 />
               ) : (
-                <UsersCard
-                key={debt.id}
-                top={new Date(debt.date).toLocaleDateString()}
-                main={`₵${debt.amount}`}
-                sub={debt.customerName}
-                contact={debt.contact}
-                onClick={() => handleCardClick(debt)}
-                additionalInfo={`Debt Date: ${new Date(
-                  debt.date
-                ).toLocaleDateString()}`}
-              />
-            )
-          )
+                  <UsersCard
+                    key={debt.contact}
+                    top={new Date(debt.date).toLocaleDateString()}
+                    main={`₵${debt.amount}`}
+                    sub={debt.customerName}
+                    contact={debt.contact}
+                    onClick={() => handleCardClick(debt)}
+                    additionalInfo={`Debt Date: ${new Date(
+                      debt.date
+                    ).toLocaleDateString()}`}
+                  />
+              )
+            )}
+          </div>
         ) : (
           <div className="content">
             {selectedDate.toISOString().split("T")[0] ===
             new Date().toISOString().split("T")[0] ? (
               <h2 style={{ paddingTop: "100px" }}>No Debts Acquired Today</h2>
             ) : (
-              <h2 style={{ paddingTop: 100 }}>
+              <h2 style={{ paddingTop: "100px" }}>
                 No Debts Acquired from{" "}
                 {selectedDate.toISOString().split("T")[0]} to today
               </h2>
             )}
           </div>
         )}
+
         <Dialog
           open={paymentDialogOpen}
           onClose={() => setPaymentDialogOpen(false)}
