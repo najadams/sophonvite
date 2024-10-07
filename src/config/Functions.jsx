@@ -97,9 +97,9 @@ export const tableActions = {
       const data = response.data.customers.map((item, index) => ({
         id: item._id,
         index: index + 1,
-        // company: item.company,
+        company: item.company ? item.company :  'None',
         name: item.name,
-        phone: item.phone ? "0"+item.phone : null,
+        phone: item.phone ? "0"+item.phone : '+233____',
         // email: item.email,
       }));
       return data;
