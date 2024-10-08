@@ -34,16 +34,16 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
           flexDirection: "column",
           alignItems: "center",
           width: "100%",
-          gap: 4,
+          gap: 3,
         }}>
         <h4 style={{ fontSize: 20, fontFamily: "sans-serif" }}>
           {capitalizeFirstLetter(company.companyName)}!
         </h4>
-        {company.tinNumber && (
+        {/* {company.tinNumber && (
           <h5>Tin Number: {company.tinNumber.toUpperCase()}</h5>
-        )}
-        {company.contact && <h5>Contact: {company.contact}</h5>}
-        {company.momo && <h5>Momo: {company.momo}</h5>}
+        )} */}
+        {company.contact && <h4>Contact: {company.contact}</h4>}
+        {company.momo && <h4>Momo: {company.momo}</h4>}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
       {<p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
@@ -110,24 +110,24 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
       </table>
       <hr style={{ height: 5, backgroundColor: "black" }} />
       <div style={{ fontSize: 15 }}>
-        {company.taxRate && (
-          <p style={{ textAlign: "left", marginTop: "20px" }}>
+        {/* {company.taxRate && (
+          <p style={{ textAlign: "left", marginTop: "10px" }}>
             <strong>Tax %: {company.taxRate}</strong>
           </p>
-        )}
+        )} */}
         {discount !== undefined && discount !== null && discount !== 0 && (
-          <p style={{ textAlign: "left", marginTop: "20px" }}>
+          <p style={{ textAlign: "left", marginTop: "10px" }}>
             <strong>Discount: ₵{discount}</strong>
           </p>
         )}
-        <p style={{ textAlign: "left", marginTop: "20px" }}>
+        <p style={{ textAlign: "left", marginTop: "10px" }}>
           <strong>Total: ₵{total}</strong>
         </p>
-        <p style={{ textAlign: "left", marginTop: "20px" }}>
+        <p style={{ textAlign: "left", marginTop: "10px" }}>
           <strong>Paid: ₵{amountPaid}</strong>
         </p>
         {balance !== undefined && balance !== null && balance !== 0 && (
-          <p style={{ textAlign: "left", marginTop: "20px" }}>
+          <p style={{ textAlign: "left", marginTop: "10px" }}>
             <strong>Balance: ₵{balance}</strong>
           </p>
         )}
