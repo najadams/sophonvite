@@ -108,7 +108,7 @@ const ProductForm = ({ data, editMutation }) => {
               type="number"
               label="onHand"
               name="onHand"
-              disabled={data}
+              //disabled={data}
             />
             <br />
             {isSubmitting && <LinearProgress />}
