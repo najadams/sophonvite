@@ -304,7 +304,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                                       selectedProduct?.salesPrice;
                                     setFieldValue(
                                       `products.${index}.totalPrice`,
-                                      newTotalPrice
+                                       newTotalPrice
                                     );
                                     setFieldValue(
                                       `products.${index}.price`,
@@ -327,80 +327,6 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                               />
                             )}
                           </Field>
-
-                          {/* <Field
-                            style={{
-                              paddingRight: 0,
-                              flex: 1,
-                              width: "50%",
-                              minWidth: 150,
-                            }}
-                            as={TextField}
-                            name={`products.${index}.quantity`}
-                            label="Quantity"
-                            type="number"
-                            step="any"
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-                              // if (value > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
-                              // }
-                            }}
-                            onChange={(event) => {
-                              const newQuantity = parseInt(
-                                event.target.value,
-                                10
-                              );
-
-                              // First, set the new quantity value
-                              setFieldValue(
-                                `products.${index}.quantity`,
-                                newQuantity
-                              );
-
-                              // Find the selected product
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Ensure we have a valid selected product
-                              if (selectedProduct) {
-                                // Get the current price from the field or fallback to the selected product's sales price
-                                const currentPrice =
-                                  values.products[index].price ||
-                                  selectedProduct.salesPrice;
-
-                                // Calculate the new total price based on quantity and price
-                                const newTotalPrice =
-                                  newQuantity * currentPrice;
-
-                                // Set the new total price
-                                setFieldValue(
-                                  `products.${index}.totalPrice`,
-                                  newTotalPrice
-                                );
-                              }
-                            }}
-                            onBlur={(event) => {
-                              const value = parseInt(event.target.value, 10);
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Check if the quantity exceeds available stock
-                              if (
-                                selectedProduct &&
-                                value > selectedProduct.onhand
-                              ) {
-                                setModalMessage(
-                                  `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
-                                );
-                                setModalOpen(true);
-                              }
-                            }}
-                          /> */}
                           <Field
                             style={{
                               paddingRight: 0,
@@ -421,8 +347,8 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                               const numericValue = parseFloat(value);
 
                               // Ensure the quantity is at least 0.25 (or 1/4)
-                              if (numericValue < 0.25) {
-                                return "Quantity must be at least 1/4";
+                              if (numericValue < 0.1) {
+                                return "Quantity must be at least 1/10";
                               }
 
                               // Optional: Validate against available stock
@@ -461,7 +387,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                                 // Set the new total price
                                 setFieldValue(
                                   `products.${index}.totalPrice`,
-                                  newTotalPrice
+                                  Math.ceil(newTotalPrice)
                                 );
                               }
                             }}
@@ -511,7 +437,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
                                     product.quantity * newPrice;
                                   setFieldValue(
                                     `products.${index}.totalPrice`,
-                                    newTotalPrice
+                                    Math.ceil(newTotalPrice)
                                   );
                                 }}
                               />
