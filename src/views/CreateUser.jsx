@@ -30,7 +30,14 @@ const validationSchema = Yup.object().shape({
 });
 
 const MyTextField = ({ label, ...props }) => {
-  const [field, meta] = useField(props);
+  const [field, meta, helpers] = useField(props);
+
+  const handleBlur = (event) => {
+    const lowercaseValue = event.target.value.toLowerCase();
+    helpers.setValue(lowercaseValue); 
+    field.onBlur(event); 
+  };
+
   return (
     <>
       <StyledTextField
@@ -39,6 +46,7 @@ const MyTextField = ({ label, ...props }) => {
         {...props}
         error={meta.touched && Boolean(meta.error)}
         helperText={meta.touched && meta.error}
+        onBlur={handleBlur} // Use the custom onBlur handler
       />
     </>
   );
@@ -87,7 +95,7 @@ const CreateUser = () => {
               console.log(err);
             }
             setSubmitting(false); // Ensure submitting is stopped
-          }}>
+          }}> 
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <Box mb={4}>
