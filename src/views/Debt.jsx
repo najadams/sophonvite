@@ -23,7 +23,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { Balance } from "@mui/icons-material";
+import PaymentDialog from "../components/Dialogs/PaymentDialog";
 
 const Debt = () => {
   const queryClient = new QueryClient();
@@ -99,8 +99,9 @@ const Debt = () => {
     setPaymentDialogOpen(true);
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (paymentAmount) => {
     try {
+      console.log(selectedDebt.id, paymentAmount)
       if (!selectedDebt?.id || !paymentAmount) {
         alert("Please select a debt and enter a valid payment amount.");
         return;
@@ -140,17 +141,26 @@ const Debt = () => {
     }
   };
 
-  const groupDebtsByCustomer = (debts) => {
+  const groupDebtsByCustomerOrCompany = (debts) => {
     const grouped = debts.reduce((acc, debt) => {
-      if (!acc[debt.customerName]) {
-        acc[debt.customerName] = { ...debt };
+      const key = debt.companyName || debt.customerName;
+
+      if (!acc[key]) {
+        acc[key] = {
+          ...debt,
+          receiptIds: [debt.id], // Initialize with the first receipt ID
+        };
       } else {
-        acc[debt.customerName].amount += debt.amount;
+        acc[key].amount += debt.amount; // Add to the existing amount
+        acc[key].receiptIds.push(debt.id); // Add the receipt ID to the list
       }
       return acc;
     }, {});
+
     return Object.values(grouped);
   };
+
+
 
   const filteredDebts =
     debts?.filter((debt) =>
@@ -158,12 +168,8 @@ const Debt = () => {
     ) || [];
 
   const displayedDebts = compressCards
-    ? groupDebtsByCustomer(filteredDebts || []) // Fallback to empty array
+    ? groupDebtsByCustomerOrCompany(filteredDebts || []) // Fallback to empty array
     : filteredDebts || [];
-
-  const calculateBalance = () => {
-    return selectedDebt?.amount - paymentAmount;
-  };
 
   if (isLoading) return <Loader />;
 
@@ -290,7 +296,7 @@ const Debt = () => {
                 <UsersCard
                   key={debt.id}
                   main={`₵${debt.amount}`}
-                  sub={debt.customerName}
+                  sub={debt.customerCompany || debt.customerName}
                   contact={debt.contact}
                   onClick={() => handleCardClick(debt)}
                   additionalInfo={`Debt Date: ${new Date(
@@ -299,10 +305,14 @@ const Debt = () => {
                 />
               ) : (
                 <UsersCard
-                  key={debt.contact}
+                  key={debt.data}
                   top={new Date(debt.date).toLocaleDateString()}
                   main={`₵${debt.amount}`}
-                  sub={debt.customerName}
+                  sub={
+                    debt.customerCompany
+                      ? debt.customerCompany
+                      : debt.customerName
+                  }
                   contact={debt.contact}
                   onClick={() => handleCardClick(debt)}
                   additionalInfo={`Debt Date: ${new Date(
@@ -326,59 +336,12 @@ const Debt = () => {
           </div>
         )}
 
-        <Dialog
+        <PaymentDialog
           open={paymentDialogOpen}
           onClose={() => setPaymentDialogOpen(false)}
-          aria-labelledby="debt-payment-title"
-          aria-describedby="debt-payment-description">
-          <DialogTitle id="debt-payment-title">
-            {"Clear Customer Debt"}
-          </DialogTitle>
-          <DialogContent>
-            {/* Display Amount Owed (non-editable) */}
-            <TextField
-              margin="dense"
-              label="Amount Owed"
-              type="number"
-              fullWidth
-              variant="standard"
-              value={selectedDebt?.amount || 0}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-            {/* Input for Amount Paid */}
-            <TextField
-              margin="dense"
-              label="Amount Paid"
-              type="number"
-              fullWidth
-              variant="standard"
-              value={paymentAmount}
-              onChange={(e) => setPaymentAmount(Number(e.target.value))}
-            />
-            {/* Display Balance */}
-            <TextField
-              margin="dense"
-              label="Balance Left"
-              type="number"
-              fullWidth
-              variant="standard"
-              value={calculateBalance()}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
-            {submitting ? (
-              <CircularProgress />
-            ) : (
-              <Button onClick={() => handlePayment()}>Submit Payment</Button>
-            )}
-          </DialogActions>
-        </Dialog>
+          selectedDebt={selectedDebt}
+          onSubmit={handlePayment}
+        />
       </div>
     </QueryClientProvider>
   );
