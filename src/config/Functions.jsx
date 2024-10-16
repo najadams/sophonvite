@@ -339,6 +339,17 @@ export const tableActions = {
       throw error;
     }
   },
+  fetchReceiptsById: async ({receiptId}) => {
+    try {
+      const response = await axios.get(
+        `/api/receipt/${receiptId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+
+  },
   fetchDebt: async (companyId, selectedDate, selectedDuration) => {
     try {
       let url = `/api/debts/${companyId}?`;
