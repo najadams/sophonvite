@@ -3,13 +3,13 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Card,
   Typography,
   Grid,
   Divider,
 } from "@mui/material";
 import { capitalizeFirstLetter } from "../../config/Functions";
 import { useSelector } from "react-redux";
+import {useMediaQuery} from "@mui/material";
 
 const ReceiptDialog = ({
   open,
@@ -29,6 +29,8 @@ const ReceiptDialog = ({
       amountPaid,
       balance,
     } = receiptData;
+  const matchesMobile = useMediaQuery("(max-width:600px)");
+
 
   return (
     <Dialog
@@ -39,8 +41,7 @@ const ReceiptDialog = ({
       PaperProps={{
         style: {
           height: "80vh", // Takes 80% of viewport height
-          width: "80vw", // Takes 80% of viewport width
-          padding: "0px",
+          width: matchesMobile ? '100vw' : "80vw" , // Takes 80% of viewport width
           overflowY: "auto", // Make it scrollable
           backgroundColor: "#E0F2F1",
         },

@@ -88,7 +88,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       console.log(row)
       // Populate the form with existing data when editing
       return {
-        customerName: row.customerName || "",
+        customerName: `${row.customerName} - ${row.customerCompany}` || "",
         products: row?.detail?.map((product) => ({
           name: product.name,
           quantity: product.quantity,
@@ -152,73 +152,6 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
     }
   };
 
-  // const handleSubmit = async (values, setSubmitting, resetForm) => {
-  //   // Calculate total sales amount
-  //   const total = values.products.reduce(
-  //     (sum, product) => sum + product.salesPrice * product.quantity,
-  //     0
-  //   );
-  //   values.total = total; // Set total before any discounts
-
-  //   // Calculate balance after discount and payment
-  //   const balance = values.total - values.amountPaid - values.discount;
-
-  //   // Error handling: Check for required fields
-  //   if (!values.customerName) {
-  //     setError("Customer Name should not be empty");
-  //     return;
-  //   }
-  //   if (values.amountPaid === undefined || values.amountPaid === null) {
-  //     setError("Amount Paid should not be empty!");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Reset error before processing
-  //     setError(null);
-  //     setLoading(true);
-  //     setSubmitting(true);
-
-  //     // Add receipt, passing all necessary data
-  //     await tableActions.addReceipt(
-  //       { ...values, balance },
-  //       companyId,
-  //       workerId
-  //     );
-
-  //     // Update product options to reflect reduced on-hand quantities
-  //     const updatedProductOptions = updateOnhandAfterSale(
-  //       productOptions,
-  //       values
-  //     );
-  //     setProductOptions(updatedProductOptions);
-
-  //     // Log values for debugging
-  //     console.log(values);
-
-  //     // Open modal (or success dialog)
-  //     setOpen(true);
-
-  //     // Prepare values for printing if needed
-  //     if (print) {
-  //       setPrintValues({ ...values, balance });
-  //     }
-
-  //     // Reset the form after a slight delay
-  //     setTimeout(() => {
-  //       resetForm();
-  //     }, 1000);
-  //   } catch (error) {
-  //     // Log and set error in state
-  //     console.error(error);
-  //     setError("Failed to process sale. Please try again.");
-  //   } finally {
-  //     // Reset loading and submitting state
-  //     setSubmitting(false);
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleNewCustomerSubmit = async () => {
     try {
       const newCustomer = await tableActions.addCustomer({
@@ -235,7 +168,6 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       setNewCustomerDialogOpen(false); // Close the dialog
       setNewCustomerName(""); // Clear the input field
       handleCustomerUpdate((prevOptions) => [
-        // "<<<< Add New Customer >>>>",
         ...prevOptions.filter(
           (option) => option !== "<<<< Add New Customer >>>>"
         ),

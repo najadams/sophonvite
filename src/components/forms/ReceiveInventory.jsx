@@ -236,13 +236,24 @@ const ReceiveInventory = ({
         <h1 style={{ fontWeight: 200 }}>Receive Items / Restock </h1>
         {open && (
           <Alert
+            className="alert"
             variant="filled"
-            severity={alert.type}
+            severity="success"
             onClose={() => setOpen(false)}>
             Restock successful
           </Alert>
         )}
       </div>
+      {error && (
+        <Alert
+         className="alert"
+         variant="filled"
+          severity="error"
+          onClose={() => setError("")}
+        >
+          {error.toString()}
+        </Alert>
+      )}
       <Formik
         initialValues={{
           supplierName: "",
@@ -574,13 +585,7 @@ const ReceiveInventory = ({
             </div>
           </Form>
         )}
-      </Formik>
-      {error && (
-        <Typography align="center" color="red">
-          {error}
-        </Typography>
-      )}
-
+      </Formik> 
       {/* Dialog for adding new products */}
       <Dialog
         open={newProductDialogOpen}
@@ -589,7 +594,7 @@ const ReceiveInventory = ({
         <DialogContent>
           <DialogContentText>
             Please enter the details of the new product.
-          </DialogContentText>
+          </DialogContentText>  
           <TextField
             autoFocus
             margin="dense"

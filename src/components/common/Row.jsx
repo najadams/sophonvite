@@ -93,7 +93,7 @@ function Row({ row, onFlagChange, setValue }) {
 
   const handlePrintClick = () => {
     setPrintValues({
-      customerName: row.customerName,
+      customerName: `${row.customerName} - ${row.customerCompany}`,
       products: row.detail,
       total: row.total,
       balance: row.balance,
@@ -221,7 +221,6 @@ function Row({ row, onFlagChange, setValue }) {
 Row.propTypes = {
   row: PropTypes.object.isRequired,
   onFlagChange: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired, // Added PropType for onEdit
 };
 
 export default Row;

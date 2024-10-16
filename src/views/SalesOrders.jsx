@@ -1,6 +1,4 @@
 import React, { lazy, useEffect, useState } from "react";
-import AddItem from "../hooks/AddItem";
-import SalesOrderForms from "../components/forms/SaleOrderForms";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
 import { serverAid, tableActions } from "../config/Functions";
@@ -11,17 +9,21 @@ import { Widgets } from "./Dashboard";
 import { Tabs, Tab } from "@mui/material";
 import SearchField from "../hooks/SearchField";
 import { TabPanel, allyProps } from "./ProductCatalogue";
-import MakeSales from "../components/forms/MakeSales"
+import MakeSales from "../components/forms/MakeSales";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SalesOrders = () => {
+  const navigate = useNavigate();
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
-  const [value, setValue] = React.useState(0); // for managing tabs
+  const [value, setValue] = useState(0); // for managing tabs
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [totalSales, setTotalSales] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const location = useLocation();
+  const [editData, setEditData] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -38,6 +40,14 @@ const SalesOrders = () => {
     };
     fetchProducts();
   }, [companyId]);
+
+  useEffect(() => {
+    if (location.state?.editData) {
+      console.log(location.state.editData);
+      setEditData(location.state.editData);
+      setValue(1); // Switch to Make Sales tab if editData is passed
+    }
+  }, [location.state]);
 
   // Fetch receipts using React Query
   const fetchReceipts = async () => {
@@ -116,13 +126,9 @@ const SalesOrders = () => {
             <Tab label="Make Sales" {...allyProps(1)} />
           </Tabs>
         </div>
-        {/* <AddItem title={"Make Sales"}>
-          <SalesOrderForms
-            customers={customerOptions}
-            Products={productOptions}
-          />
-        </AddItem> */}
-        <div className="dot" style={{paddingRight: 4}}>.</div>
+        <div className="dot" style={{ paddingRight: 4 }}>
+          .
+        </div>
       </div>
 
       <TabPanel value={value} index={0}>
@@ -178,6 +184,7 @@ const SalesOrders = () => {
                 receipts={receipts}
                 searchTerm={searchTerm} // Pass search term to CollapsibleTable
                 onFlagChange={refetch}
+                setValue={setValue}
               />
             </div>
           ) : (
@@ -201,6 +208,7 @@ const SalesOrders = () => {
           Products={productOptions}
           handleCustomerUpdate={newCustomer}
           handleProductUpdate={newProduct}
+          editData={editData} // Pass edit data to MakeSales
         />
       </TabPanel>
     </div>

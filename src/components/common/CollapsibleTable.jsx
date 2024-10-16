@@ -62,9 +62,6 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm , setValue}) {
     );
     onFlagChange();
   };
-  const handleEdit = (receipt) => {
-    onEdit(receipt)
-  };
 
   return (
     <TableContainer component={Paper} className="hide-scrollbar" sx={{ maxHeight: "61vh" }}>
