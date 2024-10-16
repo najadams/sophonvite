@@ -38,15 +38,15 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme, flagged }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: flagged ? "#ffebee" : "#fff", // Light red for flagged rows
+    backgroundColor: flagged ? "#ffebee" : "#fff",
   },
   "&:last-child td, &:last-child th": {
     border: 0,
   },
-  backgroundColor: flagged ? "#ffebee" : "inherit", // Apply background color for flagged rows
+  backgroundColor: flagged ? "#ffebee" : "inherit",
 }));
 
-function Row({ row, onFlagChange }) {
+function Row({ row, onFlagChange, setValue }) {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -66,11 +66,16 @@ function Row({ row, onFlagChange }) {
   };
 
   const handleView = () => {
-    console.log(row);
     handleMenuClose();
     navigate(`/receipts/${row._id}`, { state: { row } });
   };
- 
+
+  // Updated handleEdit to use onEdit prop
+  const handleEdit = () => {
+    navigate(`/sales`, { state: { row} })
+    handleMenuClose();
+    setValue(1)
+  };
 
   const handleFlag = async () => {
     handleMenuClose();
@@ -160,6 +165,7 @@ function Row({ row, onFlagChange }) {
                   <OutlinedFlagIcon fontSize="small" />
                 )}
               </MenuItem>
+              <MenuItem onClick={handleEdit}>Edit</MenuItem>
             </Menu>
           </TableCell>
         </StyledTableRow>
@@ -215,6 +221,7 @@ function Row({ row, onFlagChange }) {
 Row.propTypes = {
   row: PropTypes.object.isRequired,
   onFlagChange: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired, // Added PropType for onEdit
 };
 
 export default Row;

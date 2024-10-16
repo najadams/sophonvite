@@ -33,7 +33,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
+function CollapsibleTable({ receipts, onFlagChange, searchTerm , setValue}) {
   const [updatedReceipts, setUpdatedReceipts] = useState(receipts);
 
   useEffect(() => {
@@ -62,6 +62,9 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
     );
     onFlagChange();
   };
+  const handleEdit = (receipt) => {
+    onEdit(receipt)
+  };
 
   return (
     <TableContainer component={Paper} className="hide-scrollbar" sx={{ maxHeight: "61vh" }}>
@@ -82,7 +85,8 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm }) {
               key={receipt._id}
               row={receipt}
               onFlagChange={handleFlagChange}
-            />
+              setValue={setValue}
+            /> 
           ))}
         </TableBody>
       </Table>
@@ -94,6 +98,7 @@ CollapsibleTable.propTypes = {
   receipts: PropTypes.array.isRequired,
   onFlagChange: PropTypes.func.isRequired,
   searchTerm: PropTypes.string.isRequired,
+  setValue: PropTypes.func.isRequired
 };
 
 export default CollapsibleTable;

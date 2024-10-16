@@ -19,6 +19,7 @@ import { capitalizeFirstLetter, tableActions, updateOnhandAfterSale } from "../.
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
+import { useLocation } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
@@ -45,7 +46,9 @@ const validationSchema = Yup.object().shape({
 });
 
 
-const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpdate }) => {
+const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpdate, editData}) => {
+  const location = useLocation();
+  const { row } = location.state || {}; 
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -79,6 +82,34 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
   const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
   const [newProductOnhand, setNewProductOnhand] = useState("");
+
+  const getInitialValues = () => {
+    if (row) {
+      console.log(row)
+      // Populate the form with existing data when editing
+      return {
+        customerName: row.customerName || "",
+        products: row?.detail?.map((product) => ({
+          name: product.name,
+          quantity: product.quantity,
+          totalPrice: product.totalPrice,
+          price: product.salesPrice,
+        })),
+        total: row.total || 0,
+        amountPaid: row.amountPaid || "",
+        discount: row.discount || 0,
+      };
+    } else {
+      // Default empty form values
+      return {
+        customerName: "",
+        products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
+        total: 0,
+        amountPaid: "",
+        discount: 0,
+      };
+    }
+  };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
@@ -120,6 +151,73 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
       setLoading(false);
     }
   };
+
+  // const handleSubmit = async (values, setSubmitting, resetForm) => {
+  //   // Calculate total sales amount
+  //   const total = values.products.reduce(
+  //     (sum, product) => sum + product.salesPrice * product.quantity,
+  //     0
+  //   );
+  //   values.total = total; // Set total before any discounts
+
+  //   // Calculate balance after discount and payment
+  //   const balance = values.total - values.amountPaid - values.discount;
+
+  //   // Error handling: Check for required fields
+  //   if (!values.customerName) {
+  //     setError("Customer Name should not be empty");
+  //     return;
+  //   }
+  //   if (values.amountPaid === undefined || values.amountPaid === null) {
+  //     setError("Amount Paid should not be empty!");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Reset error before processing
+  //     setError(null);
+  //     setLoading(true);
+  //     setSubmitting(true);
+
+  //     // Add receipt, passing all necessary data
+  //     await tableActions.addReceipt(
+  //       { ...values, balance },
+  //       companyId,
+  //       workerId
+  //     );
+
+  //     // Update product options to reflect reduced on-hand quantities
+  //     const updatedProductOptions = updateOnhandAfterSale(
+  //       productOptions,
+  //       values
+  //     );
+  //     setProductOptions(updatedProductOptions);
+
+  //     // Log values for debugging
+  //     console.log(values);
+
+  //     // Open modal (or success dialog)
+  //     setOpen(true);
+
+  //     // Prepare values for printing if needed
+  //     if (print) {
+  //       setPrintValues({ ...values, balance });
+  //     }
+
+  //     // Reset the form after a slight delay
+  //     setTimeout(() => {
+  //       resetForm();
+  //     }, 1000);
+  //   } catch (error) {
+  //     // Log and set error in state
+  //     console.error(error);
+  //     setError("Failed to process sale. Please try again.");
+  //   } finally {
+  //     // Reset loading and submitting state
+  //     setSubmitting(false);
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleNewCustomerSubmit = async () => {
     try {
@@ -207,13 +305,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
   return (
     <div>
       <Formik
-        initialValues={{
-          customerName: "",
-          products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
-          total: 0,
-          amountPaid: "",
-          discount: 0,
-        }}
+        initialValues={getInitialValues()}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           handleSubmit(values, setSubmitting, resetForm);
@@ -261,7 +353,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
               {({ push, remove }) => (
                 <div
                   style={{ display: "flex", gap: 10, flexDirection: "column" }}>
-                  {values.products.map((product, index) => {
+                  {values.products?.map((product, index) => {
                     const productItems = productOptions.map(
                       (p) => p?.name || ""
                     );
@@ -493,7 +585,7 @@ const MakeSales = ({ customers, Products, handleCustomerUpdate, handleProductUpd
             <Field name="total">
               {({ field }) => (
                 <Input
-                  value={values.products.reduce(
+                  value={values.products?.reduce(
                     (sum, product) => sum + product?.totalPrice,
                     0
                   )}
