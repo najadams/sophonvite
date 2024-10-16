@@ -42,6 +42,7 @@ const ReceiptDialog = ({
           width: "80vw", // Takes 80% of viewport width
           padding: "0px",
           overflowY: "auto", // Make it scrollable
+          backgroundColor: "#E0F2F1",
         },
       }}>
       <DialogTitle>
@@ -50,12 +51,12 @@ const ReceiptDialog = ({
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Card
+        <div
           style={{
-            padding: "20px",
             backgroundColor: "#E0F2F1",
             borderRadius: "10px",
-            margin: "0 auto",
+            // margin: "0",
+            scrollbarWidth: 0,
             fontFamily: "'Roboto', sans-serif",
           }}>
           {/* Company Info */}
@@ -219,7 +220,7 @@ const ReceiptDialog = ({
             style={{
               textAlign: "center",
               color: secondaryColor,
-              marginTop: "10px", 
+              marginTop: "10px",
             }}>
             Goods Sold Are Not Returnable
           </Typography>
@@ -233,7 +234,7 @@ const ReceiptDialog = ({
             }}>
             Thank you for shopping with us!
           </Typography>
-        </Card>
+        </div>
       </DialogContent>
     </Dialog>
   );
