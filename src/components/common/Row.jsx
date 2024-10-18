@@ -72,7 +72,7 @@ function Row({ row, onFlagChange, setValue }) {
 
   // Updated handleEdit to use onEdit prop
   const handleEdit = () => {
-    navigate(`/sales`, { state: { row} })
+    navigate(`/sales/${row._id}`, { state: { row} })
     handleMenuClose();
     setValue(1)
   };

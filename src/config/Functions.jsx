@@ -97,9 +97,9 @@ export const tableActions = {
       const data = response.data.customers.map((item, index) => ({
         id: item._id,
         index: index + 1,
-        company: item.company ? item.company :  'None',
+        company: item.company ? item.company : "None",
         name: item.name,
-        phone: item.phone ? "0"+item.phone : '+233____',
+        phone: item.phone ? "0" + item.phone : "+233____",
         // email: item.email,
       }));
       return data;
@@ -260,7 +260,7 @@ export const tableActions = {
     privileges,
   }) => {
     try {
-      const smallName = name.toLowerCase()
+      const smallName = name.toLowerCase();
       const response = await axios.post(`/api/worker/`, {
         companyId,
         name: smallName,
@@ -284,7 +284,7 @@ export const tableActions = {
     }
   },
 
-    addReceipt: async (values, companyId, workerId) => {
+  addReceipt: async (values, companyId, workerId) => {
     try {
       const response = await axios.post("/api/receipt/", {
         ...values,
@@ -305,6 +305,30 @@ export const tableActions = {
       throw new Error(error.response?.data?.message || "An error occurred");
     }
   },
+  updateReceipt: async (receiptId, values, companyId, workerId) => {
+    try {
+      console.log(receiptId, companyId)
+      console.table(values)
+    const response = await axios.patch(
+      `/api/receipt/${receiptId}`, // Ensure this endpoint is correct
+      {
+        ...values, // Include the updated values
+        companyId, // Add company ID to the request
+        workerId, // Add worker ID to the request
+      }
+    );
+
+    if (response.status === 200) {
+      console.log("Receipt updated successfully");
+      return response.data;
+    } else {
+      console.error("Failed to update the receipt");
+    }
+  } catch (error) {
+    console.error("Failed to update the receipt:", error.message);
+    throw error;
+  }
+},
   addVendor: async (values, companyId) => {
     try {
       const response = await axios.post("/api/vendor/", {
@@ -339,16 +363,13 @@ export const tableActions = {
       throw error;
     }
   },
-  fetchReceiptsById: async ({receiptId}) => {
+  fetchReceiptsById: async ({ receiptId }) => {
     try {
-      const response = await axios.get(
-        `/api/receipt/${receiptId}`
-      );
+      const response = await axios.get(`/api/receipt/${receiptId}`);
       return response.data;
     } catch (error) {
       throw error;
     }
-
   },
   fetchDebt: async (companyId, selectedDate, selectedDuration) => {
     try {
