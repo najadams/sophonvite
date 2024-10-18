@@ -84,22 +84,6 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
   const [newProductOnhand, setNewProductOnhand] = useState("");
 
   const getInitialValues = () => {
-    if (row) {
-      console.log(row)
-      // Populate the form with existing data when editing
-      return {
-        customerName: `${row.customerName} - ${row.customerCompany}` || "",
-        products: row?.detail?.map((product) => ({
-          name: product.name,
-          quantity: product.quantity,
-          totalPrice: product.totalPrice,
-          price: product.salesPrice,
-        })),
-        total: row.total || 0,
-        amountPaid: row.amountPaid || "",
-        discount: row.discount || 0,
-      };
-    } else {
       // Default empty form values
       return {
         customerName: "",
@@ -108,7 +92,6 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
         amountPaid: "",
         discount: 0,
       };
-    }
   };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
@@ -328,7 +311,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                       selectedProduct?.salesPrice;
                                     setFieldValue(
                                       `products.${index}.totalPrice`,
-                                      newTotalPrice
+                                      Math.ceil(newTotalPrice)
                                     );
                                     setFieldValue(
                                       `products.${index}.price`,
@@ -345,6 +328,15 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                     {...params}
                                     label="Product Name"
                                     fullWidth
+                                    inputRef={(input) => {
+                                      // Auto-select this field when a new product is added
+                                      if (
+                                        index ===
+                                        2
+                                      ) {
+                                        input?.focus();
+                                      }
+                                    }}
                                   />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
@@ -480,7 +472,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
                                 // Calculate the new total price based on quantity and price
                                 const newTotalPrice =
-                                  newQuantity * currentPrice;
+                                  Math.ceil(newQuantity * currentPrice);
 
                                 // Set the new total price
                                 setFieldValue(
@@ -535,7 +527,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                     product.quantity * newPrice;
                                   setFieldValue(
                                     `products.${index}.totalPrice`,
-                                    newTotalPrice
+                                    Math.ceil(newTotalPrice)
                                   );
                                 }}
                               />
