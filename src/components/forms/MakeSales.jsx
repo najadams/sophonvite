@@ -328,15 +328,15 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                     {...params}
                                     label="Product Name"
                                     fullWidth
-                                    inputRef={(input) => {
+                                    // inputRef={(input) => {
                                       // Auto-select this field when a new product is added
-                                      if (
-                                        index ===
-                                        2
-                                      ) {
-                                        input?.focus();
-                                      }
-                                    }}
+                                      // if (
+                                      //   index ===
+                                      //   2
+                                      // ) {
+                                      //   input?.focus();
+                                      // }
+                                    // }}
                                   />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
