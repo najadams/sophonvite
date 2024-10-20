@@ -328,95 +328,13 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                     {...params}
                                     label="Product Name"
                                     fullWidth
-                                    // inputRef={(input) => {
-                                      // Auto-select this field when a new product is added
-                                      // if (
-                                      //   index ===
-                                      //   2
-                                      // ) {
-                                      //   input?.focus();
-                                      // }
-                                    // }}
-                                  />
+                                   />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
                               />
                             )}
                           </Field>
 
-                          {/* <Field
-                            style={{
-                              paddingRight: 0,
-                              flex: 1,
-                              width: "50%",
-                              minWidth: 150,
-                            }}
-                            as={TextField}
-                            name={`products.${index}.quantity`}
-                            label="Quantity"
-                            type="number"
-                            step="any"
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-                              // if (value > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
-                              // }
-                            }}
-                            onChange={(event) => {
-                              const newQuantity = parseInt(
-                                event.target.value,
-                                10
-                              );
-
-                              // First, set the new quantity value
-                              setFieldValue(
-                                `products.${index}.quantity`,
-                                newQuantity
-                              );
-
-                              // Find the selected product
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Ensure we have a valid selected product
-                              if (selectedProduct) {
-                                // Get the current price from the field or fallback to the selected product's sales price
-                                const currentPrice =
-                                  values.products[index].price ||
-                                  selectedProduct.salesPrice;
-
-                                // Calculate the new total price based on quantity and price
-                                const newTotalPrice =
-                                  newQuantity * currentPrice;
-
-                                // Set the new total price
-                                setFieldValue(
-                                  `products.${index}.totalPrice`,
-                                  newTotalPrice
-                                );
-                              }
-                            }}
-                            onBlur={(event) => {
-                              const value = parseInt(event.target.value, 10);
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Check if the quantity exceeds available stock
-                              if (
-                                selectedProduct &&
-                                value > selectedProduct.onhand
-                              ) {
-                                setModalMessage(
-                                  `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
-                                );
-                                setModalOpen(true);
-                              }
-                            }}
-                          /> */}
                           <Field
                             style={{
                               paddingRight: 0,
