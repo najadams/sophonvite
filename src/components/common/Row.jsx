@@ -204,7 +204,7 @@ function Row({ row, onFlagChange, setValue }) {
                       <TableCell align="right">{item.quantity}</TableCell>
                       <TableCell align="right">{item.salesPrice}</TableCell>
                       <TableCell align="right">
-                        {item.salesPrice * item.quantity}
+                        {Math.ceil(item.salesPrice * item.quantity)}
                       </TableCell>
                     </StyledTableRow>
                   ))}

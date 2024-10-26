@@ -49,12 +49,9 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const MakeSales = ({
-  handleCustomerUpdate,
-  handleProductUpdate,
-}) => {
+const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
   const location = useLocation();
-  const {row} = location.state || {}
+  const { row } = location.state || {};
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -69,7 +66,6 @@ const MakeSales = ({
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
   const navigate = useNavigate();
-  
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
@@ -79,70 +75,73 @@ const MakeSales = ({
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
   const [newProductOnhand, setNewProductOnhand] = useState("");
   const [customerOptions, setCustomerOptions] = useState([]);
- const [productOptions, setProductOptions] = useState([]);
+  const [productOptions, setProductOptions] = useState([]);
 
-    
-    const getInitialValues = () => {
-      if (row) {
-        // Populate the form with existing data when editing
-        const products = row?.detail?.map((product) => ({
+  const getInitialValues = () => {
+    if (row) {
+      // Populate the form with existing data when editing
+      const products = row?.detail?.map((product) => {
+        const ceil = Math.ceil(product.salesPrice * product.quantity);
+        return {
           name: product.name,
           quantity: product.quantity,
-          totalPrice: product.salesPrice * product.quantity, // Calculate total price as salesPrice * quantity
+          totalPrice: ceil, // Calculate total price as salesPrice * quantity
           price: product.salesPrice,
-        }));
-
-        // Calculate the total as the sum of all product totalPrice values
-        const total = products.reduce(
-          (acc, product) => acc + product.totalPrice,
-          0
-        );
-        
-const usedCustomerName = row.customerCompany 
-  ? `${capitalizeFirstLetter(row.customerCompany)} - ${capitalizeFirstLetter(row.customerName)}` 
-  : `None - ${capitalizeFirstLetter(row.customerName)}`;
-
-        return {
-          customerName:  usedCustomerName || "",
-          products: products,
-          total: total, // Accumulated total of all products
-          amountPaid: row.amountPaid || "",
-          discount: row.discount || 0,
         };
-      } else {
-        // Default empty form values
-        return {
-          customerName: "",
-          products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
-          total: 0,
-          amountPaid: "",
-          discount: 0,
-        };
-      }
+      });
+
+      // Calculate the total as the sum of all product totalPrice values
+      const total = products.reduce(
+        (acc, product) => acc + product.totalPrice,
+        0
+      );
+
+      const usedCustomerName = row.customerCompany
+        ? `${capitalizeFirstLetter(
+            row.customerCompany
+          )} - ${capitalizeFirstLetter(row.customerName)}`
+        : `None - ${capitalizeFirstLetter(row.customerName)}`;
+
+      return {
+        customerName: usedCustomerName || "",
+        products: products,
+        total: total, // Accumulated total of all products
+        amountPaid: row.amountPaid || "",
+        discount: row.discount || 0,
+      };
+    } else {
+      // Default empty form values
+      return {
+        customerName: "",
+        products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
+        total: 0,
+        amountPaid: "",
+        discount: 0,
+      };
+    }
+  };
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      const response = await tableActions.fetchCustomersNames(companyId);
+      setCustomerOptions(["<<<< Add New Customer >>>>", ...response]);
     };
+    fetchCustomers();
+  }, [companyId]);
 
-    
-     useEffect(() => {
-       const fetchCustomers = async () => {
-         const response = await tableActions.fetchCustomersNames(companyId);
-         setCustomerOptions(["<<<< Add New Customer >>>>", ...response]);
-       };
-       fetchCustomers();
-     }, [companyId]);
-
-    useEffect(() => {
-       const fetchProducts = async () => {
-         const response = await tableActions.fetchProductNames(companyId);
-         setProductOptions([
-           {
-             id: 1,
-             name: "<<<< Add New Product >>>>",
-           },
-           ...response,
-         ]);
-       };
-       fetchProducts();
-     }, [companyId]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await tableActions.fetchProductNames(companyId);
+      setProductOptions([
+        {
+          id: 1,
+          name: "<<<< Add New Product >>>>",
+        },
+        ...response,
+      ]);
+    };
+    fetchProducts();
+  }, [companyId]);
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
@@ -160,8 +159,8 @@ const usedCustomerName = row.customerCompany
       } else {
         setLoading(true);
         setSubmitting(true);
-          await tableActions.updateReceipt(
-        row._id,
+        await tableActions.updateReceipt(
+          row._id,
           { ...values, balance },
           companyId,
           workerId
@@ -173,8 +172,8 @@ const usedCustomerName = row.customerCompany
         if (print) {
           setPrintValues({ ...values, balance }); // Store values for printing
         }
-          setTimeout(() => {
-            navigate('/sales')
+        setTimeout(() => {
+          navigate("/sales");
           resetForm();
         }, 1000);
       }
@@ -363,9 +362,10 @@ const usedCustomerName = row.customerCompany
                                     const selectedProduct = productOptions.find(
                                       (p) => p.name === newValue
                                     );
-                                    const newTotalPrice =
+                                    const newTotalPrice = Math.ceil(
                                       product.quantity *
-                                      selectedProduct?.salesPrice;
+                                        selectedProduct?.salesPrice
+                                    );
                                     setFieldValue(
                                       `products.${index}.totalPrice`,
                                       newTotalPrice
@@ -519,8 +519,9 @@ const usedCustomerName = row.customerCompany
                                   selectedProduct.salesPrice;
 
                                 // Calculate the new total price based on quantity and price
-                                const newTotalPrice =
-                                  newQuantity * currentPrice;
+                                const newTotalPrice = Math.ceil(
+                                  newQuantity * currentPrice
+                                );
 
                                 // Set the new total price
                                 setFieldValue(
@@ -571,8 +572,9 @@ const usedCustomerName = row.customerCompany
                                   );
 
                                   // Then calculate and set the new total price
-                                  const newTotalPrice =
-                                    product.quantity * newPrice;
+                                  const newTotalPrice = Math.ceil(
+                                    product.quantity * newPrice
+                                  );
                                   setFieldValue(
                                     `products.${index}.totalPrice`,
                                     newTotalPrice
