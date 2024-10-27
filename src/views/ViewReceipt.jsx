@@ -140,8 +140,8 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
                 <td style={{ padding: "8px" }}>
                   ₵
                   {product.price
-                    ? product.price * product.quantity
-                    : product.salesPrice * product.quantity}
+                    ? Math.ceil(product.price * product.quantity)
+                    : Math.ceil(product.salesPrice * product.quantity)}
                 </td>
               </tr>
             ))}
