@@ -406,9 +406,9 @@ header .image-text .header-text {
 }
 
 @media screen and (max-width : 600px ){
-  .page{
+  
+  .main{
     height: 100lvh;
-    overflow-x: scroll;
   }
   .sidebar.collapsed{
     display: none;
