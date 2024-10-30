@@ -136,7 +136,7 @@ const SalesTable = ({ salesTransactions = [] }) => {
                 ₵{transaction.totalAmountPaid.toFixed(2)}
               </TableCell>
               <TableCell align="right">
-                ₵{transaction.discount.toFixed(2)}
+                ₵{transaction.discount}
               </TableCell>
               <TableCell align="right">
                 ₵{transaction.balance.toFixed(2)}
