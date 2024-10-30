@@ -407,7 +407,6 @@ header .image-text .header-text {
 
 @media screen and (max-width : 600px ){
   .page{
-    overflow: hidden;
     height: 100svh;
   }
   .sidebar.collapsed{
