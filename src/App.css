@@ -1,6 +1,9 @@
 .main{
   overflow: hidden;
   height: 100vh;
+  /* display: flex; */
+  /* flex-direction: column; */
+  background-color: #1976d2;
 }
 /* ===== SideBar ===== */
 .sidebar {
@@ -406,9 +409,10 @@ header .image-text .header-text {
 }
 
 @media screen and (max-width : 600px ){
-  
-  .main{
-    height: 100lvh;
+  .page{
+    height: 95lvh;
+    overflow: scroll;
+    padding-bottom: 5rem;
   }
   .sidebar.collapsed{
     display: none;
