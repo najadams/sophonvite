@@ -1,9 +1,6 @@
 .main{
   overflow: hidden;
   height: 100vh;
-  /* display: flex; */
-  /* flex-direction: column; */
-  background-color: #1976d2;
 }
 /* ===== SideBar ===== */
 .sidebar {
