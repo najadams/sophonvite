@@ -27,7 +27,7 @@ const validationSchema = Yup.object().shape({
     Yup.object().shape({
       name: Yup.string().required("Product name is required"),
       quantity: Yup.number()
-        .required("Quantity is required")
+        .required("Quantity is required"),
         // .test(
         //   "is-valid-fraction",
         //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
@@ -36,7 +36,7 @@ const validationSchema = Yup.object().shape({
         //     return true;
         //   }
         // )
-        .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
+        // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
       price: Yup.number().required("Price is required"),
     })
   ),
