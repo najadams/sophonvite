@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Paper,
@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableSortLabel,
 } from "@mui/material";
+import SearchField from "../../hooks/SearchField";
 
 const capitalizeFirstLetter = (str) => {
   if (typeof str === "string") {
@@ -37,22 +38,16 @@ const InventorySummaryCards = ({ inventoryData }) => {
         </Card>
       </Grid>
       <Grid item xs={9}>
-        {/* <Card>
-          <CardContent>
-            <Typography variant="h6">Total Items</Typography>
-            <Typography variant="h4">{inventoryData?.totalItems}</Typography>
-          </CardContent>
-        </Card> */}
+        {/* Add any additional cards here */}
       </Grid>
     </Grid>
   );
 };
 
 // Inventory Table Component
-const InventoryTable = ({ inventoryItems = [] }) => {
+const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
-  const [searchTerm, setSearchTerm] = useState("");
   const items = Array.isArray(inventoryItems) ? inventoryItems : [];
 
   const handleRequestSort = (property) => {
@@ -61,8 +56,8 @@ const InventoryTable = ({ inventoryItems = [] }) => {
     setOrderBy(property);
   };
 
-  // Filtering and sorting the inventory items
-  const filteredItems = inventoryItems.filter((item) =>
+  // Filtering and sorting the inventory items based on search term
+  const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -77,7 +72,7 @@ const InventoryTable = ({ inventoryItems = [] }) => {
   });
 
   return (
-    <TableContainer sx={{marginTop: 2}} component={Paper}>
+    <TableContainer sx={{ marginTop: 2 }} component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
@@ -121,6 +116,8 @@ const InventoryTable = ({ inventoryItems = [] }) => {
 // InventoryReports Component
 const InventoryReports = ({ inventoryItems }) => {
   const [totalCash, setTotalCash] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     if (inventoryItems) {
       const total = inventoryItems.reduce(
@@ -129,7 +126,7 @@ const InventoryReports = ({ inventoryItems }) => {
       );
       setTotalCash(total);
     }
-  }, [inventoryItems]); // Add inventoryItems as a dependency
+  }, [inventoryItems]);
 
   return (
     <div className="content" style={{ width: "100%" }}>
@@ -139,9 +136,9 @@ const InventoryReports = ({ inventoryItems }) => {
       <InventorySummaryCards inventoryData={totalCash} />
       <div
         style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
-        {/* <SearchField onSearch={setSearchTerm} /> */}
+        <SearchField onSearch={setSearchTerm} />
       </div>
-      <InventoryTable inventoryItems={inventoryItems} />
+      <InventoryTable inventoryItems={inventoryItems} searchTerm={searchTerm} />
     </div>
   );
 };
