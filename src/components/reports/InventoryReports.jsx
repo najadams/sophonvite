@@ -62,13 +62,17 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
   );
 
   const sortedItems = [...filteredItems].sort((a, b) => {
+    let comparator = 0;
     if (orderBy === "name") {
-      return a.name.localeCompare(b.name) * (order === "asc" ? 1 : -1);
+      comparator = a.name.localeCompare(b.name);
+    } else if (orderBy === "amountSold") {
+      comparator = a.totalQuantity - b.totalQuantity;
+    } else if (orderBy === "totalSalesPrice") {
+      comparator = a.totalSalesPrice - b.totalSalesPrice;
+    } else if (orderBy === "onhand") {
+      comparator = a.onhand - b.onhand;
     }
-    if (orderBy === "amountSold") {
-      return (a.amountSold - b.amountSold) * (order === "asc" ? 1 : -1);
-    }
-    return 0;
+    return comparator * (order === "asc" ? 1 : -1);
   });
 
   return (
@@ -92,8 +96,22 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
                 Amount Sold
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right">Total Sales Price</TableCell>
-            <TableCell align="right">Amount Remaining</TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={orderBy === "totalSalesPrice"}
+                direction={orderBy === "totalSalesPrice" ? order : "asc"}
+                onClick={() => handleRequestSort("totalSalesPrice")}>
+                Total Sales Price
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={orderBy === "onhand"}
+                direction={orderBy === "onhand" ? order : "asc"}
+                onClick={() => handleRequestSort("onhand")}>
+                Amount Remaining
+              </TableSortLabel>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
