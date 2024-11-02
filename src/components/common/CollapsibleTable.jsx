@@ -46,7 +46,8 @@ function CollapsibleTable({ receipts, onFlagChange, searchTerm , setValue}) {
           receipt.customerName
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          receipt.workerName.toLowerCase().includes(searchTerm.toLowerCase())
+          receipt.workerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          receipt.customerCompany?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
