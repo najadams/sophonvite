@@ -164,7 +164,9 @@ const Debt = () => {
 
   const filteredDebts =
     debts?.filter((debt) =>
-      debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+      debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) 
+      ||
+      debt.customerCompany?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   const displayedDebts = compressCards
