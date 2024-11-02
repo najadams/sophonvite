@@ -347,28 +347,28 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                             label="Quantity"
                             type="number" // Use "number" to ensure numeric keyboard on mobile
                             step="any" // Allow for decimal values
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
+                            // validate={(value) => {
+                            //   const selectedProduct = productOptions.find(
+                            //     (p) => p.name === product.name
+                            //   );
 
-                              const numericValue = parseFloat(value);
+                            //   const numericValue = parseFloat(value);
 
-                              // Ensure the quantity is at least 0.25 (or 1/4)
-                              if (numericValue < 0.25) {
-                                return "Quantity must be at least 1/4";
-                              }
+                            //   // Ensure the quantity is at least 0.25 (or 1/4)
+                            //   if (numericValue < 0.25) {
+                            //     return "Quantity must be at least 1/4";
+                            //   }
 
-                              // Optional: Validate against available stock
-                              // if (numericValue > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
-                              // }
+                            //   // Optional: Validate against available stock
+                            //   if (numericValue > selectedProduct?.onhand) {
+                            //     return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
+                            //   }
 
-                              return undefined;
-                            }}
+                            //   return undefined;
+                            // }}
                             onChange={(event) => {
                               const value = event.target.value;
-                              const newQuantity = parseFloat(value);
+                               const newQuantity = parseFloat(value);
 
                               // First, set the new quantity value
                               setFieldValue(
