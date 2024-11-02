@@ -31,16 +31,16 @@ const validationSchema = Yup.object().shape({
     Yup.object().shape({
       name: Yup.string().required("Product name is required"),
       quantity: Yup.number()
-        .required("Quantity is required")
-        .test(
-          "is-valid-fraction",
-          "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
-          (value) => {
-            if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
-            return true;
-          }
-        )
-        .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
+        .required("Quantity is required"),
+        // .test(
+        //   "is-valid-fraction",
+        //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
+        //   (value) => {
+        //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
+        //     return true;
+        //   }
+        // )
+        // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
       price: Yup.number().required("Price is required"),
     })
   ),
@@ -477,25 +477,25 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                             label="Quantity"
                             type="number" // Use "number" to ensure numeric keyboard on mobile
                             step="any" // Allow for decimal values
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
+                            // validate={(value) => {
+                            //   const selectedProduct = productOptions.find(
+                            //     (p) => p.name === product.name
+                            //   );
 
-                              const numericValue = parseFloat(value);
+                            //   const numericValue = parseFloat(value);
 
-                              // Ensure the quantity is at least 0.25 (or 1/4)
-                              if (numericValue < 0.25) {
-                                return "Quantity must be at least 1/4";
-                              }
+                            //   // Ensure the quantity is at least 0.25 (or 1/4)
+                            //   if (numericValue < 0.25) {
+                            //     return "Quantity must be at least 1/4";
+                            //   }
 
-                              // Optional: Validate against available stock
-                              // if (numericValue > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
-                              // }
+                            //   // Optional: Validate against available stock
+                            //   // if (numericValue > selectedProduct?.onhand) {
+                            //   //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
+                            //   // }
 
-                              return undefined;
-                            }}
+                            //   return undefined;
+                            // }}
                             onChange={(event) => {
                               const value = event.target.value;
                               const newQuantity = parseFloat(value);
