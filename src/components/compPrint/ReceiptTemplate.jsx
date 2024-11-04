@@ -76,7 +76,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
             <tr key={index} style={{font: 'revert'}}>
               <td
                 style={{
-                  padding: "3px",
+                  margin: "2px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
@@ -87,7 +87,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               </td>
               <td
                 style={{
-                  padding: "3px",
+                  margin: "2px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
@@ -95,14 +95,14 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               </td>
               <td
                 style={{
-                  padding: "3px",
+                  margin: "2px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
                 ₵
                 {product.price
-                  ? product.price * product.quantity
-                  : product.salesPrice * product.quantity}
+                  ? Math.ceil(product.price * product.quantity)
+                  : Math.ceil(product.salesPrice * product.quantity)}
               </td>
             </tr>
           ))}
