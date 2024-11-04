@@ -65,29 +65,29 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         }}>
         <thead>
           <tr>
-            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Qty</th>
-            <th style={{ padding: "8px", font: "caption", border: '1px solid' }}>Product</th>
-            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Price</th>
-            <th style={{ padding: "5px", font: "caption", border: '1px solid' }}>Total</th>
+            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Qty</th>
+            <th style={{ padding: "8px", font: "icon", border: '1px solid' }}>Product</th>
+            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Price</th>
+            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Total</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
-            <tr key={index}>
+            <tr key={index} style={{font: 'revert'}}>
               <td
                 style={{
-                  padding: "5px",
+                  padding: "3px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
                 {product.quantity}
               </td>
-              <td style={{ padding: "8px", textAlign: "center", font: "icon", border: '1px solid'}}>
+              <td style={{ padding: "5px", textAlign: "center", border: '1px solid'}}>
                 {capitalizeFirstLetter(product.name)}
               </td>
               <td
                 style={{
-                  padding: "5px",
+                  padding: "3px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
@@ -95,7 +95,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
               </td>
               <td
                 style={{
-                  padding: "5px",
+                  padding: "3px",
                   textAlign: "center",
                   border: '0.3px solid'
                 }}>
