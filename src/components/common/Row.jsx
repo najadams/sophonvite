@@ -105,6 +105,7 @@ function Row({ row, onFlagChange, setValue }) {
     setTimeout(() => {
       setPrintValues(null);
     }, 2000);
+    setAnchorEl(null)
   };
 
   return (
