@@ -47,12 +47,14 @@ const validationSchema = Yup.object().shape({
 
 
 const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpdate, editData}) => {
+  const checkDebt = true;
   const location = useLocation();
   const { row } = location.state || {}; 
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
+  const [owesDebt, setOwesDebt] = useState(false);
   const [open, setOpen] = useState(false);
   const [print, setPrint] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -94,6 +96,51 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       };
   };
 
+  // const handleSubmit = async (values, setSubmitting, resetForm) => {
+  //   const total = values.products.reduce(
+  //     (sum, product) => sum + product?.totalPrice,
+  //     0
+  //   );
+  //   values.total = total; // Maintain total before discount
+  //   const balance = values.total - values.amountPaid - values.discount;
+
+  //   try {
+  //     if (!values.customerName) {
+  //       setError("Customer Name Should not be Empty");
+  //     } else if (!values.amountPaid) {
+  //       setError("Amount Paid Should not be Empty!");
+  //     } else {
+  //       setLoading(true);
+  //       setSubmitting(true);
+  //       await tableActions.addReceipt(
+  //         { ...values, balance },
+  //         companyId,
+  //         workerId,
+  //       );
+  //       if (results.debt) {
+  //         setOpen(true);
+  //         results.reduct(((acc, debtDatat) => debt ))
+  //         setModalMessage("")
+  //       }
+  //       const newData = updateOnhandAfterSale(productOptions, values)
+  //       setProductOptions(newData);
+  //       setOpen(true);
+  //       if (print) {
+  //         setPrintValues({ ...values, balance }); // Store values for printing
+  //       }
+  //       setTimeout(() => {
+  //         resetForm();
+  //       }, 1000);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError(error);
+  //   } finally {
+  //     setSubmitting(false);
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
@@ -104,36 +151,55 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
     try {
       if (!values.customerName) {
-        setError("Customer Name Should not be Empty");
+        setError("Customer Name should not be empty");
       } else if (!values.amountPaid) {
-        setError("Amount Paid Should not be Empty!");
+        setError("Amount Paid should not be empty!");
       } else {
         setLoading(true);
         setSubmitting(true);
-        await tableActions.addReceipt(
+
+        // Call the API to add receipt and check for debt
+        const results = await tableActions.addReceipt(
           { ...values, balance },
           companyId,
-          workerId
+          workerId,
+          checkDebt
         );
-        console.log(values)
-        const newData = updateOnhandAfterSale(productOptions, values)
-        setProductOptions(newData);
-        setOpen(true);
-        if (print) {
-          setPrintValues({ ...values, balance }); // Store values for printing
+
+        // Check if debt exists in the response
+        if (results.existingDebt) {
+          setOwesDebt(true)
+          setModalMessage(
+            `Customer has existing debt of ${results.existingDebt.amount}.`
+          );
+          setOpen(true); // Open modal to show debt information
+        } else {
+          setModalMessage("Receipt added successfully!");
+          setOpen(true);
         }
+
+        // Update inventory onhand after sale
+        const newData = updateOnhandAfterSale(productOptions, values);
+        setProductOptions(newData);
+
+        // Store values for printing if applicable
+        if (print) {
+          setPrintValues({ ...values, balance });
+        }
+        // Reset form after a short delay
         setTimeout(() => {
           resetForm();
         }, 1000);
       }
     } catch (error) {
       console.log(error);
-      setError(error);
+      setError(error.message || "An error occurred");
     } finally {
       setSubmitting(false);
       setLoading(false);
     }
   };
+
 
   const handleNewCustomerSubmit = async () => {
     try {
@@ -328,7 +394,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                     {...params}
                                     label="Product Name"
                                     fullWidth
-                                   />
+                                  />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
                               />
@@ -368,7 +434,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                             // }}
                             onChange={(event) => {
                               const value = event.target.value;
-                               const newQuantity = parseFloat(value);
+                              const newQuantity = parseFloat(value);
 
                               // First, set the new quantity value
                               setFieldValue(
@@ -389,8 +455,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                                   selectedProduct.salesPrice;
 
                                 // Calculate the new total price based on quantity and price
-                                const newTotalPrice =
-                                  Math.ceil(newQuantity * currentPrice);
+                                const newTotalPrice = Math.ceil(
+                                  newQuantity * currentPrice
+                                );
 
                                 // Set the new total price
                                 setFieldValue(
@@ -562,7 +629,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  setPrint(true)
+                  setPrint(true);
                   submitForm(); // Trigger form submission
                 }}
                 disabled={loading || isSubmitting} // Disable button when loading or submitting
@@ -589,10 +656,15 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
         </Typography>
       )}
       <Snackbar
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            color: owesDebt ? "red" : "white",
+          },
+        }}
         open={open}
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
-        message={"Sales successfully Recorded"}
+        message={modalMessage || "Sales successfully Recorded"}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
 

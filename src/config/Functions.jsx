@@ -23,18 +23,36 @@ const processDailyData = (receipts) => {
   return { labels, salesData, dailyData };
 };
 
+// const calculateProfit = (receipts) => {
+//   let totalProfit = 0;
+
+//   for (const receipt of receipts) {
+//     let receiptProfit = 0;
+
+//     for (const item of receipt.detail) {
+//       const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
+//       receiptProfit += itemProfit;
+//     }
+
+//     totalProfit += receiptProfit;
+//   }
+
+//   return totalProfit;
+// };
+
 const calculateProfit = (receipts) => {
   let totalProfit = 0;
 
   for (const receipt of receipts) {
-    let receiptProfit = 0;
+    console.log(receipt.profit)
+    // let receiptProfit = 0;
 
-    for (const item of receipt.detail) {
-      const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
-      receiptProfit += itemProfit;
-    }
+    // for (const item of receipt.detail) {
+    //   const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
+    //   receiptProfit += itemProfit;
+    // }
 
-    totalProfit += receiptProfit;
+    totalProfit += receipt.profit;
   }
 
   return totalProfit;
@@ -284,12 +302,13 @@ export const tableActions = {
     }
   },
 
-  addReceipt: async (values, companyId, workerId) => {
+  addReceipt: async (values, companyId, workerId, checkDebt) => {
     try {
       const response = await axios.post("/api/receipt/", {
         ...values,
-        companyId: companyId,
-        workerId: workerId,
+        companyId,
+        workerId,
+        checkDebt,
       });
       if (response.status === 200 || response.status === 201) {
         // Successful response
@@ -489,7 +508,8 @@ export const tableActions = {
       // Calculate profits for each day using historical prices stored in receipts
       const profitData = labels.map((day) => {
         const dayReceipts = dailyData[day].details;
-        return calculateProfit([{ detail: dayReceipts }]);
+        // return calculateProfit([{ detail: dayReceipts }]);
+        return calculateProfit(receipts);
       });
 
       // Calculate top purchased products
