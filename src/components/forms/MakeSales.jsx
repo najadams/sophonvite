@@ -203,8 +203,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
   const handleNewCustomerSubmit = async () => {
     try {
+      const formattedName = newCustomerName.toLocaleLowerCase().trim()
       const newCustomer = await tableActions.addCustomer({
-        name: newCustomerName,
+        name: formattedName,
         companyId,
       });
       setCustomerOptions((prevOptions) => [
@@ -230,9 +231,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
   const handleNewProductSubmit = async () => {
     try {
-      console.log(newProductOnhand)
+      const formattedProductName = newProductName.toLocaleLowerCase().trim()
       const data = await tableActions.addProduct({
-        name: newProductName,
+        name: formattedProductName,
         costPrice: newProductCostPrice,
         salesPrice: newProductSalesPrice,
         onHand: newProductOnhand,
