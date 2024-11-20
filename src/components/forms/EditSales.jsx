@@ -285,7 +285,7 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
           <Form className="form" style={{ margin: 10 }}>
             <Field name="customerName">
               {({ field, form }) => {
-                const hasError = Boolean(
+                const hasError =  Boolean(
                   form.errors.customerName && form.touched.customerName
                 );
                 return (

@@ -61,7 +61,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         style={{
           width: "100%",
           borderCollapse: "collapse",
-          marginTop: "20px",
+          marginTop: "10px",
         }}>
         <thead>
           <tr>
