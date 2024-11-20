@@ -66,7 +66,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
   const today = new Date().toLocaleDateString();
   const [customerOptions, setCustomerOptions] = useState([
     "<<<< Add New Customer >>>>",
-    ...customers,
+    ...customers.sort(),
   ]);
   const [productOptions, setProductOptions] = useState([
     {
@@ -74,7 +74,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       name: "<<<< Add New Product >>>>",
     },
 
-    ...Products,
+    ...Products.sort((a, b) => a.name.localeCompare(b.name)),
   ]);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
@@ -210,15 +210,15 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       });
       setCustomerOptions((prevOptions) => [
         "<<<< Add New Customer >>>>",
-        ...prevOptions.filter(
-          (option) => option !== "<<<< Add New Customer >>>>"
-        ),
-        `None - ${newCustomer.name}`,
+        `None - ${capitalizeFirstLetter(newCustomer.name)}`,
+        ...prevOptions
+          .sort()
+          .filter((option) => option !== "<<<< Add New Customer >>>>"),
       ]);
       setNewCustomerDialogOpen(false); // Close the dialog
       setNewCustomerName(""); // Clear the input field
       handleCustomerUpdate((prevOptions) => [
-        ...prevOptions.filter(
+        ...prevOptions.sort().filter(
           (option) => option !== "<<<< Add New Customer >>>>"
         ),
         `None - ${newCustomer.name}`,
@@ -248,14 +248,14 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
           id: 1,
           name: "<<<< Add New Product >>>>",
         },
-        ...prevOptions.filter(
-          (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
         {
           name: newProductName,
           salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
           onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
         },
+        ...prevOptions
+          .sort()
+          .filter((option) => option.name !== "<<<< Add New Product >>>>"),
       ]);
 
       handleProductUpdate((prevOptions) => [
@@ -263,14 +263,15 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
           id: 1,
           name: "<<<< Add New Product >>>>",
         },
-        ...prevOptions.filter(
-          (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
         {
           name: newProductName,
           salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
           onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
         },
+        ...prevOptions.sort().filter(
+          (option) => option.name !== "<<<< Add New Product >>>>"
+        )
+        
       ]);
 
       setNewProductDialogOpen(false); // Close the dialog
