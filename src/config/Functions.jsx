@@ -8,44 +8,28 @@ const processDailyData = (receipts) => {
     }-${date.getFullYear()}`;
 
     if (!acc[dayKey]) {
-      acc[dayKey] = { totalSales: 0, details: [] };
+      acc[dayKey] = { totalSales: 0, details: [], totalProfit: 0 };
     }
 
     acc[dayKey].totalSales += receipt.total;
     acc[dayKey].details.push(...receipt.detail);
-    // acc[dayKey].totalProfits += receipt.profit
-    // console.log(acc[dayKey].totalProfits)
+    acc[dayKey].totalProfit += receipt.profit
     return acc;
   }, {});
 
   const labels = Object.keys(dailyData);
   const salesData = labels.map((day) => dailyData[day].totalSales);
+  const profitData = labels.map((day) => dailyData[day].totalProfit);
 
-  return { labels, salesData, dailyData };
-};
-
-const calculateProfit = (receipts) => {
-  let totalProfit = 0;
-
-  for (const receipt of receipts) {
-    let receiptProfit = 0;
-
-    for (const item of receipt.detail) {
-      const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
-      receiptProfit += itemProfit;
-    }
-
-    totalProfit += receiptProfit;
-  }
-
-  return totalProfit;
+  return { labels, salesData, profitData };
 };
 
 // const calculateProfit = (receipts) => {
+//   console.log(receipts)
 //   let totalProfit = 0;
 
 //   for (const receipt of receipts) {
-//     console.log(receipt.profit)
+//     console.log(receipt)
 //     let receiptProfit = 0;
 
 //     for (const item of receipt.detail) {
@@ -53,11 +37,15 @@ const calculateProfit = (receipts) => {
 //       receiptProfit += itemProfit;
 //     }
 
-//     totalProfit += receipt.profit;
+//     totalProfit += receipt;
 //   }
 
 //   return totalProfit;
 // };
+
+const calculateProfit = (receipts) => {
+  console.log(receipts)
+};
 
 function calculateTopsProfit(receipts) {
   const productProfits = {};
@@ -88,9 +76,10 @@ const calculateTopPurchasedProducts = (receipts) => {
       if (!acc[item.name]) {
         acc[item.name] = { quantity: 0, profit: 0 };
       }
-      acc[item.name].quantity += Math.abs(item.quantity);
+      const quantity = Math.abs(item.quantity)
+      acc[item.name].quantity += quantity;
       acc[item.name].profit +=
-        Math.abs((item.salesPrice - item.costPrice) * item.quantity);
+        Math.abs((item.salesPrice - item.costPrice) * quantity);
     });
     return acc;
   }, {});
@@ -502,15 +491,16 @@ export const tableActions = {
       const receipts = receiptsResponse.data;
 
       // Process daily data
-      const { labels, salesData, dailyData } = processDailyData(receipts);
+      const { labels, salesData, profitData } = processDailyData(receipts);
 
       // Calculate profits for each day using historical prices stored in receipts
-      const profitData = labels.map((day) => {
-        console.log(day)
-        const dayReceipts = dailyData[day].details;
-        return calculateProfit([{ detail: dayReceipts }]);
-        // return calculateProfit(receipts);
-      });
+      // const profitData = labels.map((day) => {
+      //   console.log(day)
+      //   // const dayReceipts = dailyData[day].details;
+      //   const dayReceipts = dailyData[day];
+      //   return calculateProfit([{ profit: dayReceipts }]);
+      //   // return calculateProfit(receipts);
+      // });
 
       // Calculate top purchased products
       const topProducts = calculateTopPurchasedProducts(receipts);
