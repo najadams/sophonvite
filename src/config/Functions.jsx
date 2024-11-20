@@ -3,9 +3,9 @@ import axios from "./index";
 const processDailyData = (receipts) => {
   const dailyData = receipts.reduce((acc, receipt) => {
     const date = new Date(receipt.createdAt);
-    const dayKey = `${date.getFullYear()}-${
+    const dayKey = `${date.getDate()}-${
       date.getMonth() + 1
-    }-${date.getDate()}`;
+    }-${date.getFullYear()}`;
 
     if (!acc[dayKey]) {
       acc[dayKey] = { totalSales: 0, details: [] };
@@ -13,7 +13,8 @@ const processDailyData = (receipts) => {
 
     acc[dayKey].totalSales += receipt.total;
     acc[dayKey].details.push(...receipt.detail);
-
+    // acc[dayKey].totalProfits += receipt.profit
+    // console.log(acc[dayKey].totalProfits)
     return acc;
   }, {});
 
@@ -23,10 +24,28 @@ const processDailyData = (receipts) => {
   return { labels, salesData, dailyData };
 };
 
+const calculateProfit = (receipts) => {
+  let totalProfit = 0;
+
+  for (const receipt of receipts) {
+    let receiptProfit = 0;
+
+    for (const item of receipt.detail) {
+      const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
+      receiptProfit += itemProfit;
+    }
+
+    totalProfit += receiptProfit;
+  }
+
+  return totalProfit;
+};
+
 // const calculateProfit = (receipts) => {
 //   let totalProfit = 0;
 
 //   for (const receipt of receipts) {
+//     console.log(receipt.profit)
 //     let receiptProfit = 0;
 
 //     for (const item of receipt.detail) {
@@ -34,29 +53,11 @@ const processDailyData = (receipts) => {
 //       receiptProfit += itemProfit;
 //     }
 
-//     totalProfit += receiptProfit;
+//     totalProfit += receipt.profit;
 //   }
 
 //   return totalProfit;
 // };
-
-const calculateProfit = (receipts) => {
-  let totalProfit = 0;
-
-  for (const receipt of receipts) {
-    console.log(receipt.profit)
-    // let receiptProfit = 0;
-
-    // for (const item of receipt.detail) {
-    //   const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
-    //   receiptProfit += itemProfit;
-    // }
-
-    totalProfit += receipt.profit;
-  }
-
-  return totalProfit;
-};
 
 function calculateTopsProfit(receipts) {
   const productProfits = {};
@@ -326,8 +327,6 @@ export const tableActions = {
   },
   updateReceipt: async (receiptId, values, companyId, workerId) => {
     try {
-      console.log(receiptId, companyId)
-      console.table(values)
     const response = await axios.patch(
       `/api/receipt/${receiptId}`, // Ensure this endpoint is correct
       {
@@ -507,9 +506,10 @@ export const tableActions = {
 
       // Calculate profits for each day using historical prices stored in receipts
       const profitData = labels.map((day) => {
+        console.log(day)
         const dayReceipts = dailyData[day].details;
-        // return calculateProfit([{ detail: dayReceipts }]);
-        return calculateProfit(receipts);
+        return calculateProfit([{ detail: dayReceipts }]);
+        // return calculateProfit(receipts);
       });
 
       // Calculate top purchased products
