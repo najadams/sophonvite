@@ -65,6 +65,7 @@ const SummaryCards = ({ salesData }) => {
 };
 
 // SalesTable Component
+// SalesTable Component
 const SalesTable = ({ salesTransactions = [] }) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("date");
@@ -77,16 +78,19 @@ const SalesTable = ({ salesTransactions = [] }) => {
 
   // Sort the transactions
   const sortedTransactions = [...salesTransactions].sort((a, b) => {
+    let comparator = 0;
+
     if (orderBy === "date") {
-      return (new Date(a.date) - new Date(b.date)) * (order === "asc" ? 1 : -1);
+      comparator = new Date(a.date) - new Date(b.date);
+    } else if (orderBy === "customerName") {
+      comparator = a.customerName.localeCompare(b.customerName);
+    } else if (orderBy === "balance") {
+      comparator = a.balance - b.balance;
+    } else if (orderBy === "totalAmountPaid") {
+      comparator = a.totalAmountPaid -b.totalAmountPaid
     }
-    if (orderBy === "customerName") {
-      return (
-        a.customerName.localeCompare(b.customerName) *
-        (order === "asc" ? 1 : -1)
-      );
-    }
-    return 0;
+
+    return comparator * (order === "asc" ? 1 : -1);
   });
 
   return (
@@ -112,9 +116,23 @@ const SalesTable = ({ salesTransactions = [] }) => {
             </TableCell>
             <TableCell align="right">Cashier</TableCell>
             <TableCell align="right">Total Amount</TableCell>
-            <TableCell align="right">Total Amount Paid</TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={orderBy === "totalAmountPaid"}
+                direction={orderBy === "totalAmountPaid" ? order : "asc"}
+                onClick={() => handleRequestSort("totalAmountPaid")}>
+                Total Amount Paid
+              </TableSortLabel>
+            </TableCell>
             <TableCell align="right">Discount</TableCell>
-            <TableCell align="right">Balance</TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={orderBy === "balance"}
+                direction={orderBy === "balance" ? order : "asc"}
+                onClick={() => handleRequestSort("balance")}>
+                Balance
+              </TableSortLabel>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -135,9 +153,7 @@ const SalesTable = ({ salesTransactions = [] }) => {
               <TableCell align="right">
                 ₵{transaction.totalAmountPaid.toFixed(2)}
               </TableCell>
-              <TableCell align="right">
-                ₵{transaction.discount}
-              </TableCell>
+              <TableCell align="right">₵{transaction.discount}</TableCell>
               <TableCell align="right">
                 ₵{transaction.balance.toFixed(2)}
               </TableCell>
@@ -164,7 +180,7 @@ const SalesReport = ({ salesData, salesTransactions }) => {
       return (
         transaction.customerName.toLowerCase().includes(searchLower) ||
         transaction.workerName.toLowerCase().includes(searchLower)
-      );
+      );s
     });
   }, [salesTransactions, searchTerm]);
 
