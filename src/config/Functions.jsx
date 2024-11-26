@@ -1,5 +1,5 @@
 import axios from "./index";
-
+export const formatNumber = (num) => new Intl.NumberFormat().format(num);
 const processDailyData = (receipts) => {
   const dailyData = receipts.reduce((acc, receipt) => {
     const date = new Date(receipt.createdAt);
