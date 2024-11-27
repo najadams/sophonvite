@@ -21,6 +21,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { capitalizeFirstLetter } from "../../config/Functions";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import axios from "../../config/index";
+import { formatNumber } from "../../config/Functions";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -143,7 +144,7 @@ function Row({ row, onFlagChange, setValue }) {
           <TableCell align="left">
             {capitalizeFirstLetter(row.workerName)}
           </TableCell>
-          <TableCell align="right">{row.total}</TableCell>
+          <TableCell align="right">{formatNumber(row.total)}</TableCell>
           <TableCell align="right">{row.detail.length}</TableCell>
           <TableCell align="right">
             <IconButton
@@ -205,7 +206,7 @@ function Row({ row, onFlagChange, setValue }) {
                       <TableCell align="right">{item.quantity}</TableCell>
                       <TableCell align="right">{item.salesPrice}</TableCell>
                       <TableCell align="right">
-                        {Math.ceil(item.salesPrice * item.quantity)}
+                        {formatNumber(Math.ceil(item.salesPrice * item.quantity))}
                       </TableCell>
                     </StyledTableRow>
                   ))}
