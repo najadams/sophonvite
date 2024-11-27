@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import SlidingCard from "../components/common/SlidingCard";
 import { useQuery } from "react-query";
-import { tableActions } from "../config/Functions";
+import { formatNumber, tableActions } from "../config/Functions";
 import MyPie from "../utils/MyPie";
 import {
   Bar,
@@ -114,10 +114,10 @@ const Dashboard = () => {
 
       <div className="content">
         <div className="widgets">
-          <Widgets title={"Sales "} count={userCount} />
-          <Widgets title={"Employees"} count={userCount} />
-          <Widgets title={"Products"} count={productCount} />
-          <Widgets title={"Customers"} count={customerCount} />
+          <Widgets title={"Sales "} count={formatNumber(userCount)} />
+          <Widgets title={"Employees"} count={formatNumber(userCount)} />
+          <Widgets title={"Products"} count={formatNumber(productCount)} />
+          <Widgets title={"Customers"} count={formatNumber(customerCount)} />
         </div>
 
         <DummyCard title={"Revenue"}>
@@ -193,12 +193,12 @@ const Dashboard = () => {
             <Typography>Loading...</Typography>
           ) : isOverallError ? (
             <Typography>Error loading product sales data</Typography>
-          ) : overall?.topProducts.length === 0 ? (
+          ) : overall?.topProductsByQuantity.length === 0 ? (
             <Typography>No product sales data available</Typography>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
-                data={overall.topProducts}
+                data={overall.topProductsByQuantity}
                 margin={{
                   top: 10,
                   right: 30,
@@ -218,6 +218,36 @@ const Dashboard = () => {
 
         <DummyCard
           title={"Most Profitable Products"}
+          sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
+          {isOverallLoading ? (
+            <Typography>Loading...</Typography>
+          ) : isOverallError ? (
+            <Typography>Error loading product sales data</Typography>
+          ) : overall?.topProductsByProfit.length === 0 ? (
+            <Typography>No product profit data available</Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={overall.topProductsByProfit}
+                margin={{
+                  top: 10,
+                  right: 30,
+                  left: 0,
+                  bottom: 0,
+                }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="quantity" fill="#00caff" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </DummyCard>
+
+        {/* <DummyCard
+          title={"Most Profitable Products"}
           sx={{ width: { xs: "100%", sm: "400px" } }}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
@@ -228,7 +258,7 @@ const Dashboard = () => {
           ) : (
             <MyPie data={overall.profitable5} />
           )}
-        </DummyCard>
+        </DummyCard> */}
 
         <DummyCard title={"Cookie"} />
         <SlidingCard />

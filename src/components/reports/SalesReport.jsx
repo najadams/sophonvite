@@ -14,7 +14,7 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import SearchField from "../../hooks/SearchField";
-import { capitalizeFirstLetter } from "../../config/Functions";
+import { capitalizeFirstLetter, formatNumber } from "../../config/Functions";
 
 // SummaryCards Component
 const SummaryCards = ({ salesData }) => {
@@ -25,7 +25,7 @@ const SummaryCards = ({ salesData }) => {
           <CardContent>
             <Typography variant="h6">Total Sales</Typography>
             <Typography variant="h4">
-              ₵{salesData?.totalSales.toFixed(2)}
+              ₵{formatNumber(salesData?.totalSales.toFixed(2))}
             </Typography>
           </CardContent>
         </Card>
@@ -35,7 +35,7 @@ const SummaryCards = ({ salesData }) => {
           <CardContent>
             <Typography variant="h6">Total Amount Paid</Typography>
             <Typography variant="h4">
-              ₵{salesData?.totalAmountPaid.toFixed(2)}
+              ₵{formatNumber(salesData?.totalAmountPaid.toFixed(2))}
             </Typography>
           </CardContent>
         </Card>
@@ -45,7 +45,7 @@ const SummaryCards = ({ salesData }) => {
           <CardContent>
             <Typography variant="h6">Balance Owed</Typography>
             <Typography variant="h4">
-              ₵{salesData?.totalBalance.toFixed(2)}
+              ₵{formatNumber(salesData?.totalBalance.toFixed(2))}
             </Typography>
           </CardContent>
         </Card>
@@ -55,7 +55,7 @@ const SummaryCards = ({ salesData }) => {
           <CardContent>
             <Typography variant="h6">Total Discounts</Typography>
             <Typography variant="h4">
-              ₵{salesData?.totalDiscounts.toFixed(2)}
+              ₵{formatNumber(salesData?.totalDiscounts.toFixed(2))}
             </Typography>
           </CardContent>
         </Card>
@@ -148,14 +148,14 @@ const SalesTable = ({ salesTransactions = [] }) => {
                 {capitalizeFirstLetter(transaction.workerName)}
               </TableCell>
               <TableCell align="right">
-                ₵{transaction.totalAmount.toFixed(2)}
+                ₵{formatNumber(transaction.totalAmount.toFixed(2))}
               </TableCell>
               <TableCell align="right">
-                ₵{transaction.totalAmountPaid.toFixed(2)}
+                ₵{formatNumber(transaction.totalAmountPaid.toFixed(2))}
               </TableCell>
-              <TableCell align="right">₵{transaction.discount}</TableCell>
+              <TableCell align="right">₵{formatNumber(transaction.discount)}</TableCell>
               <TableCell align="right">
-                ₵{transaction.balance.toFixed(2)}
+                ₵{formatNumber(transaction.balance.toFixed(2))}
               </TableCell>
             </TableRow>
           ))}

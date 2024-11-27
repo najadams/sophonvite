@@ -1,7 +1,7 @@
 import React, { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
-import { serverAid, tableActions } from "../config/Functions";
+import { formatNumber, serverAid, tableActions } from "../config/Functions";
 import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
@@ -133,7 +133,7 @@ const SalesOrders = () => {
               justifyContent: "space-between",
               marginBottom: 10,
             }}>
-            <Widgets title={"Sales"} count={`₵${totalSales}`} />
+            <Widgets title={"Sales"} count={`₵${formatNumber(totalSales)}`} />
             <div className={`filter-options ${showFilters ? "visible" : ""}`}>
               <span style={{ padding: 10 }}>
                 <label
