@@ -568,10 +568,10 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
               )}
             </FieldArray>
             <Field name="total">
-              {({ field }) => (
+              {() => (
                 <Input
                   value={values.products?.reduce(
-                    (sum, product) => sum + product?.totalPrice,
+                    (sum, product) => sum + (product?.totalPrice || 0),
                     0
                   )}
                   label="Total"
@@ -582,27 +582,54 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                 />
               )}
             </Field>
-            <Field name="amountPaid">
-              {({ field, form }) => {
-                const hasError = Boolean(
-                  form.errors.amountPaid && form.touched.amountPaid
-                );
-                return (
-                  <TextField
-                    {...field}
-                    label="Amount Paid"
-                    type="number"
-                    placeholder="Amount Paid"
-                    fullWidth
-                    error={hasError}
-                    helperText={hasError ? form.errors.amountPaid : ""}
-                    onChange={(event) => {
-                      setFieldValue("amountPaid", event.target.value);
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+                flexWrap: "wrap",
+              }}>
+              <Field name="amountPaid">
+                {({ field, form }) => {
+                  const hasError = Boolean(
+                    form.errors.amountPaid && form.touched.amountPaid
+                  );
+                  return (
+                    <TextField
+                      style={{ flex: 1 }}
+                      {...field}
+                      label="Amount Paid"
+                      type="number"
+                      placeholder="Amount Paid"
+                      fullWidth
+                      error={hasError}
+                      helperText={hasError ? form.errors.amountPaid : ""}
+                      onChange={(event) => {
+                        setFieldValue("amountPaid", event.target.value || 0);
+                      }}
+                    />
+                  );
+                }}
+              </Field>
+              <Field name="balance">
+                {() => (
+                  <Input
+                    value={
+                      values.products?.reduce(
+                        (sum, product) => sum + (product?.totalPrice || 0),
+                        0
+                      ) - values.amountPaid - values.discount
+                    }
+                    label="Balance"
+                    readOnly
+                    inputProps={{
+                      style: { textAlign: "right" },
                     }}
+                    style={{ flex: 1 }}
                   />
-                );
-              }}
-            </Field>
+                )}
+              </Field>
+            </div>
 
             <Field name="discount">
               {({ field, form }) => {
