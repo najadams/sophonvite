@@ -215,7 +215,7 @@ const Dashboard = () => {
             </ResponsiveContainer>
           )}
         </DummyCard>
-
+{/* 
         <DummyCard
           title={"Most Profitable Products"}
           sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
@@ -244,7 +244,7 @@ const Dashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           )}
-        </DummyCard>
+        </DummyCard> */}
 
         {/* <DummyCard
           title={"Most Profitable Products"}
