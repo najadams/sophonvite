@@ -611,6 +611,31 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                   );
                 }}
               </Field>
+              <Field name="discount">
+                {({ field, form }) => {
+                  const hasError = Boolean(
+                    form.errors.discount && form.touched.discount
+                  );
+                  return (
+                    <TextField
+                      {...field}
+                      style={{ width: "50%" }}
+                      label="Discount"
+                      type="number"
+                      placeholder="Discount"
+                      fullWidth
+                      error={hasError}
+                      helperText={hasError ? form.errors.discount : ""}
+                      onChange={(event) => {
+                        setFieldValue("discount", event.target.value);
+                      }}
+                    />
+                  );
+                }}
+              </Field>
+            </div>
+            <div style={{display: 'flex', gap: '2rem'}}>
+              <Typography sx={{ fontSize: '20px', textDecoration: 'underline', pt: 2}}> Balance</Typography>
               <Field name="balance">
                 {() => (
                   <Input
@@ -618,7 +643,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                       values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0
-                      ) - values.amountPaid - values.discount
+                      ) -
+                      values.amountPaid -
+                      values.discount
                     }
                     label="Balance"
                     readOnly
@@ -630,28 +657,6 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                 )}
               </Field>
             </div>
-
-            <Field name="discount">
-              {({ field, form }) => {
-                const hasError = Boolean(
-                  form.errors.discount && form.touched.discount
-                );
-                return (
-                  <TextField
-                    {...field}
-                    label="Discount"
-                    type="number"
-                    placeholder="Discount"
-                    fullWidth
-                    error={hasError}
-                    helperText={hasError ? form.errors.discount : ""}
-                    onChange={(event) => {
-                      setFieldValue("discount", event.target.value);
-                    }}
-                  />
-                );
-              }}
-            </Field>
 
             <div className="bottom_left">
               <Button
