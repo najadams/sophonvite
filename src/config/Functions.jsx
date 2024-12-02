@@ -1,28 +1,28 @@
 import axios from "./index";
-export const formatNumber = (num) => new Intl.NumberFormat().format(num);
+export  const formatNumber = (num) => new Intl.NumberFormat().format(num);
 const processDailyData = (receipts) => {
-  const dailyData = receipts.reduce((acc, receipt) => {
-    const date = new Date(receipt.createdAt);
-    const dayKey = `${date.getDate()}-${
-      date.getMonth() + 1
-    }-${date.getFullYear()}`;
+    const dailyData = receipts.reduce((acc, receipt) => {
+      const date = new Date(receipt.createdAt);
+      const dayKey = `${date.getDate()}-${
+        date.getMonth() + 1
+      }-${date.getFullYear()}`;
 
-    if (!acc[dayKey]) {
-      acc[dayKey] = { totalSales: 0, details: [], totalProfit: 0 };
-    }
+      if (!acc[dayKey]) {
+        acc[dayKey] = { totalSales: 0, details: [], totalProfit: 0 };
+      }
 
-    acc[dayKey].totalSales += receipt.total;
-    acc[dayKey].details.push(...receipt.detail);
-    acc[dayKey].totalProfit += receipt.profit
-    return acc;
-  }, {});
+      acc[dayKey].totalSales += receipt.total;
+      acc[dayKey].details.push(...receipt.detail);
+      acc[dayKey].totalProfit += receipt.profit;
+      return acc;
+    }, {});
 
-  const labels = Object.keys(dailyData);
-  const salesData = labels.map((day) => dailyData[day].totalSales);
-  const profitData = labels.map((day) => dailyData[day].totalProfit);
+    const labels = Object.keys(dailyData);
+    const salesData = labels.map((day) => dailyData[day].totalSales);
+    const profitData = labels.map((day) => dailyData[day].totalProfit);
 
-  return { labels, salesData, profitData };
-};
+    return { labels, salesData, profitData };
+  };
 
 // const calculateProfit = (receipts) => {
 //   console.log(receipts)
@@ -43,9 +43,6 @@ const processDailyData = (receipts) => {
 //   return totalProfit;
 // };
 
-const calculateProfit = (receipts) => {
-  console.log(receipts)
-};
 
 function calculateTopsProfit(receipts) {
   const productProfits = {};
@@ -76,26 +73,47 @@ const calculateTopPurchasedProducts = (receipts) => {
       if (!acc[item.name]) {
         acc[item.name] = { quantity: 0, profit: 0 };
       }
-      const quantity = Math.abs(item.quantity)
+      const quantity = Math.abs(item.quantity);
       acc[item.name].quantity += quantity;
-      acc[item.name].profit +=
-        Math.abs((item.salesPrice - item.costPrice) * quantity);
+      acc[item.name].profit += Math.abs(
+        (item.salesPrice - item.costPrice) * quantity
+      );
     });
     return acc;
   }, {});
 
   // Convert the productCounts object to an array of [name, { quantity, profit }] pairs
-  // and sort the array in descending order based on quantity
-  const sortedProducts = Object.entries(productCounts)
+  // and sort the array in descending order based on quantity and profit
+  const sortedProductsQuantityBased = Object.entries(productCounts)
     .sort((a, b) => b[1].quantity - a[1].quantity)
     .slice(0, 10);
 
-  // Convert the sorted array back to an array of objects with name, quantity, and profit
-  return sortedProducts.map(([name, { quantity, profit }]) => ({
-    name,
-    quantity,
-    profit,
-  }));
+  const sortedProductsProfitBased = Object.entries(productCounts)
+    .sort((a, b) => b[1].profit - a[1].profit)
+    .slice(0, 10);
+
+  // Convert the sorted arrays back to an array of objects with name, quantity, and profit
+  const topProductsByQuantity = sortedProductsQuantityBased.map(
+    ([name, { quantity, profit }]) => ({
+      name,
+      quantity,
+      profit,
+    })
+  );
+
+  const topProductsByProfit = sortedProductsProfitBased.map(
+    ([name, { quantity, profit }]) => ({
+      name,
+      quantity,
+      profit,
+    })
+  );
+
+  // Return both sorted data
+  return {
+    topProductsByQuantity,
+    topProductsByProfit,
+  };
 };
 
 export const tableActions = {
@@ -179,6 +197,7 @@ export const tableActions = {
   },
   updateCompanyData: async ({ companyId, ...details }) => {
     try {
+      // empty fileds in the settings forms do not change the prev values 
       // Prepare the payload by filtering out empty values
       const updateFields = {};
       for (const [key, value] of Object.entries(details)) {
@@ -503,9 +522,9 @@ export const tableActions = {
       // });
 
       // Calculate top purchased products
-      const topProducts = calculateTopPurchasedProducts(receipts);
+      const {topProductsByProfit, topProductsByQuantity} = calculateTopPurchasedProducts(receipts);
       // adding data for the pie graph
-      const profitable5 = topProducts.slice(0, 5);
+      const profitable5 = topProductsByProfit.slice(0, 5);
 
       // Combine labels and data into a single array of objects for Recharts
       const sales = labels.map((label, index) => ({
@@ -518,7 +537,7 @@ export const tableActions = {
         totalProfit: profitData[index],
       }));
 
-      return { sales, profit, topProducts, profitable5 };
+      return { sales, profit, topProductsByQuantity, profitable5, topProductsByProfit };
     } catch (error) {
       console.error("Error fetching sales data", error);
       throw new Error("Failed to fetch sales data");
@@ -537,23 +556,50 @@ export const capitalizeFirstLetter = (str) => {
 };
 
 export const serverAid = {
-  calculateTopPurchasedProducts: (receipts) => {
-    const productCounts = receipts.reduce((acc, receipt) => {
-      receipt.detail.forEach((item) => {
-        if (!acc[item.name]) {
-          acc[item.name] = 0;
-        }
-        acc[item.name] += item.quantity;
-      });
-      return acc;
-    }, {});
+  calculateTopPurchasedProducts : (receipts) => {
+  // Accumulate the total quantity and profit of each product across all receipts
+  const productCounts = receipts.reduce((acc, receipt) => {
+    receipt.detail.forEach((item) => {
+      if (!acc[item.name]) {
+        acc[item.name] = { quantity: 0, profit: 0 };
+      }
+      const quantity = Math.abs(item.quantity);
+      acc[item.name].quantity += quantity;
+      acc[item.name].profit += Math.abs((item.salesPrice - item.costPrice) * quantity);
+    });
+    return acc;
+  }, {});
 
-    const sortedProducts = Object.entries(productCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
+  // Convert the productCounts object to an array of [name, { quantity, profit }] pairs
+  // and sort the array in descending order based on quantity and profit
+  const sortedProductsQuantityBased = Object.entries(productCounts)
+    .sort((a, b) => b[1].quantity - a[1].quantity)
+    .slice(0, 10);
 
-    return sortedProducts.map(([name, quantity]) => ({ name, quantity }));
-  },
+  const sortedProductsProfitBased = Object.entries(productCounts)
+    .sort((a, b) => b[1].profit - a[1].profit)
+    .slice(0, 10);
+
+  // Convert the sorted arrays back to an array of objects with name, quantity, and profit
+  const topProductsByQuantity = sortedProductsQuantityBased.map(([name, { quantity, profit }]) => ({
+    name,
+    quantity,
+    profit,
+  }));
+
+  const topProductsByProfit = sortedProductsProfitBased.map(([name, { quantity, profit }]) => ({
+    name,
+    quantity,
+    profit,
+  }));
+
+  // Return both sorted data
+  return {
+    topProductsByQuantity,
+    topProductsByProfit
+  };
+},
+
 };
 
 export const updateAccount = async (data) => {
@@ -574,6 +620,9 @@ export const fetchReportData = async (companyId, reportType, filters) => {
   switch (reportType) {
     case "sales":
       endpoint = `/api/reports/sales?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
+      break;
+    case "summary":
+      endpoint = `/api/reports/summary?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
       break;
     case "purchases":
       endpoint = `/api/reports/purchases?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
