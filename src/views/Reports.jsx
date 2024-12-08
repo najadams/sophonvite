@@ -4,6 +4,7 @@ import { useMediaQuery } from "@mui/material";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { fetchReportData, getNextDayDate } from "../config/Functions";
+import SummaryReport from "../components/reports/SummaryReports";
 
 // Lazy-loaded components
 const PurchasesReport = lazy(() =>
@@ -80,8 +81,28 @@ const Reports = () => {
     setValue(newValue);
   };
 
+  const summaryData = {
+    totalSales: 15000.75, // Total sales value in dollars
+    debtsPaid: 3000.5, // Total value of debts paid
+    debtsAcquired: 1200.0, // Total value of debts acquired
+    // dateRange: "01 Nov 2024 - 07 Nov 2024", // Date range for the summary report
+  };
+
   const renderContent = () => {
     if (value === 0) {
+      // if (isSummaryLoading) return <CircularProgress />;
+      // if (isSummaryError)
+      //   return (
+      //     <Typography color="error">Error loading sales report</Typography>
+      //   );
+      if (!summaryData) return <Typography>No sales data available</Typography>;
+      return (
+        <SummaryReport
+          data={summaryData}
+          />
+      );
+    }
+    if (value === 1) {
       if (isSalesLoading) return <CircularProgress />;
       if (isSalesError)
         return (
@@ -96,7 +117,7 @@ const Reports = () => {
       );
     }
 
-       if (value === 1) {
+       if (value === 2) {
          if (isInventoryLoading) return <CircularProgress />;
          if (isInventoryError)
            return (
@@ -111,7 +132,7 @@ const Reports = () => {
          );
        }
 
-    if (value === 2) {
+    if (value === 3) {
       if (isPurchasesLoading) return <CircularProgress />;
       if (isPurchasesError)
         return (
@@ -122,7 +143,7 @@ const Reports = () => {
       return <PurchasesReport data={purchasesData.purchases} />;
     }
 
-    if (value === 3) {
+    if (value === 4) {
       if (isDebtsLoading) return <CircularProgress />;
       if (isDebtsError)
         return (
@@ -149,6 +170,7 @@ const Reports = () => {
             textColor="inherit"
             variant="fullWidth"
             aria-label="full width tabs example">
+            <Tab label="Summary" />
             <Tab label="Sales" />
             <Tab label="Inventory" />
             <Tab label="Purchases" />
@@ -188,7 +210,7 @@ const Reports = () => {
                 htmlFor="endDate"
                 style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
                 End Date:
-              </label>
+               </label>
               <input
                 className="date-input"
                 type="date"

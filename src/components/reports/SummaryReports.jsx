@@ -1,71 +1,133 @@
 import React from "react";
-import { Card, Grid, Typography, Box } from "@mui/material";
+import { Card, Grid, Typography, Box, Divider } from "@mui/material";
 import { TrendingUp, TrendingDown, AttachMoney } from "@mui/icons-material";
-import {formatNumber} from '../../config/Functions'
+import { formatNumber } from "../../config/Functions";
 
 const SummaryReport = ({ data }) => {
   const { totalSales, debtsPaid, debtsAcquired, dateRange } = data;
 
-
   return (
-    <div className="content">
-      {/* <Box
-        sx={{
-          padding: "20px",
-          backgroundColor: "#f9f9f9",
-          borderRadius: "8px",
-        }}> */}
-        {/* Header */}
-        <Typography variant="h4" gutterBottom>
-          Summary Report
-        </Typography>
-        <Typography variant="subtitle1" color="textSecondary">
-          {dateRange}
-        </Typography>
+    <div
+      className="content"
+      sx={{ padding: "10px", backgroundColor: "#f4f5f7" }}>
+      <Typography variant="h4" gutterBottom>
+        Summary Report
+      </Typography>
 
-        {/* Summary Cards */}
-        <Grid container spacing={3} sx={{ marginTop: "20px" }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: "20px", textAlign: "center" }}>
-              <TrendingUp color="success" fontSize="large" />
-              <Typography variant="h6">Total Sales</Typography>
-              <Typography variant="h4">${formatNumber(totalSales)}</Typography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: "20px", textAlign: "center" }}>
-              <AttachMoney color="primary" fontSize="large" />
-              <Typography variant="h6">Debts Paid</Typography>
-              <Typography variant="h4">${formatNumber(debtsPaid)}</Typography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: "20px", textAlign: "center" }}>
-              <TrendingDown color="error" fontSize="large" />
-              <Typography variant="h6">Debts Acquired</Typography>
-              <Typography variant="h4">
-                ${formatNumber(debtsAcquired)}
-              </Typography>
-            </Card>
-          </Grid>
-
-          {/* Add more cards as needed */}
+      {/* Summary Cards */}
+      <Grid container spacing={3} sx={{ marginTop: "0px" }}>
+        {/* Total Sales */}
+        <Grid item xs={6} sm={6} md={3}>
+          <Card
+            sx={{
+              padding: "20px",
+              textAlign: "center",
+              backgroundColor: "#e8f5e9",
+              borderRadius: "8px",
+            }}>
+            <TrendingUp color="success" fontSize="large" />
+            <Typography variant="h6" mt={1}>
+              Total Sales
+            </Typography>
+            <Typography variant="h4" fontWeight="bold">
+              ${formatNumber(totalSales)}
+            </Typography>
+          </Card>
         </Grid>
 
-        {/* Details Section */}
-        <Box sx={{ marginTop: "30px" }}>
-          <Typography variant="h5" gutterBottom>
-            Breakdown
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            - Top-performing products or categories
-            <br />
-            - Percentage change in sales
-            <br />- Etc.
-          </Typography>
-        </Box>
+        {/* Debts Paid */}
+        <Grid item xs={6} sm={6} md={3}>
+          <Card
+            sx={{
+              padding: "20px",
+              textAlign: "center",
+              backgroundColor: "#e3f2fd",
+              borderRadius: "8px",
+            }}>
+            <AttachMoney color="primary" fontSize="large" />
+            <Typography variant="h6" mt={1}>
+              Debts Paid
+            </Typography>
+            <Typography variant="h4" fontWeight="bold">
+              ${formatNumber(debtsPaid)}
+            </Typography>
+          </Card>
+        </Grid>
+
+        {/* Debts Acquired */}
+        <Grid item xs={6} sm={6} md={3}>
+          <Card
+            sx={{
+              padding: "20px",
+              textAlign: "center",
+              backgroundColor: "#ffebee",
+              borderRadius: "8px",
+            }}>
+            <TrendingDown color="error" fontSize="large" />
+            <Typography variant="h6" mt={1}>
+              Debts Acquired
+            </Typography>
+            <Typography variant="h4" fontWeight="bold">
+              ${formatNumber(debtsAcquired)}
+            </Typography>
+          </Card>
+        </Grid>
+
+        {/* Placeholder for additional metrics */}
+        <Grid item xs={6} sm={6} md={3}>
+          <Card
+            sx={{
+              padding: "20px",
+              textAlign: "center",
+              backgroundColor: "#f3e5f5",
+              borderRadius: "8px",
+            }}>
+            <TrendingDown color="error" fontSize="large" />
+            <Typography variant="h6" mt={1}>
+              Additional Metric
+            </Typography>
+            <Typography variant="h4" fontWeight="bold">
+              Coming Soon
+            </Typography>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* <Box
+        sx={{
+          marginTop: "40px",
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          borderRadius: "8px",
+        }}> */}
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Breakdown
+      </Typography>
+      <Divider sx={{ marginBottom: "20px" }} />
+      <Typography variant="body1" color="textSecondary" mb={2}>
+        - **Top-performing products or categories**: Highlight items driving the
+        most sales.
+        <br />
+        - **Percentage change in sales**: Visualize trends compared to previous
+        periods.
+        <br />- **Other Insights**: Add more data points or insights as
+        needed.l;ask'dfl
+        <br />
+        - **Percentage change in sales**: Visualize trends compared to previous
+        periods.
+        <br />- **Other Insights**: Add more data points or insights as
+        needed.l;ask'dfl
+        <br />
+        - **Percentage change in sales**: Visualize trends compared to previous
+        periods.
+        <br />- **Other Insights**: Add more data points or insights as
+        needed.l;ask'dfl
+        <br />
+        - **Percentage change in sales**: Visualize trends compared to previous
+        periods.
+        <br />- **Other Insights**: Add more data points or insights as
+        needed.l;ask'dfl
+      </Typography>
       {/* </Box> */}
     </div>
   );

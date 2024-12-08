@@ -21,7 +21,7 @@ const SummaryCards = ({ salesData }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={6} sm={6} md={3}>
-        <Card>
+        <Card sx={{ backgroundColor: "#d8fede" }}>
           <CardContent>
             <Typography variant="h6">Total Sales</Typography>
             <Typography variant="h4">
@@ -31,7 +31,7 @@ const SummaryCards = ({ salesData }) => {
         </Card>
       </Grid>
       <Grid item xs={6} sm={6} md={3}>
-        <Card>
+        <Card sx={{ backgroundColor: "#e3f2fd" }}>
           <CardContent>
             <Typography variant="h6">Total Amount Paid</Typography>
             <Typography variant="h4">
@@ -41,7 +41,7 @@ const SummaryCards = ({ salesData }) => {
         </Card>
       </Grid>
       <Grid item xs={6} sm={6} md={3}>
-        <Card>
+        <Card sx={{ backgroundColor: "#ffebee" }}>
           <CardContent>
             <Typography variant="h6">Balance Owed</Typography>
             <Typography variant="h4">
@@ -51,7 +51,7 @@ const SummaryCards = ({ salesData }) => {
         </Card>
       </Grid>
       <Grid item xs={6} sm={6} md={3}>
-        <Card>
+        <Card sx={{ backgroundColor: "#3e3eff0f"}}>
           <CardContent>
             <Typography variant="h6">Total Discounts</Typography>
             <Typography variant="h4">
