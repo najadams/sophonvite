@@ -20,6 +20,7 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittingView, setSubmittingView] = useState(false);
+  const [submittingViewPayment, setSubmittingViewPayment] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false); // State to handle receipt dialog
   const [receiptData, setReceiptData] = useState(null);
 
@@ -35,7 +36,7 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
     setPaymentAmount(0)
   };
 
-  const handleView = async () => {
+  const handleViewReciept = async () => {
     setSubmittingView(true);
     const data = await tableActions.fetchReceiptsById({
       receiptId: selectedDebt?.id,
@@ -43,6 +44,16 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
     setReceiptData(data); // Set fetched data
     setReceiptDialogOpen(true); // Open the receipt dialog
     setSubmittingView(false);
+  };
+
+  const handleViewPayment = async () => {
+    setSubmittingViewPayment(true);
+    const data = await tableActions.fetchReceiptsById({
+      receiptId: selectedDebt?.id,
+    });
+    setPaymentData(data); // Set fetched data
+    setPaymentDialogOpen(true); // Open the receipt dialog
+    setSubmittingViewPayment(false);
   };
 
   const handleCloseReceiptDialog = () => {
@@ -85,17 +96,17 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography
-                variant="body1"
-                gutterBottom
-                sx={{ fontWeight: "bld" }}>
-                <b>Number of Receipts:</b> {selectedDebt?.id}
-              </Typography>
+              <Button
+                variant="outlined"
+                onClick={handleViewPayment}
+                sx={{ color: "blue", textTransform: "capitalize" }}>
+                View Payments
+              </Button>
             </Grid>
             <Grid item xs={6}>
               <Button
                 variant="outlined"
-                onClick={handleView}
+                onClick={handleViewReciept}
                 sx={{ color: "blue", textTransform: "capitalize" }}>
                 View Receipt
               </Button>

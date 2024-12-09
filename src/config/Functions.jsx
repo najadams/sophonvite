@@ -284,7 +284,7 @@ export const tableActions = {
     username,
     contact,
     password,
-    privileges,
+    role
   }) => {
     try {
       const smallName = name.toLowerCase();
@@ -294,7 +294,7 @@ export const tableActions = {
         username,
         contact,
         password,
-        privileges,
+        role
       });
 
       if (response.status === 201) {
