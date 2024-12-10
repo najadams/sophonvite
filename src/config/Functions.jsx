@@ -397,6 +397,14 @@ export const tableActions = {
       throw error;
     }
   },
+  fetchPaymentsById: async ({ debtId }) => {
+    try {
+      const response = await axios.get(`/api/debt/${debtId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   fetchDebt: async (companyId, selectedDate, selectedDuration) => {
     try {
       let url = `/api/debts/${companyId}?`;
