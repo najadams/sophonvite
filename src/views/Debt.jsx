@@ -28,6 +28,7 @@ import PaymentDialog from "../components/Dialogs/PaymentDialog";
 const Debt = () => {
   const queryClient = new QueryClient();
   const companyId = useSelector((state) => state.companyState.data.id);
+  const workerId = useSelector((state) => state.userState.currentUser._id);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
@@ -39,7 +40,7 @@ const Debt = () => {
   const [selectedDebt, setSelectedDebt] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const matchesTablet = useMediaQuery("(max-width:600px)");
-
+  
   const fetchDebts = async () => {
     const formattedDate = selectedDate.toISOString().split("T")[0];
     const url = showAllDebtors
@@ -59,7 +60,7 @@ const Debt = () => {
 
   const paymentMutation = useMutation(
     async ({ debtId, amount }) => {
-      return await axios.post(`/api/debts/${debtId}/pay`, { amount });
+      return await axios.post(`/api/debts/${debtId}/pay`, { amount, workerId });
     },
     {
       onSuccess: () => {
@@ -101,7 +102,6 @@ const Debt = () => {
 
   const handlePayment = async (paymentAmount) => {
     try {
-      console.log(selectedDebt.id, paymentAmount)
       if (!selectedDebt?.id || !paymentAmount) {
         alert("Please select a debt and enter a valid payment amount.");
         return;
@@ -111,6 +111,7 @@ const Debt = () => {
       await paymentMutation.mutateAsync({
         debtId: selectedDebt.id,
         amount: paymentAmount,
+        workerId: workerId,
       });
       const updatedDebts = debts.map((debt) => {
         return (

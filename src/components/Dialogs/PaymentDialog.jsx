@@ -1,5 +1,3 @@
-// PaymentDialog.js
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -15,13 +13,17 @@ import {
 import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import ReceiptDialog from "./ReceiptDialog";
+import PaymentDisplayDialog from "./PaymentDisplayDialog";
 
 const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittingView, setSubmittingView] = useState(false);
-  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false); // State to handle receipt dialog
+  const [paymentDisplayDialogOpen, setPaymentDisplayDialogOpen] =
+    useState(false);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+  const [paymentData, setPaymentData] = useState(null);
 
   const calculateBalance = () => {
     return selectedDebt ? selectedDebt.amount - paymentAmount : 0;
@@ -31,23 +33,39 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
     setSubmitting(true);
     await onSubmit(paymentAmount); // Call the parent function to handle payment
     setSubmitting(false);
-    onClose(); 
-    setPaymentAmount(0)
+    onClose();
+    setPaymentAmount(0);
   };
 
-  const handleView = async () => {
+  const handleViewReceipt = async () => {
     setSubmittingView(true);
-    const data = await tableActions.fetchReceiptsById({
+    const  data = await tableActions.fetchReceiptsById({
       receiptId: selectedDebt?.id,
     });
-    setReceiptData(data); // Set fetched data
-    setReceiptDialogOpen(true); // Open the receipt dialog
+    setReceiptData(data);
+    setReceiptDialogOpen(true);
+    setSubmittingView(false);
+  };
+
+  const handleViewPayment = async () => {
+    setSubmittingView(true);
+    const data = await tableActions.fetchPaymentsById({
+      debtId: selectedDebt?.id,
+    });
+    console.log(data)
+    setPaymentData(data);
+    setPaymentDisplayDialogOpen(true); // Open the payment display dialog
     setSubmittingView(false);
   };
 
   const handleCloseReceiptDialog = () => {
     setReceiptDialogOpen(false);
     setReceiptData(null);
+  };
+
+  const handleClosePaymentDialog = () => {
+    setPaymentDisplayDialogOpen(false);
+    setPaymentData(null);
   };
 
   return (
@@ -64,43 +82,34 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
         </DialogTitle>
         <DialogContent sx={{ padding: "34px" }}>
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            {/* Display Customer and Cashier Information */}
             <Grid item xs={6}>
-              <Typography
-                variant="body1"
-                gutterBottom
-                //   sx={{ fontWeight: "bold" }}
-              >
-                <b>Customer:</b>
+              <Typography variant="body1" gutterBottom>
+                <b>Customer:</b>{" "}
                 {capitalizeFirstLetter(selectedDebt?.customerName)}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography
-                variant="body1"
-                gutterBottom
-                sx={{ fontWeight: "bld" }}>
+              <Typography variant="body1" gutterBottom>
                 <b>Cashier:</b>{" "}
                 {capitalizeFirstLetter(selectedDebt?.workerName)}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography
-                variant="body1"
-                gutterBottom
-                sx={{ fontWeight: "bld" }}>
-                <b>Number of Receipts:</b> {selectedDebt?.id}
-              </Typography>
+              <Button
+                variant="outlined"
+                onClick={handleViewPayment}
+                sx={{ color: "blue", textTransform: "capitalize" }}>
+                View Payments
+              </Button>
             </Grid>
             <Grid item xs={6}>
               <Button
                 variant="outlined"
-                onClick={handleView}
+                onClick={handleViewReceipt}
                 sx={{ color: "blue", textTransform: "capitalize" }}>
                 View Receipt
               </Button>
             </Grid>
-            {/* Display Amount Owed */}
             <Grid item xs={6}>
               <TextField
                 margin="dense"
@@ -112,10 +121,8 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 InputProps={{
                   readOnly: true,
                 }}
-                //   sx={{ background: "#f0f0f0", borderRadius: 1 }}
               />
             </Grid>
-            {/* Input for Amount Paid */}
             <Grid item xs={6}>
               <TextField
                 margin="dense"
@@ -125,10 +132,8 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 variant="standard"
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                //   sx={{ background: "#f0f0f0", borderRadius: 1 }}
               />
             </Grid>
-            {/* Display Balance */}
             <Grid item xs={6}>
               <TextField
                 margin="dense"
@@ -140,7 +145,6 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 InputProps={{
                   readOnly: true,
                 }}
-                //   sx={{ background: "#f0f0f0", borderRadius: 1 }}
               />
             </Grid>
           </Grid>
@@ -163,11 +167,24 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
         </DialogActions>
       </Dialog>
 
-      {receiptData && <ReceiptDialog
-        open={receiptDialogOpen}
-        onClose={handleCloseReceiptDialog}
-        receiptData={receiptData}
-      />}
+      {/* Receipt Dialog */}
+      {receiptData && (
+        <ReceiptDialog
+          open={receiptDialogOpen}
+          onClose={handleCloseReceiptDialog}
+          receiptData={receiptData}
+        />
+      )}
+
+      {/* Payment Display Dialog */}
+      {paymentData && (
+        <PaymentDisplayDialog
+          open={paymentDisplayDialogOpen}
+          onClose={handleClosePaymentDialog}
+          paymentData={paymentData}
+          customerName={selectedDebt?.customerName}
+        />
+      )}
     </>
   );
 };

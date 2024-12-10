@@ -284,7 +284,7 @@ export const tableActions = {
     username,
     contact,
     password,
-    privileges,
+    role
   }) => {
     try {
       const smallName = name.toLowerCase();
@@ -294,7 +294,7 @@ export const tableActions = {
         username,
         contact,
         password,
-        privileges,
+        role
       });
 
       if (response.status === 201) {
@@ -392,6 +392,14 @@ export const tableActions = {
   fetchReceiptsById: async ({ receiptId }) => {
     try {
       const response = await axios.get(`/api/receipt/${receiptId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  fetchPaymentsById: async ({ debtId }) => {
+    try {
+      const response = await axios.get(`/api/debt/${debtId}`);
       return response.data;
     } catch (error) {
       throw error;
