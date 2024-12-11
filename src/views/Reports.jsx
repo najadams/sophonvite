@@ -29,6 +29,16 @@ const Reports = () => {
   // const matchesMobile = useMediaQuery("(max-width:600px)");
   const [showFilters, setShowFilters] = useState(false);
 
+  // const {
+  //   data: summaryData,
+  //   isLoading: isSummaryLoading,
+  //   isError: isSummaryError,
+  // } = useQuery(
+  //   ["summary", companyId, filters],
+  //   () => fetchReportData(companyId, "summary", filters),
+  //   { enabled: value === 0, keepPreviousData: true }
+  //   );
+  
   const {
     data: salesData,
     isLoading: isSalesLoading,
@@ -36,7 +46,7 @@ const Reports = () => {
   } = useQuery(
     ["sales", companyId, filters],
     () => fetchReportData(companyId, "sales", filters),
-    { enabled: value === 0, keepPreviousData: true }
+    { enabled: value === 1, keepPreviousData: true }
   );
 
   const {
@@ -46,7 +56,7 @@ const Reports = () => {
   } = useQuery(
     ["purchases", companyId, filters],
     () => fetchReportData(companyId, "purchases", filters),
-    { enabled: value === 2, keepPreviousData: true }
+    { enabled: value === 3, keepPreviousData: true }
   );
 
   const {
@@ -56,7 +66,7 @@ const Reports = () => {
   } = useQuery(
     ["inventory", companyId, filters],
     () => fetchReportData(companyId, "inventory", filters),
-    { enabled: value === 1, keepPreviousData: true }
+    { enabled: value === 2, keepPreviousData: true }
   );
 
   const {
@@ -66,7 +76,7 @@ const Reports = () => {
   } = useQuery(
     ["debts", companyId, filters],
     () => fetchReportData(companyId, "debts", filters),
-    { enabled: value === 3, keepPreviousData: true }
+    { enabled: value === 4, keepPreviousData: true }
   );
 
   const handleDateChange = (e, type) => {
@@ -95,7 +105,7 @@ const Reports = () => {
       //   return (
       //     <Typography color="error">Error loading sales report</Typography>
       //   );
-      if (!summaryData) return <Typography>No sales data available</Typography>;
+      if (!summaryData) return <Typography>No summary available</Typography>;
       return (
         <SummaryReport
           data={summaryData}
