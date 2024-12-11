@@ -2,6 +2,7 @@ import { Card, Typography, Grid, Divider } from "@mui/material";
 import { useLocation } from "react-router-dom"; // Import useLocation hook
 import { capitalizeFirstLetter } from "../config/Functions";
 import { useSelector } from "react-redux";
+import { format } from "date-fns";
 
 const ViewReceipt = () => {
   const company = useSelector((state) => state.companyState.data);
@@ -98,7 +99,8 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
               Date:
             </Typography>
             <Typography variant="body1">
-              {new Date(date).toLocaleDateString()} {/* Format date */}
+              {format(new Date(date), "dd/MM/yyyy")}
+              {/* Format date */}
             </Typography>
           </Grid>
         </Grid>

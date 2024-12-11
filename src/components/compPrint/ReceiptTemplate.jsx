@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useReactToPrint } from "react-to-print";
 import { capitalizeFirstLetter } from "../../config/Functions";
-import { Receipt } from "@mui/icons-material";
+import { format } from "date-fns";
 
 const ReceiptTemplate = React.forwardRef((props, ref) => {
   const {
@@ -46,16 +46,20 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         {company.momo && <h4>Momo: {company.momo}</h4>}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
-      {<p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
-        <strong>Customer:</strong> <strong>{capitalizeFirstLetter(customerName)}</strong>
-      </p>}
+      {
+        <p style={{ textAlign: "left", marginTop: "30px", display: "flex" }}>
+          <strong>Customer:</strong>{" "}
+          <strong>{capitalizeFirstLetter(customerName)}</strong>
+        </p>
+      }
       <p>
         <strong>Cashier: </strong>
         {capitalizeFirstLetter(workerName)}
       </p>
       <p>
         <strong>Date: </strong>
-        {new Date(date).toLocaleDateString()} {/* Ensure only date is shown */}
+        {format(new Date(date), "dd/MM/yyyy")}
+        {/* Ensure only date is shown */}
       </p>
       <table
         style={{
@@ -65,31 +69,44 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         }}>
         <thead>
           <tr>
-            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Qty</th>
-            <th style={{ padding: "8px", font: "icon", border: '1px solid' }}>Product</th>
-            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Price</th>
-            <th style={{ padding: "5px", font: "icon", border: '1px solid' }}>Total</th>
+            <th style={{ padding: "5px", font: "icon", border: "1px solid" }}>
+              Qty
+            </th>
+            <th style={{ padding: "8px", font: "icon", border: "1px solid" }}>
+              Product
+            </th>
+            <th style={{ padding: "5px", font: "icon", border: "1px solid" }}>
+              Price
+            </th>
+            <th style={{ padding: "5px", font: "icon", border: "1px solid" }}>
+              Total
+            </th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
-            <tr key={index} style={{font: 'revert'}}>
+            <tr key={index} style={{ font: "revert" }}>
               <td
                 style={{
                   margin: "2px",
                   textAlign: "center",
-                  border: '0.3px solid'
+                  border: "0.3px solid",
                 }}>
                 {product.quantity}
               </td>
-              <td style={{ padding: "5px", textAlign: "center", border: '1px solid'}}>
+              <td
+                style={{
+                  padding: "5px",
+                  textAlign: "center",
+                  border: "1px solid",
+                }}>
                 {capitalizeFirstLetter(product.name)}
               </td>
               <td
                 style={{
                   margin: "2px",
                   textAlign: "center",
-                  border: '0.3px solid'
+                  border: "0.3px solid",
                 }}>
                 ₵{product.price ? product.price : product.salesPrice}
               </td>
@@ -97,7 +114,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
                 style={{
                   margin: "2px",
                   textAlign: "center",
-                  border: '0.3px solid'
+                  border: "0.3px solid",
                 }}>
                 ₵
                 {product.price

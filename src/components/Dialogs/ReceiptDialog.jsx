@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import { capitalizeFirstLetter } from "../../config/Functions";
 import { useSelector } from "react-redux";
-import {useMediaQuery} from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import { format } from 'date-fns'
 
 const ReceiptDialog = ({
   open,
@@ -41,7 +42,7 @@ const ReceiptDialog = ({
       PaperProps={{
         style: {
           height: "80vh", // Takes 80% of viewport height
-          width: matchesMobile ? '100vw' : "80vw" , // Takes 80% of viewport width
+          width: matchesMobile ? "100vw" : "80vw", // Takes 80% of viewport width
           overflowY: "auto", // Make it scrollable
           backgroundColor: "#E0F2F1",
         },
@@ -117,7 +118,7 @@ const ReceiptDialog = ({
                 Date:
               </Typography>
               <Typography variant="body1">
-                {new Date(date).toLocaleDateString()}
+                {format(new Date(date), "dd/MM/yyyy")}
               </Typography>
             </Grid>
           </Grid>
