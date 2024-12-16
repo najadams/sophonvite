@@ -15,6 +15,34 @@ import {
 } from "@mui/material";
 import SearchField from "../../hooks/SearchField";
 import { capitalizeFirstLetter, formatNumber } from "../../config/Functions";
+import {styled} from "@mui/material/styles"
+
+export const StyledTableHead = styled(TableHead)(({ theme }) => ({
+  backgroundColor: "black",
+  "& th": {
+    color: "white",
+    fontWeight: "bold",
+  },
+  "& th .MuiTableSortLabel-root": {
+    fontSize: "1rem", // Default font size
+    fontWeight: "bold", // Default weight
+  },
+  "& th .MuiTableSortLabel-root.Mui-active": {
+    fontSize: "1.2rem", // Larger size when active
+    fontWeight: "bolder", // Bolder weight when active
+    color: "white", // Ensure it stays white
+  },
+  "& th:hover": {
+    fontSize: "1.1rem", // Slightly larger font on hover
+    fontWeight: "bolder", // Bolder text on hover
+  },
+  // Hover effect for TableSortLabel inside the header
+  "& th .MuiTableSortLabel-root:hover": {
+    fontSize: "1.1rem", // Slightly larger on hover
+    fontWeight: "bolder", // Bolder text on hover
+    color: "white", // Ensure it remains white
+  },
+}));
 
 // SummaryCards Component
 const SummaryCards = ({ salesData }) => {
@@ -88,6 +116,8 @@ const SalesTable = ({ salesTransactions = [] }) => {
       comparator = a.balance - b.balance;
     } else if (orderBy === "totalAmountPaid") {
       comparator = a.totalAmountPaid -b.totalAmountPaid
+    } else if (orderBy === "totalAmount") {
+      comparator = a.totalAmountPaid -b.totalAmountPaid
     }
 
     return comparator * (order === "asc" ? 1 : -1);
@@ -96,7 +126,7 @@ const SalesTable = ({ salesTransactions = [] }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
-        <TableHead>
+        <StyledTableHead>
           <TableRow>
             <TableCell>
               <TableSortLabel
@@ -115,7 +145,15 @@ const SalesTable = ({ salesTransactions = [] }) => {
               </TableSortLabel>
             </TableCell>
             <TableCell align="right">Cashier</TableCell>
-            <TableCell align="right">Total Amount</TableCell>
+            {/* <TableCell align="right">Total Amount</TableCell> */}
+            <TableCell align="right">
+              <TableSortLabel
+                active={orderBy === "totalAmount"}
+                direction={orderBy === "totalAmount" ? order : "asc"}
+                onClick={() => handleRequestSort("totalAmount")}>
+                Total Amount
+              </TableSortLabel>
+            </TableCell>
             <TableCell align="right">
               <TableSortLabel
                 active={orderBy === "totalAmountPaid"}
@@ -134,7 +172,7 @@ const SalesTable = ({ salesTransactions = [] }) => {
               </TableSortLabel>
             </TableCell>
           </TableRow>
-        </TableHead>
+        </StyledTableHead>
         <TableBody>
           {sortedTransactions.map((transaction) => (
             <TableRow key={transaction.receiptId}>
@@ -153,7 +191,9 @@ const SalesTable = ({ salesTransactions = [] }) => {
               <TableCell align="right">
                 ₵{formatNumber(transaction.totalAmountPaid.toFixed(2))}
               </TableCell>
-              <TableCell align="right">₵{formatNumber(transaction.discount)}</TableCell>
+              <TableCell align="right">
+                ₵{formatNumber(transaction.discount)}
+              </TableCell>
               <TableCell align="right">
                 ₵{formatNumber(transaction.balance.toFixed(2))}
               </TableCell>
@@ -190,9 +230,9 @@ const SalesReport = ({ salesData, salesTransactions }) => {
         Sales Report
       </Typography>
       <SummaryCards salesData={salesData} />
-      <Typography variant="h6" gutterBottom style={{ marginTop: "20px" }}>
+      {/* <Typography variant="h6" gutterBottom style={{ marginTop: "20px" }}>
         Sales Transactions
-      </Typography>
+      </Typography> */}
       <div
         style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
         <SearchField onSearch={handleSearch} />

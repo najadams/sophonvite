@@ -14,6 +14,7 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import SearchField from "../../hooks/SearchField";
+import { StyledTableHead } from "./SalesReport";
 
 const capitalizeFirstLetter = (str) => {
   if (typeof str === "string") {
@@ -78,7 +79,7 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
   return (
     <TableContainer sx={{ marginTop: 2 }} component={Paper}>
       <Table>
-        <TableHead>
+        <StyledTableHead>
           <TableRow>
             <TableCell>
               <TableSortLabel
@@ -113,7 +114,7 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
               </TableSortLabel>
             </TableCell>
           </TableRow>
-        </TableHead>
+        </StyledTableHead>
         <TableBody>
           {sortedItems.map((item) => (
             <TableRow key={item._id}>
