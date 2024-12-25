@@ -1,29 +1,17 @@
 import React from "react";
-import { Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import NotAuthorized from "./common/NotAuthorised";
+import { getPermissionsForRole } from "../context/userRoles";
 
-const ProtectedRoute = ({ element: Element, requiredPermissions, ...rest }) => {
-  const user = useSelector((state) => state.userState.currentUser);
-  console.log(user.permissions)
+const ProtectedRoute = ({ role, requiredPermission, children }) => {
+  const userPermissions = getPermissionsForRole(role);
+  console.log(role)
 
-  if (!user) {
-    // You may handle loading or unauthenticated state here
-    return <Navigate to="/login" />;
+  if (!userPermissions.includes(requiredPermission)) {
+    // Redirect to a "Not Authorized" page or show an error message
+    return <NotAuthorized />;
   }
 
-  // const hasRequiredPermissions = requiredPermissions.every((permission) =>
-  //   user.permissions.includes(permission)
-  // );
-
-  return (
-    <Route
-      {...rest}
-      element={
-        <Element />
-      }
-      // hasRequiredPermissions ? <Element /> : <Navigate to="/unauthorized" />
-    />
-  );
+  return children;
 };
 
 export default ProtectedRoute;

@@ -745,7 +745,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
             fullWidth
             variant="standard"
             value={newCustomerName}
-            onChange={(e) => setNewCustomerName(e.target.value)}
+            onChange={(e) => setNewCustomerName(e.target.value.toLowerCase())}
           />
         </DialogContent>
         <DialogActions>
