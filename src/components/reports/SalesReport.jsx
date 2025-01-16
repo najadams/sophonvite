@@ -219,7 +219,8 @@ const SalesReport = ({ salesData, salesTransactions }) => {
       const searchLower = searchTerm.toLowerCase();
       return (
         transaction.customerName.toLowerCase().includes(searchLower) ||
-        transaction.workerName.toLowerCase().includes(searchLower)
+        transaction.workerName.toLowerCase().includes(searchLower) ||
+        transaction.customerCompany.toLowerCase().includes(searchLower)
       );s
     });
   }, [salesTransactions, searchTerm]);

@@ -40,6 +40,16 @@ const Reports = () => {
   //   );
   
   const {
+    data: summaryData,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = useQuery(
+    ["summary", companyId, filters],
+    () => fetchReportData(companyId, "summary", filters),
+    { enabled: value === 0, keepPreviousData: true }
+    );
+  
+  const {
     data: salesData,
     isLoading: isSalesLoading,
     isError: isSalesError,
@@ -91,7 +101,7 @@ const Reports = () => {
     setValue(newValue);
   };
 
-  const summaryData = {
+  const summasryData = {
     totalSales: 15000.75, // Total sales value in dollars
     debtsPaid: 3000.5, // Total value of debts paid
     debtsAcquired: 1200.0, // Total value of debts acquired

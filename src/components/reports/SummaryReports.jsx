@@ -4,20 +4,22 @@ import { TrendingUp, TrendingDown, AttachMoney } from "@mui/icons-material";
 import { formatNumber } from "../../config/Functions";
 
 const SummaryReport = ({ data }) => {
-  const { totalSales, debtsPaid, debtsAcquired, dateRange } = data;
+  const {
+    totalCashReceived,
+    summary: { sales, debtPayments, debtsAcquired },
+  } = data;
+  const totalCash = totalCashReceived?.cash + totalCashReceived?.momo;
 
   return (
-    <div
-      className="content"
-      sx={{ padding: "10px", backgroundColor: "#f4f5f7" }}>
+    <div className="content" >
       <Typography variant="h4" gutterBottom>
         Summary Report
       </Typography>
 
       {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ marginTop: "0px" }}>
+      <Grid container spacing={3}>
         {/* Total Sales */}
-        <Grid item xs={6} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               padding: "20px",
@@ -30,13 +32,13 @@ const SummaryReport = ({ data }) => {
               Total Sales
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(totalSales)}
+              ${formatNumber(sales.totalSales)}
             </Typography>
           </Card>
         </Grid>
 
-        {/* Debts Paid */}
-        <Grid item xs={6} sm={6} md={3}>
+        {/* Total Debt Payments */}
+        <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               padding: "20px",
@@ -46,16 +48,16 @@ const SummaryReport = ({ data }) => {
             }}>
             <AttachMoney color="primary" fontSize="large" />
             <Typography variant="h6" mt={1}>
-              Debts Paid
+              Total Debt Payments
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(debtsPaid)}
+              ${formatNumber(debtPayments.totalPaid)}
             </Typography>
           </Card>
         </Grid>
 
-        {/* Debts Acquired */}
-        <Grid item xs={6} sm={6} md={3}>
+        {/* Total Debts Acquired */}
+        <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               padding: "20px",
@@ -68,67 +70,54 @@ const SummaryReport = ({ data }) => {
               Debts Acquired
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(debtsAcquired)}
+              ${formatNumber(debtsAcquired.totalDebts)}
             </Typography>
           </Card>
         </Grid>
 
-        {/* Placeholder for additional metrics */}
-        <Grid item xs={6} sm={6} md={3}>
+        {/* Total Cash Received */}
+        <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               padding: "20px",
               textAlign: "center",
-              backgroundColor: "#f3e5f5",
+              backgroundColor: "#fff3e0",
               borderRadius: "8px",
             }}>
-            <TrendingDown color="error" fontSize="large" />
+            <AttachMoney color="secondary" fontSize="large" />
             <Typography variant="h6" mt={1}>
-              Additional Metric
+              Total Cash Received
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              Coming Soon
+              {/* Momo: ${formatNumber(totalCashReceived.momo)} <br />
+              Cash: ${formatNumber(totalCashReceived.cash)} */}
+              {formatNumber(totalCash)}
             </Typography>
           </Card>
         </Grid>
       </Grid>
 
-      {/* <Box
-        sx={{
-          marginTop: "40px",
-          padding: "20px",
-          backgroundColor: "#ffffff",
-          borderRadius: "8px",
-        }}> */}
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
+      {/* Breakdown Section */}
+      <Typography variant="h5" fontWeight="bold" mt={4} gutterBottom>
         Breakdown
       </Typography>
       <Divider sx={{ marginBottom: "20px" }} />
-      <Typography variant="body1" color="textSecondary" mb={2}>
-        - **Top-performing products or categories**: Highlight items driving the
-        most sales.
-        <br />
-        - **Percentage change in sales**: Visualize trends compared to previous
-        periods.
-        <br />- **Other Insights**: Add more data points or insights as
-        needed.l;ask'dfl
-        <br />
-        - **Percentage change in sales**: Visualize trends compared to previous
-        periods.
-        <br />- **Other Insights**: Add more data points or insights as
-        needed.l;ask'dfl
-        <br />
-        - **Percentage change in sales**: Visualize trends compared to previous
-        periods.
-        <br />- **Other Insights**: Add more data points or insights as
-        needed.l;ask'dfl
-        <br />
-        - **Percentage change in sales**: Visualize trends compared to previous
-        periods.
-        <br />- **Other Insights**: Add more data points or insights as
-        needed.l;ask'dfl
-      </Typography>
-      {/* </Box> */}
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="body1">
+            <strong>Sales Breakdown:</strong> <br />
+            Momo: ${formatNumber(sales.momo)} <br />
+            Cash: ${formatNumber(sales.cash)}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="body1">
+            <strong>Debt Payments Breakdown:</strong> <br />
+            Momo: ${formatNumber(debtPayments.momo)} <br />
+            Cash: ${formatNumber(debtPayments.cash)}
+          </Typography>
+        </Grid>
+      </Grid>
     </div>
   );
 };
