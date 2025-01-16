@@ -8,7 +8,7 @@ import VendorsRoutes from "./vendors/VendorsRoutes";
 import ViewReceipt from "../views/ViewReceipt";
 import { getPermissionsForRole } from "../context/userRoles";
 import ProtectedRoute from "../components/ProtectedRoute";
-import NotAuthorized from "../components/common/NotAuthorised";
+import Unauthorized from "../views/common/Unauthorized";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
 const Customers = lazy(() => import("../views/Customers"));
@@ -130,7 +130,7 @@ const AuthenticatedRoutes = () => {
       />
       <Route path="/myaccount/:accoutNumber" element={<MyAccount />} />
       <Route path="/notification" element={<Notifications />} />
-      <Route path="/not-authorized" element={<NotAuthorized />} />
+      <Route path="/not-authorized" element={<Unauthorized />} />
       <Route path="/*" element={<NoPage />} />
     </Routes>
   );
