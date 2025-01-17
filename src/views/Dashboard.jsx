@@ -21,6 +21,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Pie,
+  PieChart,
 } from "recharts";
 
 const DummyCard = ({ children, title, sx }) => (
@@ -215,7 +217,7 @@ const Dashboard = () => {
             </ResponsiveContainer>
           )}
         </DummyCard>
-{/* 
+        {/* 
         <DummyCard
           title={"Most Profitable Products"}
           sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
@@ -246,19 +248,41 @@ const Dashboard = () => {
           )}
         </DummyCard> */}
 
-        {/* <DummyCard
-          title={"Most Profitable Products"}
-          sx={{ width: { xs: "100%", sm: "400px" } }}>
+        <DummyCard
+          title={"Top Profitable Products"}
+          sx={{ width: { xs: "100%", sm: "300px" ,md: '420px'} }}>
           {isOverallLoading ? (
             <Typography>Loading...</Typography>
           ) : isOverallError ? (
             <Typography>Error loading product sales data</Typography>
-          ) : overall?.profitable5.length === 0 ? (
+          ) : overall?.topProductsByProfit.length === 0 ? (
             <Typography>No product sales data available</Typography>
           ) : (
-            <MyPie data={overall.profitable5} />
+            <MyPie
+              data={overall.topProductsByProfit}
+              dataKey="profit"
+              nameKey="name"
+            />
           )}
-        </DummyCard> */}
+        </DummyCard>
+
+        <DummyCard
+          title={"Top 10 Customers By Sale"}
+          sx={{ width: { xs: "100%", sm: "300px", md: "420px" } }}>
+          {isOverallLoading ? (
+            <Typography>Loading...</Typography>
+          ) : isOverallError ? (
+            <Typography>Error loading customer data</Typography>
+          ) : overall?.topCustomers.length === 0 ? (
+            <Typography>No customer data available</Typography>
+          ) : (
+            <MyPie
+              data={overall.topCustomers}
+              dataKey="totalSales"
+              nameKey="name"
+            />
+          )}
+        </DummyCard>
 
         <DummyCard title={"Cookie"} />
         <SlidingCard />

@@ -22,7 +22,88 @@ const processDailyData = (receipts) => {
     const profitData = labels.map((day) => dailyData[day].totalProfit);
 
     return { labels, salesData, profitData };
-  };
+};
+  
+const calculateTopProfitableProducts = (receipts) => {
+  // Create a map to store product profits
+  const productProfits = {};
+
+  // Process each receipt
+  receipts.forEach((receipt) => {
+    receipt.detail.forEach((item) => {
+      const productName = item.name;
+      const profit = item.profit || 0;
+
+      if (!productProfits[productName]) {
+        productProfits[productName] = {
+          name: productName,
+          profit: 0,
+          percentage: 0,
+        };
+      }
+
+      productProfits[productName].profit += profit;
+    });
+  });
+
+  // Convert to array and sort by profit
+  const sortedProducts = Object.values(productProfits)
+    .sort((a, b) => b.profit - a.profit)
+    .slice(0, 10);
+
+  // Calculate total profit for percentage
+  const totalProfit = sortedProducts.reduce(
+    (sum, product) => sum + product.profit,
+    0
+  );
+
+  // Calculate percentage for each product
+  return sortedProducts.map((product) => ({
+    ...product,
+    percentage: ((product.profit / totalProfit) * 100).toFixed(1),
+  }));
+};
+
+const calculateTopCustomers = (receipts) => {
+  // Create a map to store customer sales
+  const customerSales = {};
+
+  // Process each receipt
+  receipts.forEach((receipt) => {
+    // console.log(receipt)
+    const customerId = receipt.customerId?._id;
+    const customerName = receipt.customerId?.name || "Unknown Customer";
+    const total = receipt.total || 0;
+
+    if (!customerSales[customerId]) {
+      customerSales[customerId] = {
+        id: customerId,
+        name: customerName,
+        totalSales: 0,
+        percentage: 0,
+      };
+    }
+
+    customerSales[customerId].totalSales += total;
+  });
+
+  // Convert to array and sort by total sales
+  const sortedCustomers = Object.values(customerSales)
+    .sort((a, b) => b.totalSales - a.totalSales)
+    .slice(0, 10);
+
+  // Calculate total sales for percentage
+  const totalSales = sortedCustomers.reduce(
+    (sum, customer) => sum + customer.totalSales,
+    0
+  );
+
+  // Calculate percentage for each customer
+  return sortedCustomers.map((customer) => ({
+    ...customer,
+    percentage: ((customer.totalSales / totalSales) * 100).toFixed(1),
+  }));
+};
 
 // const calculateProfit = (receipts) => {
 //   console.log(receipts)
@@ -44,27 +125,27 @@ const processDailyData = (receipts) => {
 // };
 
 
-function calculateTopsProfit(receipts) {
-  const productProfits = {};
+// function calculateTopsProfit(receipts) {
+//   const productProfits = {};
 
-  receipts.forEach((receipt) => {
-    receipt.detail.forEach((product) => {
-      const profit =
-        (product.salesPrice - product.costPrice) * product.quantity;
+//   receipts.forEach((receipt) => {
+//     receipt.detail.forEach((product) => {
+//       const profit =
+//         (product.salesPrice - product.costPrice) * product.quantity;
 
-      if (productProfits[product.name]) {
-        productProfits[product.name] += profit;
-      } else {
-        productProfits[product.name] = profit;
-      }
-    });
-  });
+//       if (productProfits[product.name]) {
+//         productProfits[product.name] += profit;
+//       } else {
+//         productProfits[product.name] = profit;
+//       }
+//     });
+//   });
 
-  return Object.keys(productProfits).map((name) => ({
-    name: name,
-    profit: productProfits[name],
-  }));
-}
+//   return Object.keys(productProfits).map((name) => ({
+//     name: name,
+//     profit: productProfits[name],
+//   }));
+// }
 
 const calculateTopPurchasedProducts = (receipts) => {
   // Accumulate the total quantity and profit of each product across all receipts
@@ -511,46 +592,41 @@ export const tableActions = {
       throw new Error(error.response?.data?.message || "An error occurred");
     }
   },
-  fetchSalesData: async (companyId) => {
-    try {
-      // Fetch receipts data
-      const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
-      const receipts = receiptsResponse.data;
+  fetchSalesData : async (companyId) => {
+  try {
+    const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
+    const receipts = receiptsResponse.data;
+    
+    const { labels, salesData, profitData } = processDailyData(receipts);
+    const { topProductsByProfit, topProductsByQuantity } = calculateTopPurchasedProducts(receipts);
+    
+    // Add new analytics
+    const topProfitableProducts = calculateTopProfitableProducts(receipts);
+    const topCustomers = calculateTopCustomers(receipts);
+    
+    const sales = labels.map((label, index) => ({
+      month: label,
+      totalSales: salesData[index],
+    }));
+    
+    const profit = labels.map((label, index) => ({
+      month: label,
+      totalProfit: profitData[index],
+    }));
 
-      // Process daily data
-      const { labels, salesData, profitData } = processDailyData(receipts);
-
-      // Calculate profits for each day using historical prices stored in receipts
-      // const profitData = labels.map((day) => {
-      //   console.log(day)
-      //   // const dayReceipts = dailyData[day].details;
-      //   const dayReceipts = dailyData[day];
-      //   return calculateProfit([{ profit: dayReceipts }]);
-      //   // return calculateProfit(receipts);
-      // });
-
-      // Calculate top purchased products
-      const {topProductsByProfit, topProductsByQuantity} = calculateTopPurchasedProducts(receipts);
-      // adding data for the pie graph
-      const profitable5 = topProductsByProfit.slice(0, 5);
-
-      // Combine labels and data into a single array of objects for Recharts
-      const sales = labels.map((label, index) => ({
-        month: label,
-        totalSales: salesData[index],
-      }));
-
-      const profit = labels.map((label, index) => ({
-        month: label,
-        totalProfit: profitData[index],
-      }));
-
-      return { sales, profit, topProductsByQuantity, profitable5, topProductsByProfit };
-    } catch (error) {
-      console.error("Error fetching sales data", error);
-      throw new Error("Failed to fetch sales data");
-    }
-  },
+    return {
+      sales,
+      profit,
+      topProductsByQuantity,
+      topProductsByProfit,
+      topProfitableProducts,
+      topCustomers
+    };
+  } catch (error) {
+    console.error("Error fetching sales data", error);
+    throw new Error("Failed to fetch sales data");
+  }
+},
 };
 
 export const capitalizeFirstLetter = (str) => {
