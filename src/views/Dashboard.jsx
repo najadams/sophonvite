@@ -217,36 +217,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           )}
         </DummyCard>
-        {/* 
-        <DummyCard
-          title={"Most Profitable Products"}
-          sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
-          {isOverallLoading ? (
-            <Typography>Loading...</Typography>
-          ) : isOverallError ? (
-            <Typography>Error loading product sales data</Typography>
-          ) : overall?.topProductsByProfit.length === 0 ? (
-            <Typography>No product profit data available</Typography>
-          ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={overall.topProductsByProfit}
-                margin={{
-                  top: 10,
-                  right: 30,
-                  left: 0,
-                  bottom: 0,
-                }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="quantity" fill="#00caff" />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </DummyCard> */}
 
         <DummyCard
           title={"Top Profitable Products"}
