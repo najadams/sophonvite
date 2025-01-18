@@ -10,6 +10,7 @@ import SlidingCard from "../components/common/SlidingCard";
 import { useQuery } from "react-query";
 import { formatNumber, tableActions } from "../config/Functions";
 import MyPie from "../utils/MyPie";
+import Loader from "../components/common/Loader";
 import {
   Bar,
   BarChart,
@@ -34,7 +35,7 @@ const DummyCard = ({ children, title, sx }) => (
       flexGrow: 1,
       ...sx,
     }}>
-    <Card sx={{ width: "100%", height: "100%" }}>
+    <Card sx={{ width: "100%", height: "100%" ,margin:0, padding: 0}}>
       <CardContent>
         <Typography variant="h5" component="div">
           {title}
@@ -124,7 +125,7 @@ const Dashboard = () => {
 
         <DummyCard title={"Revenue"}>
           {isOverallLoading ? (
-            <Typography>Loading...</Typography>
+            <Loader type={2}/>
           ) : isOverallError ? (
             <Typography>Error loading sales data</Typography>
           ) : overall?.sales.length === 0 ? (
@@ -157,7 +158,7 @@ const Dashboard = () => {
 
         <DummyCard title={"Sales Profit"}>
           {isOverallLoading ? (
-            <Typography>Loading...</Typography>
+            <Loader type={2}/>
           ) : isOverallError ? (
             <Typography>Error loading Revenue data</Typography>
           ) : overall?.profit.length === 0 ? (
@@ -192,7 +193,7 @@ const Dashboard = () => {
           title={"Most Selling Products"}
           sx={{ width: { xs: "100%", sm: "300px", md: "600px" } }}>
           {isOverallLoading ? (
-            <Typography>Loading...</Typography>
+            <Loader type={2}/>
           ) : isOverallError ? (
             <Typography>Error loading product sales data</Typography>
           ) : overall?.topProductsByQuantity.length === 0 ? (
@@ -222,7 +223,7 @@ const Dashboard = () => {
           title={"Top Profitable Products"}
           sx={{ width: { xs: "100%", sm: "300px" ,md: '420px'} }}>
           {isOverallLoading ? (
-            <Typography>Loading...</Typography>
+            <Loader type={2}/>
           ) : isOverallError ? (
             <Typography>Error loading product sales data</Typography>
           ) : overall?.topProductsByProfit.length === 0 ? (
@@ -240,7 +241,7 @@ const Dashboard = () => {
           title={"Top 10 Customers By Sale"}
           sx={{ width: { xs: "100%", sm: "300px", md: "420px" } }}>
           {isOverallLoading ? (
-            <Typography>Loading...</Typography>
+            <Loader type={2}/>
           ) : isOverallError ? (
             <Typography>Error loading customer data</Typography>
           ) : overall?.topCustomers.length === 0 ? (

@@ -1,27 +1,83 @@
 import axios from "./index";
 export  const formatNumber = (num) => new Intl.NumberFormat().format(num);
 const processDailyData = (receipts) => {
-    const dailyData = receipts.reduce((acc, receipt) => {
-      const date = new Date(receipt.createdAt);
-      const dayKey = `${date.getDate()}-${
-        date.getMonth() + 1
-      }-${date.getFullYear()}`;
+  // First, aggregate the data with full precision
+  const dailyData = receipts.reduce((acc, receipt) => {
+    const date = new Date(receipt.createdAt);
+    const dayKey = `${date.getDate()}-${
+      date.getMonth() + 1
+    }-${date.getFullYear()}`;
 
-      if (!acc[dayKey]) {
-        acc[dayKey] = { totalSales: 0, details: [], totalProfit: 0 };
-      }
+    if (!acc[dayKey]) {
+      acc[dayKey] = {
+        totalSales: 0,
+        details: [],
+        totalProfit: 0,
+        // Store raw values for calculations
+        rawSales: 0,
+        rawProfit: 0,
+      };
+    }
 
-      acc[dayKey].totalSales += receipt.total;
-      acc[dayKey].details.push(...receipt.detail);
-      acc[dayKey].totalProfit += receipt.profit;
-      return acc;
-    }, {});
+    // Keep raw values for accurate calculations
+    acc[dayKey].rawSales += receipt.total;
+    acc[dayKey].rawProfit += receipt.profit;
 
-    const labels = Object.keys(dailyData);
-    const salesData = labels.map((day) => dailyData[day].totalSales);
-    const profitData = labels.map((day) => dailyData[day].totalProfit);
+    // Round only for display
+    acc[dayKey].totalSales = Number(acc[dayKey].rawSales.toFixed(2));
+    acc[dayKey].totalProfit = Number(acc[dayKey].rawProfit.toFixed(2));
+    acc[dayKey].details.push(...receipt.detail);
 
-    return { labels, salesData, profitData };
+    return acc;
+  }, {});
+
+  // Sort dates chronologically
+  const sortedLabels = Object.keys(dailyData).sort((a, b) => {
+    const [dayA, monthA, yearA] = a.split("-").map(Number);
+    const [dayB, monthB, yearB] = b.split("-").map(Number);
+    const dateA = new Date(yearA, monthA - 1, dayA);
+    const dateB = new Date(yearB, monthB - 1, dayB);
+    return dateA - dateB;
+  });
+
+  // Create data arrays maintaining precision for calculations
+  const salesData = sortedLabels.map((day) => ({
+    date: day,
+    value: dailyData[day].totalSales,
+    // Include raw value for precise calculations if needed
+    rawValue: dailyData[day].rawSales,
+  }));
+
+  const profitData = sortedLabels.map((day) => ({
+    date: day,
+    value: dailyData[day].totalProfit,
+    // Include raw value for precise calculations if needed
+    rawValue: dailyData[day].rawProfit,
+  }));
+
+  // Format dates for better display
+  const formattedLabels = sortedLabels.map((day) => {
+    const [d, m, y] = day.split("-");
+    return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+  });
+
+  return {
+    labels: formattedLabels,
+    salesData: salesData.map((item) => item.value),
+    profitData: profitData.map((item) => item.value),
+    // Include raw data arrays if needed for additional calculations
+    rawSalesData: salesData.map((item) => item.rawValue),
+    rawProfitData: profitData.map((item) => item.rawValue),
+  };
+};
+
+// Example usage:
+const formatDataForChart = (processedData) => {
+  return processedData.labels.map((label, index) => ({
+    date: label,
+    sales: processedData.salesData[index],
+    profit: processedData.profitData[index],
+  }));
 };
   
 const calculateTopProfitableProducts = (receipts) => {
@@ -78,7 +134,7 @@ const calculateTopCustomers = (receipts) => {
     if (!customerSales[customerId]) {
       customerSales[customerId] = {
         id: customerId,
-        name: customerName,
+        name: capitalizeFirstLetter(customerName),
         totalSales: 0,
         percentage: 0,
       };
@@ -105,47 +161,6 @@ const calculateTopCustomers = (receipts) => {
   }));
 };
 
-// const calculateProfit = (receipts) => {
-//   console.log(receipts)
-//   let totalProfit = 0;
-
-//   for (const receipt of receipts) {
-//     console.log(receipt)
-//     let receiptProfit = 0;
-
-//     for (const item of receipt.detail) {
-//       const itemProfit = (item.salesPrice - item.costPrice) * item.quantity;
-//       receiptProfit += itemProfit;
-//     }
-
-//     totalProfit += receipt;
-//   }
-
-//   return totalProfit;
-// };
-
-
-// function calculateTopsProfit(receipts) {
-//   const productProfits = {};
-
-//   receipts.forEach((receipt) => {
-//     receipt.detail.forEach((product) => {
-//       const profit =
-//         (product.salesPrice - product.costPrice) * product.quantity;
-
-//       if (productProfits[product.name]) {
-//         productProfits[product.name] += profit;
-//       } else {
-//         productProfits[product.name] = profit;
-//       }
-//     });
-//   });
-
-//   return Object.keys(productProfits).map((name) => ({
-//     name: name,
-//     profit: productProfits[name],
-//   }));
-// }
 
 const calculateTopPurchasedProducts = (receipts) => {
   // Accumulate the total quantity and profit of each product across all receipts

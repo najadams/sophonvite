@@ -19,7 +19,6 @@ const COLORS = [
 ];
 
 const MyPie = ({ data, dataKey, nameKey }) => {
-  console.log(dataKey)
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   const formatTooltip = (value) => {
@@ -43,13 +42,16 @@ const MyPie = ({ data, dataKey, nameKey }) => {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={300} style={{margin:0 , padding:0}}>
+    <ResponsiveContainer
+      width="100%"
+      height={300}
+      style={{ margin: 0, padding: 0 }}>
       <PieChart>
         <Pie
           data={data}
           dataKey={dataKey}
           nameKey={nameKey}
-          cx="45%"
+          cx="52%"
           cy="52%"
           innerRadius="40%"
           outerRadius="85%"
@@ -65,6 +67,15 @@ const MyPie = ({ data, dataKey, nameKey }) => {
           layout={isMobile ? "horizontal" : "vertical"}
           align={isMobile ? "center" : "right"}
           verticalAlign={isMobile ? "bottom" : "middle"}
+          wrapperStyle={{
+            paddingLeft: 40, // Increased padding for desktop
+            paddingRight: isMobile ? 0 : 10,
+            paddingTop: isMobile ? 20 : 0,
+            fontSize: "10px",
+           }}
+          formatter={(value) => {
+            return value.length > 20 ? value.substring(0, 20) + "..." : value;
+          }}
         />
       </PieChart>
     </ResponsiveContainer>
