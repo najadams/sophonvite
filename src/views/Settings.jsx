@@ -66,6 +66,7 @@ const Settings = () => {
               momo: company.momo || "",
               address: company.address || "",
               paymentMethod: "",
+              location: company.location || "",
               paymentProvider: "",
               currency: "cedis  ₵",
               tinNumber: company.tinNumber || "",
@@ -151,9 +152,18 @@ const Settings = () => {
                     as={TextField}
                     fullWidth
                     name="address"
-                    label="Store Address"
+                    label="Store Digital Address"
                     variant="outlined"
                     value={values.address}
+                    onChange={handleChange}
+                  />
+                  <StyledField
+                    as={TextField}
+                    fullWidth
+                    name="location"
+                    label="Store Location"
+                    variant="outlined"
+                    value={values.location}
                     onChange={handleChange}
                   />
                 </Box>

@@ -24,6 +24,7 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
 
   useEffect(() => {
     handlePrint();
+    console.log(company)
   }, []);
 
   return (
@@ -44,6 +45,8 @@ const ReceiptTemplate = React.forwardRef((props, ref) => {
         )} */}
         {company.contact && <h4>Contact: {company.contact}</h4>}
         {company.momo && <h4>Momo: {company.momo}</h4>}
+        {company.location && <h4>Location: {company.location}</h4>}
+        {/* {company.email && <h5>Email: {company.email}</h5>} */}
         {/* {company.email && <h5>Email: {company.email}</h5>} */}
       </div>
       {
