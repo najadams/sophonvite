@@ -723,9 +723,6 @@ export const fetchReportData = async (companyId, reportType, filters) => {
     case "sales":
       endpoint = `/api/reports/sales?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
       break;
-    case "summary":
-      endpoint = `/api/reports/summary?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
-      break;
     case "purchases":
       endpoint = `/api/reports/purchases?companyId=${companyId}&startDate=${startDate}&endDate=${endDate}`;
       break;
