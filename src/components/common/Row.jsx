@@ -101,7 +101,7 @@ function Row({ row, onFlagChange, setValue }) {
       discount: row.discount,
       amountPaid: row.amountPaid,
       date: formatDate(row.date),
-      workerName: row.workerName,
+      workerName: row.workerusername ? row.workerusername : row.workerName,
     });
     setTimeout(() => {
       setPrintValues(null);

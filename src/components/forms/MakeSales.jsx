@@ -15,7 +15,11 @@ import {
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { capitalizeFirstLetter, tableActions, updateOnhandAfterSale } from "../../config/Functions";
+import {
+  capitalizeFirstLetter,
+  tableActions,
+  updateOnhandAfterSale,
+} from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
@@ -26,17 +30,16 @@ const validationSchema = Yup.object().shape({
   products: Yup.array().of(
     Yup.object().shape({
       name: Yup.string().required("Product name is required"),
-      quantity: Yup.number()
-        .required("Quantity is required"),
-        // .test(
-        //   "is-valid-fraction",
-        //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
-        //   (value) => {
-        //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
-        //     return true;
-        //   }
-        // )
-        // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
+      quantity: Yup.number().required("Quantity is required"),
+      // .test(
+      //   "is-valid-fraction",
+      //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
+      //   (value) => {
+      //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
+      //     return true;
+      //   }
+      // )
+      // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
       price: Yup.number().required("Price is required"),
     })
   ),
@@ -45,11 +48,16 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-
-const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpdate, editData}) => {
+const MakeSales = ({
+  customers,
+  Products,
+  handleCustomerUpdate,
+  handleProductUpdate,
+  editData,
+}) => {
   const checkDebt = true;
   const location = useLocation();
-  const { row } = location.state || {}; 
+  const { row } = location.state || {};
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -86,14 +94,14 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
   const [newProductOnhand, setNewProductOnhand] = useState("");
 
   const getInitialValues = () => {
-      // Default empty form values
-      return {
-        customerName: "",
-        products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
-        total: 0,
-        amountPaid: "",
-        discount: 0,
-      };
+    // Default empty form values
+    return {
+      customerName: "",
+      products: [{ name: "", quantity: "", totalPrice: 0, price: 0 }],
+      total: 0,
+      amountPaid: "",
+      discount: 0,
+    };
   };
 
   // const handleSubmit = async (values, setSubmitting, resetForm) => {
@@ -168,7 +176,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
         // Check if debt exists in the response
         if (results.existingDebt) {
-          setOwesDebt(true)
+          setOwesDebt(true);
           setModalMessage(
             `Customer has existing debt of ${results.existingDebt.amount}.`
           );
@@ -200,10 +208,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
     }
   };
 
-
   const handleNewCustomerSubmit = async () => {
     try {
-      const formattedName = newCustomerName.toLocaleLowerCase().trim()
+      const formattedName = newCustomerName.toLocaleLowerCase().trim();
       const newCustomer = await tableActions.addCustomer({
         name: formattedName,
         companyId,
@@ -218,9 +225,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
       setNewCustomerDialogOpen(false); // Close the dialog
       setNewCustomerName(""); // Clear the input field
       handleCustomerUpdate((prevOptions) => [
-        ...prevOptions.sort().filter(
-          (option) => option !== "<<<< Add New Customer >>>>"
-        ),
+        ...prevOptions
+          .sort()
+          .filter((option) => option !== "<<<< Add New Customer >>>>"),
         `None - ${newCustomer.name}`,
       ]);
     } catch (error) {
@@ -231,7 +238,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
 
   const handleNewProductSubmit = async () => {
     try {
-      const formattedProductName = newProductName.toLocaleLowerCase().trim()
+      const formattedProductName = newProductName.toLocaleLowerCase().trim();
       const data = await tableActions.addProduct({
         name: formattedProductName,
         costPrice: newProductCostPrice,
@@ -268,10 +275,9 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
           salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
           onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
         },
-        ...prevOptions.sort().filter(
-          (option) => option.name !== "<<<< Add New Product >>>>"
-        )
-        
+        ...prevOptions
+          .sort()
+          .filter((option) => option.name !== "<<<< Add New Product >>>>"),
       ]);
 
       setNewProductDialogOpen(false); // Close the dialog
@@ -634,8 +640,12 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
                 }}
               </Field>
             </div>
-            <div style={{display: 'flex', gap: '2rem'}}>
-              <Typography sx={{ fontSize: '20px', textDecoration: 'underline', pt: 2}}> Balance</Typography>
+            <div style={{ display: "flex", gap: "2rem" }}>
+              <Typography
+                sx={{ fontSize: "20px", textDecoration: "underline", pt: 2 }}>
+                {" "}
+                Balance
+              </Typography>
               <Field name="balance">
                 {() => (
                   <Input
@@ -826,7 +836,7 @@ const MakeSales = ({customers, Products, handleCustomerUpdate, handleProductUpda
             amountPaid={printValues.amountPaid}
             discount={printValues.discount}
             date={today}
-            workerName={worker.name}
+            workerName={worker.username ? worker.username : worker.name}
           />
         </div>
       )}
