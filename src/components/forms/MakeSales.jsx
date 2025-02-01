@@ -12,6 +12,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import ErrorAlert from "../../utils/Error";
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
@@ -72,6 +73,7 @@ const MakeSales = ({
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
+  const [customerError, setCustomerError] = useState("");
   const [customerOptions, setCustomerOptions] = useState([
     "<<<< Add New Customer >>>>",
     ...customers.sort(),
@@ -88,6 +90,7 @@ const MakeSales = ({
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerCompany, setNewCustomerCompany] = useState("");
   const [newProductName, setNewProductName] = useState("");
   const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
   const [newProductCostPrice, setNewProductCostPrice] = useState("");
@@ -103,51 +106,6 @@ const MakeSales = ({
       discount: 0,
     };
   };
-
-  // const handleSubmit = async (values, setSubmitting, resetForm) => {
-  //   const total = values.products.reduce(
-  //     (sum, product) => sum + product?.totalPrice,
-  //     0
-  //   );
-  //   values.total = total; // Maintain total before discount
-  //   const balance = values.total - values.amountPaid - values.discount;
-
-  //   try {
-  //     if (!values.customerName) {
-  //       setError("Customer Name Should not be Empty");
-  //     } else if (!values.amountPaid) {
-  //       setError("Amount Paid Should not be Empty!");
-  //     } else {
-  //       setLoading(true);
-  //       setSubmitting(true);
-  //       await tableActions.addReceipt(
-  //         { ...values, balance },
-  //         companyId,
-  //         workerId,
-  //       );
-  //       if (results.debt) {
-  //         setOpen(true);
-  //         results.reduct(((acc, debtDatat) => debt ))
-  //         setModalMessage("")
-  //       }
-  //       const newData = updateOnhandAfterSale(productOptions, values)
-  //       setProductOptions(newData);
-  //       setOpen(true);
-  //       if (print) {
-  //         setPrintValues({ ...values, balance }); // Store values for printing
-  //       }
-  //       setTimeout(() => {
-  //         resetForm();
-  //       }, 1000);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError(error);
-  //   } finally {
-  //     setSubmitting(false);
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
@@ -208,31 +166,115 @@ const MakeSales = ({
     }
   };
 
+  // const handleNewCustomerSubmit = async () => {
+  //   try {
+  //     const formattedName = newCustomerName.toLocaleLowerCase().trim();
+  //     const newCustomer = await tableActions.addCustomer({
+  //       name: formattedName,
+  //       company: newCustomerCompany,
+  //       companyId,
+  //     });
+  //     setCustomerOptions((prevOptions) => [
+  //       "<<<< Add New Customer >>>>",
+  //       `None - ${capitalizeFirstLetter(newCustomer.name)}`,
+  //       ...prevOptions
+  //         .sort()
+  //         .filter((option) => option !== "<<<< Add New Customer >>>>"),
+  //     ]);
+  //     setNewCustomerDialogOpen(false); // Close the dialog
+  //     setNewCustomerName(""); // Clear the input field
+  //     handleCustomerUpdate((prevOptions) => [
+  //       ...prevOptions
+  //         .sort()
+  //         .filter((option) => option !== "<<<< Add New Customer >>>>"),
+  //       newCustomerCompany ? `${newCustomer.company} - ${newCustomer.name}` : `None - ${newCustomer.name}`,
+  //     ]);
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("Failed to add new customer");
+  //   }
+  // };
+
   const handleNewCustomerSubmit = async () => {
     try {
-      const formattedName = newCustomerName.toLocaleLowerCase().trim();
-      const newCustomer = await tableActions.addCustomer({
+      setCustomerError(""); // Reset error state
+
+      // Input validation
+      if (!newCustomerName.trim()) {
+        setCustomerError("Customer name is required");
+        return;
+      }
+
+      const formattedName = newCustomerName.trim().toLowerCase();
+
+      // Create customer object with company
+      const customerData = {
         name: formattedName,
+        company: newCustomerCompany.trim(),
         companyId,
-      });
-      setCustomerOptions((prevOptions) => [
-        "<<<< Add New Customer >>>>",
-        `None - ${capitalizeFirstLetter(newCustomer.name)}`,
-        ...prevOptions
-          .sort()
-          .filter((option) => option !== "<<<< Add New Customer >>>>"),
-      ]);
-      setNewCustomerDialogOpen(false); // Close the dialog
-      setNewCustomerName(""); // Clear the input field
-      handleCustomerUpdate((prevOptions) => [
-        ...prevOptions
-          .sort()
-          .filter((option) => option !== "<<<< Add New Customer >>>>"),
-        `None - ${newCustomer.name}`,
-      ]);
+      };
+
+      // Make the API call
+      const response = await tableActions.addCustomer(customerData);
+
+      // Validate API response
+      if (!response || typeof response !== "object") {
+        throw new Error("Invalid response from server");
+      }
+
+      if (!response.name) {
+        throw new Error("Customer name is missing in server response");
+      }
+
+      // Format the display name only after confirming we have valid data
+      let displayName;
+      if (response.company && response.company.trim()) {
+        displayName = `${capitalizeFirstLetter(response.company)} - ${
+          capitalizeFirstLetter(response.name)
+        }`;
+      } else {
+        displayName = capitalizeFirstLetter(response.name); // Remove the "None -" prefix
+      }
+
+      // Update customer options only if we have a valid displayName
+      if (displayName) {
+        // Update customer options
+        setCustomerOptions((prevOptions) => {
+          const filteredOptions = prevOptions.filter(
+            (option) =>
+              option !== "<<<< Add New Customer >>>>" && option !== displayName // Remove any existing entry for this customer
+          );
+          return [
+            "<<<< Add New Customer >>>>",
+            displayName,
+            ...filteredOptions,
+          ].sort();
+        });
+
+        // Update parent component's customer list
+        handleCustomerUpdate((prevOptions) => {
+          const filteredOptions = prevOptions.filter(
+            (option) =>
+              option !== "<<<< Add New Customer >>>>" && option !== displayName
+          );
+          return [...filteredOptions, displayName].sort();
+        });
+
+        // Reset form and close dialog
+        setNewCustomerDialogOpen(false);
+        setNewCustomerName("");
+        setNewCustomerCompany("");
+        setCustomerError("");
+      } else {
+        setCustomerError(error.message || "Duplicate customer details");
+        throw new Error("Failed to format customer name");
+      }
     } catch (error) {
-      console.log(error);
-      setError("Failed to add new customer");
+      setError(error.message || "Failed to add new customer");
+      <ErrorAlert error={error} onClose={() => setError(null)} />;
+      console.error("Error adding new customer:", error);
+      setCustomerError(error.message || "Failed to add new customer");
+      // Don't close the dialog when there's an error
     }
   };
 
@@ -695,9 +737,10 @@ const MakeSales = ({
         )}
       </Formik>
       {error && (
-        <Typography align="center" color="red">
-          {error}
-        </Typography>
+        // <Typography align="center" color="red">
+        //   {error}
+        // </Typography>
+        <ErrorAlert error={error} onClose={() => setError(null)} />
       )}
       <Snackbar
         sx={{
@@ -756,6 +799,22 @@ const MakeSales = ({
             variant="standard"
             value={newCustomerName}
             onChange={(e) => setNewCustomerName(e.target.value.toLowerCase())}
+          />
+        </DialogContent>
+        <DialogContent>
+          <DialogContentText id="new-customer-dialog-description">
+            Enter Company Name:
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="new-customer-company"
+            label="Company Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCustomerCompany}
+            onChange={(e) => setNewCustomerCompany(e.target.value.toLowerCase())}
           />
         </DialogContent>
         <DialogActions>
