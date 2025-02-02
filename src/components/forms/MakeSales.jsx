@@ -194,7 +194,8 @@ const [newProduct, setNewProduct] = useState({
 
       // Validate API response
       if (!response || typeof response !== "object") {
-        throw new Error("Invalid response from server");
+        setError(response)
+        return;
       }
 
       if (!response.name) {
@@ -223,7 +224,7 @@ const [newProduct, setNewProduct] = useState({
             "<<<< Add New Customer >>>>",
             displayName,
             ...filteredOptions,
-          ].sort();
+          ].sort((data) => data.name);
         });
 
         // Update parent component's customer list
@@ -245,7 +246,7 @@ const [newProduct, setNewProduct] = useState({
         throw new Error("Failed to format customer name");
       }
     } catch (error) {
-      setError(error.message || "Failed to add new customer");
+      setError(error.response.message || "Failed to add new customer");
       <ErrorAlert error={error} onClose={() => setError(null)} />;
       console.error("Error adding new customer:", error);
       setCustomerError(error.message || "Failed to add new customer");
@@ -256,8 +257,6 @@ const [newProduct, setNewProduct] = useState({
   const handleNewProductSubmit = async () => {
     if (!validateFields()) return; // Validate the input fields
     try {
-      console.log("newProduct", newProduct);
-
       // Ensure the product name is properly formatted
       const formattedProductName = newProduct.name.trim().toLowerCase();
 
@@ -268,7 +267,7 @@ const [newProduct, setNewProduct] = useState({
         companyId,
       });
 
-      if (!data || !data.data) throw new Error("Invalid response from server");
+      if (!data || !data.data) throw new Error(data);
 
       const addedProduct = data.data;
 
@@ -305,8 +304,7 @@ const [newProduct, setNewProduct] = useState({
       setNewProductDialogOpen(false);
       setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
-      console.error(error);
-      setError(error.message || "Failed to add new product");
+      setError(error.message|| "Failed to add new product");
     }
   };
 
@@ -822,9 +820,11 @@ const [newProduct, setNewProduct] = useState({
             color="primary">
             Cancel
           </Button>
-          <Button onClick={handleNewCustomerSubmit} color="primary">
-            Add
-          </Button>
+          {newCustomerName && (
+            <Button onClick={handleNewCustomerSubmit} color="primary">
+              Add
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
 
