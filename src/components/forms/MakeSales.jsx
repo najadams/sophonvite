@@ -75,6 +75,7 @@ const MakeSales = ({
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
   const [customerError, setCustomerError] = useState("");
+  const [submittingForm, setSubmittingForm] = useState(false);
   const [customerOptions, setCustomerOptions] = useState([
     "<<<< Add New Customer >>>>",
     ...customers.sort().filter((options) => options !== "<<<< Add New Customer >>>>"),
@@ -172,6 +173,7 @@ const [newProduct, setNewProduct] = useState({
 
   const handleNewCustomerSubmit = async () => {
     try {
+      setSubmittingForm(true);
       setCustomerError(""); // Reset error state
 
       // Input validation
@@ -237,18 +239,24 @@ const [newProduct, setNewProduct] = useState({
         });
 
         // Reset form and close dialog
+        setSubmittingForm(false)
         setNewCustomerDialogOpen(false);
         setNewCustomerName("");
         setNewCustomerCompany("");
         setCustomerError("");
       } else {
+        setSubmittingForm(false);
         setCustomerError(error.message || "Duplicate customer details");
         throw new Error("Failed to format customer name");
       }
     } catch (error) {
-      setError(error.response.message || "Failed to add new customer");
+      if (error.response) {
+        console.log("error part")
+        setError(error.response.message || "Failed to add new customer");
+      }
       <ErrorAlert error={error} onClose={() => setError(null)} />;
       console.error("Error adding new customer:", error);
+      setSubmittingForm(false)
       setCustomerError(error.message || "Failed to add new customer");
       // Don't close the dialog when there's an error
     }
@@ -257,7 +265,9 @@ const [newProduct, setNewProduct] = useState({
   const handleNewProductSubmit = async () => {
     if (!validateFields()) return; // Validate the input fields
     try {
-      // Ensure the product name is properly formatted
+      setSubmittingForm(true);
+      // Ensure the product 
+      // name is properly formatted
       const formattedProductName = newProduct.name.trim().toLowerCase();
 
       // Send request to add product
@@ -302,8 +312,10 @@ const [newProduct, setNewProduct] = useState({
 
       // Close dialog and reset form
       setNewProductDialogOpen(false);
+      setSubmittingForm(false);
       setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
+      setSubmittingForm(false)
       setError(error.message|| "Failed to add new product");
     }
   };
@@ -795,7 +807,7 @@ const [newProduct, setNewProduct] = useState({
             value={newCustomerName}
             onChange={(e) => setNewCustomerName(e.target.value.toLowerCase())}
           />
-        </DialogContent>
+          </DialogContent>
         <DialogContent>
           <DialogContentText id="new-customer-dialog-description">
             Enter Company Name:
