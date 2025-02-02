@@ -221,7 +221,7 @@ export const tableActions = {
         index: index + 1,
         company: item.company ? item.company : "None",
         name: item.name,
-        phone: item.phone ? "0" + item.phone : "+233____",
+        phone: item.phone ?  item.phone : "+233____",
         // email: item.email,
       }));
       return data;
@@ -275,6 +275,7 @@ export const tableActions = {
 
   updateCustomer: async ({ id, name, phone, email, address, company }) => {
     try {
+      console.log(id)
       const customer = await axios.patch(`/api/customer/${id}`, {
         id,
         name,

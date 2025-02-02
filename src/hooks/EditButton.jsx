@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { DialogContext } from "../context/context";
 
-const EditButton = ({ children   }) => {
+const EditButton = ({ children, title   }) => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -35,7 +35,7 @@ const EditButton = ({ children   }) => {
               maxHeight: "none",
             },
           }}>
-          <DialogTitle>Add New Item</DialogTitle>
+          <DialogTitle>{title ? title : `Add New Item`}</DialogTitle>
           <DialogContent>{children}</DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
