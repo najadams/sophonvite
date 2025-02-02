@@ -62,6 +62,46 @@ const TableCreater = ({ companyId, data, type }) => {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("mymd"));
   const dispatch = useDispatch();
 
+// const fetchData = useCallback(async () => {
+//   try {
+//     let transformRecord = (record) => ({
+//       ...record,
+//       phone: Array.isArray(record.phone) ? record.phone[0] : record.phone,
+//       email: Array.isArray(record.email) ? record.email[0] : record.email,
+//     });
+
+//     let fetchedData;
+
+//     if (data) {
+//       // If data already exists, just transform it
+//       fetchedData = transformRecord(data);
+//     } else {
+//       // Fetch new data based on type
+//       if (type === "customers") {
+//         console.log(first)
+//         const raw = await tableActions.fetchCustomers(companyId);
+//         fetchedData = transformRecord(raw);
+//       } else if (type === "products") {
+//         fetchedData = await tableActions.fetchProducts(companyId);
+//       }
+
+//       // Transform fetched data if it's an array
+//       if (Array.isArray(fetchedData)) {
+//         fetchedData = fetchedData.map(transformRecord);
+//       }
+//     }
+
+//     // Set headers based on first record if we have an array
+//     if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+//       setHeaders(Object.keys(fetchedData[0]).filter((key) => key !== "id"));
+//     }
+
+//     setData(fetchedData);
+//   } catch (error) {
+//     console.error("Failed to fetch data:", error);
+//   }
+// }, [companyId, type, data]);
+
   const fetchData = useCallback(async () => {
     try {
       let fetchedData;
@@ -74,14 +114,24 @@ const TableCreater = ({ companyId, data, type }) => {
           fetchedData = await tableActions.fetchProducts(companyId);
         }
       }
+
       if (fetchedData && fetchedData.length > 0) {
-        setHeaders(Object.keys(fetchedData[0]).filter((key) => key !== "id"));
-        setData(fetchedData);
+        // Ensure only one phone and email are displayed
+        const processedData = fetchedData.map((item) => ({
+          ...item,
+          phone: Array.isArray(item.phone) ? item.phone[0] : item.phone, // Take the first phone
+          email: Array.isArray(item.email) ? item.email[0] : item.email, // Take the first email
+        }));
+
+        setHeaders(Object.keys(processedData[0]).filter((key) => key !== "id"));
+        setData(processedData);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
   }, [companyId, type, data]);
+
+  useEffect(() => { console.log(fetchedData) }, [fetchData]);
 
   const deleteRowConfirmed = () => {
     if (type === "products") {
@@ -138,7 +188,16 @@ const TableCreater = ({ companyId, data, type }) => {
   useEffect(() => {
     if (fetchedData) {
       setHeaders(Object.keys(fetchedData[0]).filter((key) => key !== "id"));
-      setData(fetchedData);
+      const transformedData = fetchedData.map(({ phone, email, ...rest }) => ({
+        ...rest,
+        phone:
+          Array.isArray(phone) && phone.length > 0 && phone[0] !== ""
+            ? phone.splice(0, 2).join(", ")
+            : null,
+        email: Array.isArray(email) && email.length > 0 ? email[0] : null,
+      }));
+
+      setData(transformedData);
     }
   }, [fetchedData]);
 
@@ -276,7 +335,8 @@ const TableCreater = ({ companyId, data, type }) => {
             handleEditOpen();
             handleMenuClose(); // Ensure menu closes when edit is selected
           }}>
-          <EditButton>
+          <EditButton
+            title={type === "products" ? "Edit Product" : "Edit Customer"}>
             {type === "products" ? (
               <ProductForm
                 editMutation={editProductMutation}

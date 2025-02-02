@@ -63,6 +63,7 @@ const MakeSales = ({
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [owesDebt, setOwesDebt] = useState(false);
   const [open, setOpen] = useState(false);
   const [print, setPrint] = useState(false);
@@ -76,7 +77,7 @@ const MakeSales = ({
   const [customerError, setCustomerError] = useState("");
   const [customerOptions, setCustomerOptions] = useState([
     "<<<< Add New Customer >>>>",
-    ...customers.sort(),
+    ...customers.sort().filter((options) => options !== "<<<< Add New Customer >>>>"),
   ]);
   const [productOptions, setProductOptions] = useState([
     {
@@ -84,19 +85,22 @@ const MakeSales = ({
       name: "<<<< Add New Product >>>>",
     },
 
-    ...Products.sort((a, b) => a.name.localeCompare(b.name)),
+    ...Products.sort((a, b) => a.name.localeCompare(b.name)).filter(
+      (option) =>
+        option !== "<<<< Add New Product >>>>" 
+    ),
   ]);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerCompany, setNewCustomerCompany] = useState("");
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
-  const [newProductCostPrice, setNewProductCostPrice] = useState("");
-  const [newProductOnhand, setNewProductOnhand] = useState("");
-
-  const getInitialValues = () => {
+const [newProduct, setNewProduct] = useState({
+  name: "",
+  salesPrice: "",
+  costPrice: "",
+  onhand: "",
+});  const getInitialValues = () => {
     // Default empty form values
     return {
       customerName: "",
@@ -165,35 +169,6 @@ const MakeSales = ({
       setLoading(false);
     }
   };
-
-  // const handleNewCustomerSubmit = async () => {
-  //   try {
-  //     const formattedName = newCustomerName.toLocaleLowerCase().trim();
-  //     const newCustomer = await tableActions.addCustomer({
-  //       name: formattedName,
-  //       company: newCustomerCompany,
-  //       companyId,
-  //     });
-  //     setCustomerOptions((prevOptions) => [
-  //       "<<<< Add New Customer >>>>",
-  //       `None - ${capitalizeFirstLetter(newCustomer.name)}`,
-  //       ...prevOptions
-  //         .sort()
-  //         .filter((option) => option !== "<<<< Add New Customer >>>>"),
-  //     ]);
-  //     setNewCustomerDialogOpen(false); // Close the dialog
-  //     setNewCustomerName(""); // Clear the input field
-  //     handleCustomerUpdate((prevOptions) => [
-  //       ...prevOptions
-  //         .sort()
-  //         .filter((option) => option !== "<<<< Add New Customer >>>>"),
-  //       newCustomerCompany ? `${newCustomer.company} - ${newCustomer.name}` : `None - ${newCustomer.name}`,
-  //     ]);
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError("Failed to add new customer");
-  //   }
-  // };
 
   const handleNewCustomerSubmit = async () => {
     try {
@@ -279,58 +254,85 @@ const MakeSales = ({
   };
 
   const handleNewProductSubmit = async () => {
+    if (!validateFields()) return; // Validate the input fields
     try {
-      const formattedProductName = newProductName.toLocaleLowerCase().trim();
+      console.log("newProduct", newProduct);
+
+      // Ensure the product name is properly formatted
+      const formattedProductName = newProduct.name.trim().toLowerCase();
+
+      // Send request to add product
       const data = await tableActions.addProduct({
+        ...newProduct,
         name: formattedProductName,
-        costPrice: newProductCostPrice,
-        salesPrice: newProductSalesPrice,
-        onHand: newProductOnhand,
         companyId,
       });
 
-      const newProduct = data.data;
+      if (!data || !data.data) throw new Error("Invalid response from server");
 
-      // Update product options using a functional state update
-      setProductOptions((prevOptions) => [
-        {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
-        },
-        {
-          name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
-        ...prevOptions
-          .sort()
-          .filter((option) => option.name !== "<<<< Add New Product >>>>"),
-      ]);
+      const addedProduct = data.data;
 
+      // Update product options properly
+      setProductOptions((prevOptions) => {
+        const filteredOptions = prevOptions.filter(
+          (option) => option.name !== "<<<< Add New Product >>>>"
+        );
+        return [
+          { id: 1, name: "<<<< Add New Product >>>>" },
+          ...filteredOptions,
+          {
+            name: capitalizeFirstLetter(addedProduct.name),
+            salesPrice: addedProduct.salesPrice || 0,
+            onhand: addedProduct.onhand || 0,
+          },
+        ].sort((a, b) => a.name.localeCompare(b.name));
+      });
+
+      // Update parent component's product list
       handleProductUpdate((prevOptions) => [
+        { id: 1, name: "<<<< Add New Product >>>>" },
         {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
+          name: capitalizeFirstLetter(addedProduct.name),
+          salesPrice: addedProduct.salesPrice || 0,
+          onhand: addedProduct.onhand || 0,
         },
-        {
-          name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
-        ...prevOptions
-          .sort()
-          .filter((option) => option.name !== "<<<< Add New Product >>>>"),
+        ...prevOptions.filter(
+          (option) => option.name !== "<<<< Add New Product >>>>"
+        ),
       ]);
 
-      setNewProductDialogOpen(false); // Close the dialog
-      setNewProductName(""); // Clear the input fields
-      setNewProductSalesPrice("");
-      setNewProductCostPrice("");
-      setNewProductOnhand("");
+      // Close dialog and reset form
+      setNewProductDialogOpen(false);
+      setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
-      console.log(error);
-      setError("Failed to add new product");
+      console.error(error);
+      setError(error.message || "Failed to add new product");
     }
+  };
+
+
+  // handle new product creation
+  // Handle input change for new product
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validateFields = () => {
+    let newErrors = {};
+    if (!newProduct.name.trim()) newErrors.name = "Product Name is required";
+    if (!newProduct.salesPrice || newProduct.salesPrice <= 0)
+      newErrors.salesPrice = "Sales Price must be a positive number";
+    if (!newProduct.costPrice || newProduct.costPrice <= 0)
+      newErrors.costPrice = "Cost Price must be a positive number";
+    if (!newProduct.onhand || newProduct.onhand < 0)
+      newErrors.onhand = "Available Quantity must be at least 0";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
   return (
@@ -736,12 +738,7 @@ const MakeSales = ({
           </Form>
         )}
       </Formik>
-      {error && (
-        // <Typography align="center" color="red">
-        //   {error}
-        // </Typography>
-        <ErrorAlert error={error} onClose={() => setError(null)} />
-      )}
+      {error && <ErrorAlert error={error} onClose={() => setError(null)} />}
       <Snackbar
         sx={{
           "& .MuiSnackbarContent-root": {
@@ -814,7 +811,9 @@ const MakeSales = ({
             fullWidth
             variant="standard"
             value={newCustomerCompany}
-            onChange={(e) => setNewCustomerCompany(e.target.value.toLowerCase())}
+            onChange={(e) =>
+              setNewCustomerCompany(e.target.value.toLowerCase())
+            }
           />
         </DialogContent>
         <DialogActions>
@@ -829,7 +828,7 @@ const MakeSales = ({
         </DialogActions>
       </Dialog>
 
-      {/* Dialog for adding new products */}
+      {/* Dialog for new products */}
       <Dialog
         open={newProductDialogOpen}
         onClose={() => setNewProductDialogOpen(false)}>
@@ -838,39 +837,60 @@ const MakeSales = ({
           <DialogContentText>
             Please enter the details of the new product.
           </DialogContentText>
+
           <TextField
             autoFocus
             margin="dense"
             label="Product Name"
+            name="name"
             fullWidth
-            value={newProductName}
-            onChange={(e) => setNewProductName(e.target.value)}
+            required
+            value={newProduct.name}
+            onChange={handleInputChange} // ✅ Use the same function
+            error={!!errors.name}
+            helperText={errors.name}
           />
+
           <TextField
             margin="dense"
             label="Sales Price"
             type="number"
+            name="salesPrice"
             fullWidth
-            value={newProductSalesPrice}
-            onChange={(e) => setNewProductSalesPrice(e.target.value)}
+            required
+            value={newProduct.salesPrice}
+            onChange={handleInputChange}
+            error={!!errors.salesPrice}
+            helperText={errors.salesPrice}
           />
+
           <TextField
             margin="dense"
             label="Cost Price"
             type="number"
+            name="costPrice"
             fullWidth
-            value={newProductCostPrice}
-            onChange={(e) => setNewProductCostPrice(e.target.value)}
+            required
+            value={newProduct.costPrice}
+            onChange={handleInputChange}
+            error={!!errors.costPrice}
+            helperText={errors.costPrice}
           />
+
           <TextField
             margin="dense"
             label="Available Quantity"
             type="number"
+            name="onhand"
             fullWidth
-            value={newProductOnhand}
-            onChange={(e) => setNewProductOnhand(e.target.value)}
+            required
+            value={newProduct.onhand}
+            onChange={handleInputChange}
+            error={!!errors.onhand}
+            helperText={errors.onhand}
           />
         </DialogContent>
+
         <DialogActions>
           <Button
             onClick={() => setNewProductDialogOpen(false)}

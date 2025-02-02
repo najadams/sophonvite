@@ -386,14 +386,14 @@ export const tableActions = {
     }
   },
 
-  addProduct: async ({ companyId, name, costPrice, salesPrice, onHand }) => {
+  addProduct: async ({ companyId, name, costPrice, salesPrice, onhand }) => {
     try {
       const product = await axios.post(`/api/product/`, {
         companyId,
         name,
-        costPrice: costPrice,
-        salesPrice: salesPrice,
-        onhand: onHand,
+        costPrice,
+        salesPrice,
+        onhand,
       });
       if (product.status === 201) {
         return product;
