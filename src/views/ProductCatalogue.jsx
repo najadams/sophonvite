@@ -54,20 +54,24 @@ export const allyProps = (index) => {
 
 const ProductCatalogue = () => {
   const [value, setValue] = React.useState(0);
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState([]);
   // const myFunc = (product) => console.log("from parent ", product)
   // myFunc()
+  const handleProductUpdate = (newProduct) => {
+    const newData = [...products,newProduct]
+    setProducts(newData);
+  };
   const companyId = useSelector((state) => state.companyState.data.id);
-  const {
-    isLoading,
-    isError,
-  } = useQuery(["api/products", companyId], () => fetchProducts(companyId),
+  const { isLoading, isError } = useQuery(
+    ["api/products", companyId],
+    () => fetchProducts(companyId),
     {
-    onSuccess: (data) => setProducts(data)
-  });
+      onSuccess: (data) => setProducts(data),
+    }
+  );
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValue(newValue)
   };
 
   if (isLoading) return <Loader />;
@@ -104,7 +108,11 @@ const ProductCatalogue = () => {
 
       <TabPanel value={value} index={0}>
         {products.length > 0 ? (
-          <TableCreater companyId={companyId} type={'products'} data={products} />
+          <TableCreater
+            companyId={companyId}
+            type={"products"}
+            data={products}
+          />
         ) : (
           <div className="content">
             <h2>Add Products to Get Started</h2>
@@ -112,7 +120,11 @@ const ProductCatalogue = () => {
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <ReceiveInventory Products={products} setProducts={setProducts} />
+        <ReceiveInventory
+          Products={products}
+          setProducts={setProducts}
+          handleProductUpdate={handleProductUpdate}
+        />
       </TabPanel>
       {/* <TabPanel value={value} index={2}>
         <AddItem>

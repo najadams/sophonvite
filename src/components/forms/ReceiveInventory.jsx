@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Field, FieldArray, Form } from "formik";
 import {
   Button,
@@ -16,7 +16,12 @@ import {
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
-import { capitalizeFirstLetter, tableActions, updateValuesAfterRestock } from "../../config/Functions";
+import {
+  capitalizeFirstLetter,
+  tableActions,
+  updateValuesAfterRestock,
+  validateFields,
+} from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useQuery } from "react-query";
@@ -37,11 +42,7 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const ReceiveInventory = ({
-  Products,
-  handleProductUpdate,
-  setProducts
-}) => {
+const ReceiveInventory = ({ Products, handleProductUpdate, setProducts }) => {
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -52,7 +53,7 @@ const ReceiveInventory = ({
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const matchesMobile = useMediaQuery("(max-width:600px)");
   const [loading, setLoading] = useState(false);
-  
+
   const [supplierOptions, setSupplierOptions] = useState([
     {
       id: 1,
@@ -69,22 +70,24 @@ const ReceiveInventory = ({
 
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newSupplierDialogOpen, setNewSupplierDialogOpen] = useState(false);
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
-  const [newProductCostPrice, setNewProductCostPrice] = useState("");
-  const [newProductOnhand, setNewProductOnhand] = useState("");
-
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    salesPrice: "",
+    costPrice: "",
+    onhand: "",
+  });
   const [newSupplierName, setNewSupplierName] = useState("");
   const [newSupplierCompany, setNewSupplierCompany] = useState("");
   const [newSupplierContact, setNewSupplierContact] = useState("");
-  
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = async (values, setSubmitting, resetForm) => {
-    console.log(values)
+    console.log(values);
     const total = values.products.reduce(
       (sum, product) => sum + product?.totalPrice,
       0
     );
-    values.total = total; 
+    values.total = total;
     const balance = values.total - values.amountPaid - values.discount;
 
     try {
@@ -93,12 +96,12 @@ const ReceiveInventory = ({
       } else {
         setLoading(true);
         setSubmitting(true);
-        await tableActions.restock(
-          { ...values, balance, workerId },
-          companyId,
+        await tableActions.restock({ ...values, balance, workerId }, companyId);
+        const newProductsData = updateValuesAfterRestock(
+          productOptions,
+          values
         );
-        const newProductsData = updateValuesAfterRestock(productOptions, values)
-        console.log(newProductsData)
+        console.log(newProductsData);
         // setProducts(newProductsData);
         setOpen(true);
         setTimeout(() => {
@@ -114,59 +117,65 @@ const ReceiveInventory = ({
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleNewProductSubmit = async () => {
     try {
-      setIsSubmittingProduct(true)
+      const noOnhand = false;
+      if (!validateFields(newProduct, setErrors, noOnhand)) return; // Validate the input fields
+      setIsSubmittingProduct(true);
+
+      // Ensure the product
+      // name is properly formatted
+      const formattedProductName = newProduct.name.trim().toLowerCase();
+      console.log("first", newProduct);
+
+      // Send request to add product
       const data = await tableActions.addProduct({
-        name: newProductName,
-        costPrice: newProductCostPrice,
-        salesPrice: newProductSalesPrice,
-        onHhand: newProductOnhand,
+        ...newProduct,
+        name: formattedProductName,
         companyId,
       });
+      console.log("coco");
 
-      const newProduct = data.data;
+      if (!data || !data.data) throw new Error(data);
 
-      // Update product options using a functional state update
-      setProductOptions((prevOptions) => [
-        {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
-        },
-        ...prevOptions.filter(
+      const addedProduct = data.data;
+
+      // Update product options properly
+      setProductOptions((prevOptions) => {
+        const filteredOptions = prevOptions.filter(
           (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
-        {
-          name: newProductName,
-          costPrice: parseFloat(newProductCostPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
-      ]);
+        );
+        return [
+          { id: 1, name: "<<<< Add New Product >>>>" },
+          ...filteredOptions,
+          {
+            name: capitalizeFirstLetter(addedProduct.name),
+            salesPrice: addedProduct.salesPrice || 0,
+            onhand: addedProduct.onhand || 0,
+          },
+        ].sort((a, b) => a.name.localeCompare(b.name));
+      });
 
-      handleProductUpdate((prevOptions) => [
-        {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
-        },
-        ...prevOptions.filter(
-          (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
-        {
-          name: newProductName,
-          costPrice: parseFloat(newProductCostPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
-      ]);
+      const update = {...newProduct, onhand: 0}
+      // Update parent component's product list
+      handleProductUpdate(newProduct);
 
-      setNewProductDialogOpen(false); // Close the dialog
-      setNewProductName(""); // Clear the input fields
-      setNewProductSalesPrice("");
-      setNewProductCostPrice("");
-      setNewProductOnhand("");
+      // Close dialog and reset form
+      setNewProductDialogOpen(false);
+      setIsSubmittingProduct(false);
+      setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
-      console.log(error);
-      setError("Failed to add new product");
+      setIsSubmittingProduct(false);
+      console.log("error from catch in submit product");
+      setError(error.message || "Failed to add new product");
     }
   };
   const handleNewSupplierSubmit = async () => {
@@ -178,10 +187,9 @@ const ReceiveInventory = ({
         companyName: newSupplierCompany,
         contact: newSupplierContact,
       });
-      
-      
+
       const newSupplier = data?.data; // Make sure data is as expected
-      
+
       // Update supplier options using a functional state update
       setSupplierOptions((prevOptions) => [
         "<<<< Add New Supplier >>>>",
@@ -190,43 +198,40 @@ const ReceiveInventory = ({
         ),
         newSupplierName,
       ]);
-      
+
       // Close the dialog
       setNewSupplierDialogOpen(false);
-      
+
       // Clear the input fields
       setNewSupplierName("");
       setNewSupplierCompany("");
       setNewSupplierContact("");
     } catch (error) {
-    setIsSubmittingSupplier(false);
-    console.log("Error adding supplier:", error);
-    setError("Failed to add new Supplier");
-  }
-};
+      setIsSubmittingSupplier(false);
+      console.log("Error adding supplier:", error);
+      setError("Failed to add new Supplier");
+    }
+  };
 
- const {
-   data: suppliers,
-   isLoading: isSuppliersLoading,
-   isError: isSuppliersError,
-   error: suppliersError, // Capture error
- } = useQuery(
-   ["suppliers", companyId],
-   () => tableActions.fetchSuppliersNames(companyId),
-   {
-     enabled: !!companyId,
-     onError: (error) => {
-       console.error("Error fetching suppliers:", error);
-     },
-   }
-   );
-  
+  const {
+    data: suppliers,
+    isLoading: isSuppliersLoading,
+    isError: isSuppliersError,
+    error: suppliersError, // Capture error
+  } = useQuery(
+    ["suppliers", companyId],
+    () => tableActions.fetchSuppliersNames(companyId),
+    {
+      enabled: !!companyId,
+      onError: (error) => {
+        console.error("Error fetching suppliers:", error);
+      },
+    }
+  );
+
   useEffect(() => {
     if (suppliers) {
-      setSupplierOptions([
-        "<<<< Add New Supplier >>>>",
-        ...suppliers
-      ]);
+      setSupplierOptions(["<<<< Add New Supplier >>>>", ...suppliers]);
     }
   }, [suppliers]);
 
@@ -246,11 +251,10 @@ const ReceiveInventory = ({
       </div>
       {error && (
         <Alert
-         className="alert"
-         variant="filled"
+          className="alert"
+          variant="filled"
           severity="error"
-          onClose={() => setError("")}
-        >
+          onClose={() => setError("")}>
           {error.toString()}
         </Alert>
       )}
@@ -585,7 +589,7 @@ const ReceiveInventory = ({
             </div>
           </Form>
         )}
-      </Formik> 
+      </Formik>
       {/* Dialog for adding new products */}
       <Dialog
         open={newProductDialogOpen}
@@ -594,38 +598,69 @@ const ReceiveInventory = ({
         <DialogContent>
           <DialogContentText>
             Please enter the details of the new product.
-          </DialogContentText>  
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Product Name"
-            fullWidth
-            value={newProductName}
-            onChange={(e) => setNewProductName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Cost Price"
-            fullWidth
-            type="number"
-            value={newProductCostPrice}
-            onChange={(e) => setNewProductCostPrice(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Sales Price"
-            fullWidth
-            value={newProductSalesPrice}
-            type="number"
-            onChange={(e) => setNewProductSalesPrice(e.target.value)}
-          />
-          {/* <TextField
-            margin="dense"
-            label="Available Quantity"
-            fullWidth
-            value={newProductOnhand}
-            onChange={(e) => setNewProductOnhand(e.target.value)}
-          /> */}
+          </DialogContentText>
+          <Dialog
+            open={newProductDialogOpen}
+            onClose={() => setNewProductDialogOpen(false)}>
+            <DialogTitle>Add New Product</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter the details of the new product.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Product Name"
+                name="name"
+                fullWidth
+                required
+                value={newProduct.name}
+                onChange={handleInputChange} // ✅ Use the same function
+                error={!!errors.name}
+                helperText={errors.name}
+              />
+
+              <TextField
+                margin="dense"
+                label="Sales Price"
+                type="number"
+                name="salesPrice"
+                fullWidth
+                required
+                value={newProduct.salesPrice}
+                onChange={handleInputChange}
+                error={!!errors.salesPrice}
+                helperText={errors.salesPrice}
+              />
+
+              <TextField
+                margin="dense"
+                label="Cost Price"
+                type="number"
+                name="costPrice"
+                fullWidth
+                required
+                value={newProduct.costPrice}
+                onChange={handleInputChange}
+                error={!!errors.costPrice}
+                helperText={errors.costPrice}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setNewProductDialogOpen(false)}
+                color="primary">
+                Cancel
+              </Button>
+              {!isSubmittingProduct ? (
+                <Button onClick={handleNewProductSubmit} color="primary">
+                  Add Product
+                </Button>
+              ) : (
+                <CircularProgress />
+              )}
+            </DialogActions>
+          </Dialog>
         </DialogContent>
         <DialogActions>
           <Button
@@ -633,11 +668,12 @@ const ReceiveInventory = ({
             color="primary">
             Cancel
           </Button>
-          {!isSubmittingProduct ?
-            (<Button onClick={handleNewProductSubmit} color="primary">
-            Add Product
-            </Button>) : (
-              <CircularProgress />
+          {!isSubmittingProduct ? (
+            <Button onClick={handleNewProductSubmit} color="primary">
+              Add Product
+            </Button>
+          ) : (
+            <CircularProgress />
           )}
         </DialogActions>
       </Dialog>

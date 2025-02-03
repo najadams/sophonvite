@@ -21,6 +21,7 @@ import {
   tableActions,
   updateOnhandAfterSale,
 } from "../../config/Functions";
+import { validateFields } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
@@ -97,12 +98,13 @@ const MakeSales = ({
   const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerCompany, setNewCustomerCompany] = useState("");
-const [newProduct, setNewProduct] = useState({
-  name: "",
-  salesPrice: "",
-  costPrice: "",
-  onhand: "",
-});  const getInitialValues = () => {
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    salesPrice: "",
+    costPrice: "",
+    onhand: "",
+  });
+  const getInitialValues = () => {
     // Default empty form values
     return {
       customerName: "",
@@ -141,143 +143,6 @@ const [newProduct, setNewProduct] = useState({
     setDetailErrors(detailErrors);
     return detailErrors; // Return the error object
   };
-
-
-
-  // const handleSubmit = async (values, setSubmitting, resetForm) => {
-  //   const total = values.products.reduce(
-  //     (sum, product) => sum + product?.totalPrice,
-  //     0
-  //   );
-  //   values.total = total; // Maintain total before discount
-  //   const balance = values.total - values.amountPaid - values.discount;
-
-  //   try {
-  //     const errors = validateReceiptDetail(values);
-  //     if (Object.keys(errors).length > 0) {
-  //       setError("Please correct the errors before submitting.");
-  //       throw new Error("Validation error");
-  //     }
-  //     if (!values.customerName) {
-  //       setError("Customer Name should not be empty");
-  //     } else if (!values.amountPaid) {
-  //       setError("Amount Paid should not be empty!");
-  //     } else {
-  //       setLoading(true);
-  //       setSubmitting(true);
-
-  //       // Call the API to add receipt and check for debt
-  //       const results = await tableActions.addReceipt(
-  //         { ...values, balance },
-  //         companyId,
-  //         workerId,
-  //         checkDebt
-  //       );
-
-  //       // Check if debt exists in the response
-  //       if (results.existingDebt) {
-  //         setOwesDebt(true);
-  //         setModalMessage(
-  //           `Customer has existing debt of ${results.existingDebt.amount}.`
-  //         );
-  //         setOpen(true); // Open modal to show debt information
-  //       } else {
-  //         setModalMessage("Receipt added successfully!");
-  //         setOpen(true);
-  //       }
-
-  //       // Update inventory onhand after sale
-  //       const newData = updateOnhandAfterSale(productOptions, values);
-  //       setProductOptions(newData);
-
-  //       // Store values for printing if applicable
-  //       if (print) {
-  //         setPrintValues({ ...values, balance });
-  //       }
-  //       // Reset form after a short delay
-  //       setTimeout(() => {
-  //         resetForm();
-  //       }, 1000);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError(error.message || "An error occurred");
-  //   } finally {
-  //     setSubmitting(false);
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleSubmit = async (values, setSubmitting, resetForm) => {
-  //   const total = values.products.reduce(
-  //     (sum, product) => sum + (product?.totalPrice || 0),
-  //     0
-  //   );
-  //   values.total = total; // Maintain total before discount
-  //   const balance = values.total - values.amountPaid - values.discount;
-
-  //   try {
-  //     const errors = validateReceiptDetail(values);
-  //     if (errors) {
-  //       console.log(errors)
-  //       setError(detailError.name || detailError.quantity || detailError.price);
-  //       return; // Stop execution if validation fails
-  //     }
-
-  //     if (!values.customerName) {
-  //       setError("Customer Name should not be empty");
-  //       return;
-  //     }
-
-  //     if (!values.amountPaid) {
-  //       setError("Amount Paid should not be empty!");
-  //       return;
-  //     }
-
-  //     setLoading(true);
-  //     setSubmitting(true);
-
-  //     // Call the API to add receipt and check for debt
-  //     const results = await tableActions.addReceipt(
-  //       { ...values, balance },
-  //       companyId,
-  //       workerId,
-  //       checkDebt
-  //     );
-
-  //     // Check if debt exists in the response
-  //     if (results.existingDebt) {
-  //       setOwesDebt(true);
-  //       setModalMessage(
-  //         `Customer has existing debt of ${results.existingDebt.amount}.`
-  //       );
-  //       setOpen(true); // Open modal to show debt information
-  //     } else {
-  //       setModalMessage("Receipt added successfully!");
-  //       setOpen(true);
-  //     }
-
-  //     // Update inventory onhand after sale
-  //     const newData = updateOnhandAfterSale(productOptions, values);
-  //     setProductOptions(newData);
-
-  //     // Store values for printing if applicable
-  //     if (print) {
-  //       setPrintValues({ ...values, balance });
-  //     }
-
-  //     // Reset form after a short delay
-  //     setTimeout(() => {
-  //       resetForm();
-  //     }, 1000);
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError(error.message || "An error occurred");
-  //   } finally {
-  //     setSubmitting(false);
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     // Calculate total price
@@ -449,7 +314,7 @@ const [newProduct, setNewProduct] = useState({
 
   const handleNewProductSubmit = async () => {
     try {
-      if (!validateFields()) return; // Validate the input fields
+      if (!validateFields(newProduct, setErrors)) return; // Validate the input fields
       setSubmittingForm(true);
       // Ensure the product 
       // name is properly formatted
@@ -514,20 +379,6 @@ const [newProduct, setNewProduct] = useState({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const validateFields = () => {
-    let newErrors = {};
-    if (!newProduct.name.trim()) newErrors.name = "Product Name is required";
-    if (!newProduct.salesPrice || newProduct.salesPrice <= 0)
-      newErrors.salesPrice = "Sales Price must be a positive number";
-    if (!newProduct.costPrice || newProduct.costPrice <= 0)
-      newErrors.costPrice = "Cost Price must be a positive number";
-    if (!newProduct.onhand || newProduct.onhand < 0)
-      newErrors.onhand = "Available Quantity must be at least 0";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
   return (

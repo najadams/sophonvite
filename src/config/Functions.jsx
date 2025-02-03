@@ -1,5 +1,5 @@
 import axios from "./index";
-export  const formatNumber = (num) => new Intl.NumberFormat().format(num);
+export const formatNumber = (num) => new Intl.NumberFormat().format(num);
 const processDailyData = (receipts) => {
   // First, aggregate the data with full precision
   const dailyData = receipts.reduce((acc, receipt) => {
@@ -79,7 +79,20 @@ const formatDataForChart = (processedData) => {
     profit: processedData.profitData[index],
   }));
 };
-  
+
+export const validateFields = (newProduct, setErrors, noOnhand = true) => {
+  let newErrors = {};
+  if (!newProduct.name.trim()) newErrors.name = "Product Name is required";
+  if (!newProduct.salesPrice || newProduct.salesPrice <= 0)
+    newErrors.salesPrice = "Sales Price must be a positive number";
+  if (!newProduct.costPrice || newProduct.costPrice <= 0)
+    newErrors.costPrice = "Cost Price must be a positive number";
+  if ((!newProduct.onhand || newProduct.onhand < 0) && noOnhand)
+    newErrors.onhand = "Available Quantity must be at least 0";
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0; // Return true if no errors
+};
 const calculateTopProfitableProducts = (receipts) => {
   // Create a map to store product profits
   const productProfits = {};
@@ -161,7 +174,6 @@ const calculateTopCustomers = (receipts) => {
   }));
 };
 
-
 const calculateTopPurchasedProducts = (receipts) => {
   // Accumulate the total quantity and profit of each product across all receipts
   const productCounts = receipts.reduce((acc, receipt) => {
@@ -221,7 +233,7 @@ export const tableActions = {
         index: index + 1,
         company: item.company ? item.company : "None",
         name: item.name,
-        phone: item.phone ?  item.phone : "+233____",
+        phone: item.phone ? item.phone : "+233____",
         // email: item.email,
       }));
       return data;
@@ -255,7 +267,7 @@ export const tableActions = {
       // const page = response.page
       return data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new Error("Failed to fetch products");
     }
   },
@@ -276,7 +288,7 @@ export const tableActions = {
 
   updateCustomer: async ({ id, name, phone, email, address, company }) => {
     try {
-      console.log(id)
+      console.log(id);
       const customer = await axios.patch(`/api/customer/${id}`, {
         id,
         name,
@@ -295,7 +307,7 @@ export const tableActions = {
   },
   updateCompanyData: async ({ companyId, ...details }) => {
     try {
-      // empty fileds in the settings forms do not change the prev values 
+      // empty fileds in the settings forms do not change the prev values
       // Prepare the payload by filtering out empty values
       const updateFields = {};
       for (const [key, value] of Object.entries(details)) {
@@ -322,27 +334,26 @@ export const tableActions = {
     }
   },
 
- 
-  addCustomer : async ({ companyId, name, phone, email, address, company }) => {
-  try {
-    const response = await axios.post(`/api/customer/`, {
-      belongsTo: companyId,
-      name,
-      phone,
-      email,
-      address,
-      company,
-    });
+  addCustomer: async ({ companyId, name, phone, email, address, company }) => {
+    try {
+      const response = await axios.post(`/api/customer/`, {
+        belongsTo: companyId,
+        name,
+        phone,
+        email,
+        address,
+        company,
+      });
 
-    if (response.status === 201) {
-      return response.data;
+      if (response.status === 201) {
+        return response.data;
+      }
+    } catch (error) {
+      // Check if it's a known error response from our API
+      console.log(error.response.data.message);
+      return error.response.data.message; // Throw the specific error message
     }
-  } catch (error) {
-    // Check if it's a known error response from our API
-    console.log(error.response.data.message);
-    return(error.response.data.message); // Throw the specific error message
-  }
-},
+  },
 
   updateProduct: async ({ id, name, costPrice, salesPrice, onHand }) => {
     try {
@@ -378,14 +389,7 @@ export const tableActions = {
       return error.response?.data?.message || "An error occurred";
     }
   },
-  addWorker: async ({
-    companyId,
-    name,
-    username,
-    contact,
-    password,
-    role
-  }) => {
+  addWorker: async ({ companyId, name, username, contact, password, role }) => {
     try {
       const smallName = name.toLowerCase();
       const response = await axios.post(`/api/worker/`, {
@@ -394,7 +398,7 @@ export const tableActions = {
         username,
         contact,
         password,
-        role
+        role,
       });
 
       if (response.status === 201) {
@@ -435,26 +439,26 @@ export const tableActions = {
   },
   updateReceipt: async (receiptId, values, companyId, workerId) => {
     try {
-    const response = await axios.patch(
-      `/api/receipt/${receiptId}`, // Ensure this endpoint is correct
-      {
-        ...values, // Include the updated values
-        companyId, // Add company ID to the request
-        workerId, // Add worker ID to the request
-      }
-    );
+      const response = await axios.patch(
+        `/api/receipt/${receiptId}`, // Ensure this endpoint is correct
+        {
+          ...values, // Include the updated values
+          companyId, // Add company ID to the request
+          workerId, // Add worker ID to the request
+        }
+      );
 
-    if (response.status === 200) {
-      console.log("Receipt updated successfully");
-      return response.data;
-    } else {
-      console.error("Failed to update the receipt");
+      if (response.status === 200) {
+        console.log("Receipt updated successfully");
+        return response.data;
+      } else {
+        console.error("Failed to update the receipt");
+      }
+    } catch (error) {
+      console.error("Failed to update the receipt:", error.message);
+      throw error;
     }
-  } catch (error) {
-    console.error("Failed to update the receipt:", error.message);
-    throw error;
-  }
-},
+  },
   addVendor: async (values, companyId) => {
     try {
       const response = await axios.post("/api/vendor/", {
@@ -611,41 +615,42 @@ export const tableActions = {
       throw new Error(error.response?.data?.message || "An error occurred");
     }
   },
-  fetchSalesData : async (companyId) => {
-  try {
-    const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
-    const receipts = receiptsResponse.data;
-    
-    const { labels, salesData, profitData } = processDailyData(receipts);
-    const { topProductsByProfit, topProductsByQuantity } = calculateTopPurchasedProducts(receipts);
-    
-    // Add new analytics
-    const topProfitableProducts = calculateTopProfitableProducts(receipts);
-    const topCustomers = calculateTopCustomers(receipts);
-    
-    const sales = labels.map((label, index) => ({
-      month: label,
-      totalSales: salesData[index],
-    }));
-    
-    const profit = labels.map((label, index) => ({
-      month: label,
-      totalProfit: profitData[index],
-    }));
+  fetchSalesData: async (companyId) => {
+    try {
+      const receiptsResponse = await axios.get(`/api/overall/${companyId}`);
+      const receipts = receiptsResponse.data;
 
-    return {
-      sales,
-      profit,
-      topProductsByQuantity,
-      topProductsByProfit,
-      topProfitableProducts,
-      topCustomers
-    };
-  } catch (error) {
-    console.error("Error fetching sales data", error);
-    throw new Error("Failed to fetch sales data");
-  }
-},
+      const { labels, salesData, profitData } = processDailyData(receipts);
+      const { topProductsByProfit, topProductsByQuantity } =
+        calculateTopPurchasedProducts(receipts);
+
+      // Add new analytics
+      const topProfitableProducts = calculateTopProfitableProducts(receipts);
+      const topCustomers = calculateTopCustomers(receipts);
+
+      const sales = labels.map((label, index) => ({
+        month: label,
+        totalSales: salesData[index],
+      }));
+
+      const profit = labels.map((label, index) => ({
+        month: label,
+        totalProfit: profitData[index],
+      }));
+
+      return {
+        sales,
+        profit,
+        topProductsByQuantity,
+        topProductsByProfit,
+        topProfitableProducts,
+        topCustomers,
+      };
+    } catch (error) {
+      console.error("Error fetching sales data", error);
+      throw new Error("Failed to fetch sales data");
+    }
+  },
 };
 
 export const capitalizeFirstLetter = (str) => {
@@ -659,50 +664,55 @@ export const capitalizeFirstLetter = (str) => {
 };
 
 export const serverAid = {
-  calculateTopPurchasedProducts : (receipts) => {
-  // Accumulate the total quantity and profit of each product across all receipts
-  const productCounts = receipts.reduce((acc, receipt) => {
-    receipt.detail.forEach((item) => {
-      if (!acc[item.name]) {
-        acc[item.name] = { quantity: 0, profit: 0 };
-      }
-      const quantity = Math.abs(item.quantity);
-      acc[item.name].quantity += quantity;
-      acc[item.name].profit += Math.abs((item.salesPrice - item.costPrice) * quantity);
-    });
-    return acc;
-  }, {});
+  calculateTopPurchasedProducts: (receipts) => {
+    // Accumulate the total quantity and profit of each product across all receipts
+    const productCounts = receipts.reduce((acc, receipt) => {
+      receipt.detail.forEach((item) => {
+        if (!acc[item.name]) {
+          acc[item.name] = { quantity: 0, profit: 0 };
+        }
+        const quantity = Math.abs(item.quantity);
+        acc[item.name].quantity += quantity;
+        acc[item.name].profit += Math.abs(
+          (item.salesPrice - item.costPrice) * quantity
+        );
+      });
+      return acc;
+    }, {});
 
-  // Convert the productCounts object to an array of [name, { quantity, profit }] pairs
-  // and sort the array in descending order based on quantity and profit
-  const sortedProductsQuantityBased = Object.entries(productCounts)
-    .sort((a, b) => b[1].quantity - a[1].quantity)
-    .slice(0, 10);
+    // Convert the productCounts object to an array of [name, { quantity, profit }] pairs
+    // and sort the array in descending order based on quantity and profit
+    const sortedProductsQuantityBased = Object.entries(productCounts)
+      .sort((a, b) => b[1].quantity - a[1].quantity)
+      .slice(0, 10);
 
-  const sortedProductsProfitBased = Object.entries(productCounts)
-    .sort((a, b) => b[1].profit - a[1].profit)
-    .slice(0, 10);
+    const sortedProductsProfitBased = Object.entries(productCounts)
+      .sort((a, b) => b[1].profit - a[1].profit)
+      .slice(0, 10);
 
-  // Convert the sorted arrays back to an array of objects with name, quantity, and profit
-  const topProductsByQuantity = sortedProductsQuantityBased.map(([name, { quantity, profit }]) => ({
-    name,
-    quantity,
-    profit,
-  }));
+    // Convert the sorted arrays back to an array of objects with name, quantity, and profit
+    const topProductsByQuantity = sortedProductsQuantityBased.map(
+      ([name, { quantity, profit }]) => ({
+        name,
+        quantity,
+        profit,
+      })
+    );
 
-  const topProductsByProfit = sortedProductsProfitBased.map(([name, { quantity, profit }]) => ({
-    name,
-    quantity,
-    profit,
-  }));
+    const topProductsByProfit = sortedProductsProfitBased.map(
+      ([name, { quantity, profit }]) => ({
+        name,
+        quantity,
+        profit,
+      })
+    );
 
-  // Return both sorted data
-  return {
-    topProductsByQuantity,
-    topProductsByProfit
-  };
-},
-
+    // Return both sorted data
+    return {
+      topProductsByQuantity,
+      topProductsByProfit,
+    };
+  },
 };
 
 export const updateAccount = async (data) => {
@@ -754,45 +764,46 @@ export const getNextDayDate = () => {
   return nextDay.toISOString().split("T")[0];
 };
 
-export const updateOnhandAfterSale = (productOptions, values, allowBelowZero = true) => {
-  values.products.forEach(soldItem => {
+export const updateOnhandAfterSale = (
+  productOptions,
+  values,
+  allowBelowZero = true
+) => {
+  values.products.forEach((soldItem) => {
     const productToUpdate = productOptions.find(
-      product => product.name === soldItem.name
+      (product) => product.name === soldItem.name
     );
     if (productToUpdate) {
-      productToUpdate.onhand -= soldItem.quantity
+      productToUpdate.onhand -= soldItem.quantity;
     }
 
     // if (productToUpdate.onhand < 0 && allowBelowZero) {
     //   productToUpdate.onhand = 0;
     // }
   });
-  return productOptions
-}
+  return productOptions;
+};
 export const updateValuesAfterRestock = (products, values) => {
-  values.products.forEach(receivedItem => {
+  values.products.forEach((receivedItem) => {
     const productToUpdate = products.find(
-      product => product.name === receivedItem.name
+      (product) => product.name === receivedItem.name
     );
     if (productToUpdate) {
-      productToUpdate.onHand += receivedItem.quantity
-      productToUpdate.costPrice = receivedItem.costPrice
-      productToUpdate.salesPrice = receivedItem.salesPrice
+      productToUpdate.onHand += receivedItem.quantity;
+      productToUpdate.costPrice = receivedItem.costPrice;
+      productToUpdate.salesPrice = receivedItem.salesPrice;
     }
-
   });
-  return products
-}
+  return products;
+};
 export const updateValuesAfterEdit = (Data, values) => {
-    const productToUpdate = Data.find(
-      product => product.id === values._id
-    );
-    console.log(productToUpdate)
+  const productToUpdate = Data.find((product) => product.id === values._id);
+  console.log(productToUpdate);
   if (productToUpdate) {
-      productToUpdate.name = values.name
-      productToUpdate.costPrice = values.costPrice
-      productToUpdate.salesPrice = values.salesPrice
-    }
+    productToUpdate.name = values.name;
+    productToUpdate.costPrice = values.costPrice;
+    productToUpdate.salesPrice = values.salesPrice;
+  }
 
-  return Data
-}
+  return Data;
+};
