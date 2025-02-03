@@ -25,7 +25,7 @@ import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import { useLocation } from "react-router-dom";
-
+import Loader from "../common/Loader";
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
   products: Yup.array().of(
@@ -197,12 +197,13 @@ const [newProduct, setNewProduct] = useState({
       // Validate API response
       if (!response || typeof response !== "object") {
         setError(response)
+        setSubmittingForm(false)
         return;
       }
 
-      if (!response.name) {
-        throw new Error("Customer name is missing in server response");
-      }
+      // if (!response.name) {
+      //   throw new Error("Customer name is missing in server response");
+      // }
 
       // Format the display name only after confirming we have valid data
       let displayName;
@@ -239,7 +240,7 @@ const [newProduct, setNewProduct] = useState({
         });
 
         // Reset form and close dialog
-        setSubmittingForm(false)
+        setSubmittingForm(false);
         setNewCustomerDialogOpen(false);
         setNewCustomerName("");
         setNewCustomerCompany("");
@@ -250,6 +251,7 @@ const [newProduct, setNewProduct] = useState({
         throw new Error("Failed to format customer name");
       }
     } catch (error) {
+      setSubmittingForm(false);
       if (error.response) {
         console.log("error part")
         setError(error.response.message || "Failed to add new customer");
@@ -263,8 +265,8 @@ const [newProduct, setNewProduct] = useState({
   };
 
   const handleNewProductSubmit = async () => {
-    if (!validateFields()) return; // Validate the input fields
     try {
+      if (!validateFields()) return; // Validate the input fields
       setSubmittingForm(true);
       // Ensure the product 
       // name is properly formatted
@@ -311,8 +313,11 @@ const [newProduct, setNewProduct] = useState({
       ]);
 
       // Close dialog and reset form
-      setNewProductDialogOpen(false);
-      setSubmittingForm(false);
+      setTimeout(() => {
+        setNewProductDialogOpen(false);
+        setSubmittingForm(false);
+        
+      }, 5000);
       setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
       setSubmittingForm(false)
@@ -792,40 +797,57 @@ const [newProduct, setNewProduct] = useState({
         <DialogTitle id="new-customer-dialog-title">
           {"Add New Customer"}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="new-customer-dialog-description">
-            Enter the name of the new customer:
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="new-customer-name"
-            label="Customer Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={newCustomerName}
-            onChange={(e) => setNewCustomerName(e.target.value.toLowerCase())}
-          />
-          </DialogContent>
-        <DialogContent>
-          <DialogContentText id="new-customer-dialog-description">
-            Enter Company Name:
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="new-customer-company"
-            label="Company Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={newCustomerCompany}
-            onChange={(e) =>
-              setNewCustomerCompany(e.target.value.toLowerCase())
-            }
-          />
-        </DialogContent>
+        {submittingForm ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              width: 316,
+              height: 400,
+            }}>
+            <Loader type={3} />
+          </div>
+        ) : (
+          <>
+            <DialogContent>
+              <DialogContentText id="new-customer-dialog-description">
+                Enter the name of the new customer:
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="new-customer-name"
+                label="Customer Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={newCustomerName}
+                onChange={(e) =>
+                  setNewCustomerName(e.target.value.toLowerCase())
+                }
+              />
+            </DialogContent>
+            <DialogContent>
+              <DialogContentText id="new-customer-dialog-description">
+                Enter Company Name:
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="new-customer-company"
+                label="Company Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={newCustomerCompany}
+                onChange={(e) =>
+                  setNewCustomerCompany(e.target.value.toLowerCase())
+                }
+              />
+            </DialogContent>
+          </>
+        )}
         <DialogActions>
           <Button
             onClick={() => setNewCustomerDialogOpen(false)}
@@ -845,63 +867,76 @@ const [newProduct, setNewProduct] = useState({
         open={newProductDialogOpen}
         onClose={() => setNewProductDialogOpen(false)}>
         <DialogTitle>Add New Product</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the details of the new product.
-          </DialogContentText>
+        {submittingForm ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              width: 600,
+              height: 316,
+            }}>
+            <Loader type={3} />
+          </div>
+        ) : (
+          <DialogContent>
+            <DialogContentText>
+              Please enter the details of the new product.
+            </DialogContentText>
 
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Product Name"
-            name="name"
-            fullWidth
-            required
-            value={newProduct.name}
-            onChange={handleInputChange} // ✅ Use the same function
-            error={!!errors.name}
-            helperText={errors.name}
-          />
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Product Name"
+              name="name"
+              fullWidth
+              required
+              value={newProduct.name}
+              onChange={handleInputChange} // ✅ Use the same function
+              error={!!errors.name}
+              helperText={errors.name}
+            />
 
-          <TextField
-            margin="dense"
-            label="Sales Price"
-            type="number"
-            name="salesPrice"
-            fullWidth
-            required
-            value={newProduct.salesPrice}
-            onChange={handleInputChange}
-            error={!!errors.salesPrice}
-            helperText={errors.salesPrice}
-          />
+            <TextField
+              margin="dense"
+              label="Sales Price"
+              type="number"
+              name="salesPrice"
+              fullWidth
+              required
+              value={newProduct.salesPrice}
+              onChange={handleInputChange}
+              error={!!errors.salesPrice}
+              helperText={errors.salesPrice}
+            />
 
-          <TextField
-            margin="dense"
-            label="Cost Price"
-            type="number"
-            name="costPrice"
-            fullWidth
-            required
-            value={newProduct.costPrice}
-            onChange={handleInputChange}
-            error={!!errors.costPrice}
-            helperText={errors.costPrice}
-          />
+            <TextField
+              margin="dense"
+              label="Cost Price"
+              type="number"
+              name="costPrice"
+              fullWidth
+              required
+              value={newProduct.costPrice}
+              onChange={handleInputChange}
+              error={!!errors.costPrice}
+              helperText={errors.costPrice}
+            />
 
-          <TextField
-            margin="dense"
-            label="Available Quantity"
-            type="number"
-            name="onhand"
-            fullWidth
-            required
-            value={newProduct.onhand}
-            onChange={handleInputChange}
-            error={!!errors.onhand}
-            helperText={errors.onhand}
-          />
-        </DialogContent>
+            <TextField
+              margin="dense"
+              label="Available Quantity"
+              type="number"
+              name="onhand"
+              fullWidth
+              required
+              value={newProduct.onhand}
+              onChange={handleInputChange}
+              error={!!errors.onhand}
+              helperText={errors.onhand}
+            />
+          </DialogContent>
+        )}
 
         <DialogActions>
           <Button

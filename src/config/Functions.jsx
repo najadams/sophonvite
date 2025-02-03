@@ -255,6 +255,7 @@ export const tableActions = {
       // const page = response.page
       return data;
     } catch (error) {
+      console.log(error)
       throw new Error("Failed to fetch products");
     }
   },
@@ -321,25 +322,7 @@ export const tableActions = {
     }
   },
 
-  // addCustomer: async ({ companyId, name, phone, email, address, company }) => {
-  //   try {
-  //     const response = await axios.post(`/api/customer/`, {
-  //       belongsTo: companyId,
-  //       name,
-  //       phone,
-  //       email,
-  //       address,
-  //       company,
-  //     });
-  //     if (response.status === 201) {
-  //       return response.data; // Return the customer data
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     return error.response?.data?.message || "An error occurred";
-  //   }
-  // },
-
+ 
   addCustomer : async ({ companyId, name, phone, email, address, company }) => {
   try {
     const response = await axios.post(`/api/customer/`, {
@@ -357,14 +340,7 @@ export const tableActions = {
   } catch (error) {
     // Check if it's a known error response from our API
     console.log(error.response.data.message);
-    if (error.response && error.response.status === 400) {
-      const errorMessage = error.response.data.message;
-      throw new Error(errorMessage); // Throw the specific error message
-    }
-
-    // For other types of errors
-    console.error('Customer addition error:', error);
-    throw new Error('Failed to add customer. Please try again.');
+    return(error.response.data.message); // Throw the specific error message
   }
 },
 
@@ -399,7 +375,6 @@ export const tableActions = {
         return product;
       }
     } catch (error) {
-      console.log(error);
       return error.response?.data?.message || "An error occurred";
     }
   },
