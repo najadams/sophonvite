@@ -28,22 +28,22 @@ import { useLocation } from "react-router-dom";
 import Loader from "../common/Loader";
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
-  products: Yup.array().of(
-    Yup.object().shape({
-      name: Yup.string().required("Product name is required"),
-      quantity: Yup.number().required("Quantity is required"),
-      // .test(
-      //   "is-valid-fraction",
-      //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
-      //   (value) => {
-      //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
-      //     return true;
-      //   }
-      // )
-      // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
-      price: Yup.number().required("Price is required"),
-    })
-  ),
+  // products: Yup.array().of(
+  //   Yup.object().shape({
+  //     name: Yup.string().required("Product name is required"),
+  //     quantity: Yup.number().required("Quantity is required"),
+  //     // .test(
+  //     //   "is-valid-fraction",
+  //     //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
+  //     //   (value) => {
+  //     //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
+  //     //     return true;
+  //     //   }
+  //     // )
+  //     // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
+  //     price: Yup.number().required("Price is required"),
+  //   })
+  // ),
   total: Yup.number().required(),
   amountPaid: Yup.number().required("Amount Paid should not be empty"),
   discount: Yup.number().min(0, "Discount cannot be negative"),
@@ -64,6 +64,7 @@ const MakeSales = ({
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
   const [errors, setErrors] = useState({});
+  const [detailError, setDetailErrors] = useState({});
   const [owesDebt, setOwesDebt] = useState(false);
   const [open, setOpen] = useState(false);
   const [print, setPrint] = useState(false);
@@ -110,58 +111,162 @@ const [newProduct, setNewProduct] = useState({
       amountPaid: "",
       discount: 0,
     };
+};
+  
+  const validateReceiptDetail = (values) => {
+    let detailErrors = {};
+
+    console.log(values.products);
+    const details = values.products;
+
+    if (details) {
+      details.forEach((detail, index) => {
+        console.log(detail.name, detail.quantity, detail.price);
+
+        if (!detail.product) {
+          detailErrors[`products.${index}.product`] =
+            "Product name is required";
+        }
+        if (!detail.quantity) {
+          detailErrors[`products.${index}.quantity`] = "Quantity is required";
+        }
+        if (!detail.price) {
+          detailErrors[`products.${index}.price`] = "Price is required";
+        }
+      });
+    }
+
+    setDetailErrors(detailErrors);
+    return detailErrors; // Return the error object
   };
+
+
+
+  // const handleSubmit = async (values, setSubmitting, resetForm) => {
+  //   const total = values.products.reduce(
+  //     (sum, product) => sum + product?.totalPrice,
+  //     0
+  //   );
+  //   values.total = total; // Maintain total before discount
+  //   const balance = values.total - values.amountPaid - values.discount;
+
+  //   try {
+  //     const errors = validateReceiptDetail(values);
+  //     if (Object.keys(errors).length > 0) {
+  //       setError("Please correct the errors before submitting.");
+  //       throw new Error("Validation error");
+  //     }
+  //     if (!values.customerName) {
+  //       setError("Customer Name should not be empty");
+  //     } else if (!values.amountPaid) {
+  //       setError("Amount Paid should not be empty!");
+  //     } else {
+  //       setLoading(true);
+  //       setSubmitting(true);
+
+  //       // Call the API to add receipt and check for debt
+  //       const results = await tableActions.addReceipt(
+  //         { ...values, balance },
+  //         companyId,
+  //         workerId,
+  //         checkDebt
+  //       );
+
+  //       // Check if debt exists in the response
+  //       if (results.existingDebt) {
+  //         setOwesDebt(true);
+  //         setModalMessage(
+  //           `Customer has existing debt of ${results.existingDebt.amount}.`
+  //         );
+  //         setOpen(true); // Open modal to show debt information
+  //       } else {
+  //         setModalMessage("Receipt added successfully!");
+  //         setOpen(true);
+  //       }
+
+  //       // Update inventory onhand after sale
+  //       const newData = updateOnhandAfterSale(productOptions, values);
+  //       setProductOptions(newData);
+
+  //       // Store values for printing if applicable
+  //       if (print) {
+  //         setPrintValues({ ...values, balance });
+  //       }
+  //       // Reset form after a short delay
+  //       setTimeout(() => {
+  //         resetForm();
+  //       }, 1000);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError(error.message || "An error occurred");
+  //   } finally {
+  //     setSubmitting(false);
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
     const total = values.products.reduce(
-      (sum, product) => sum + product?.totalPrice,
+      (sum, product) => sum + (product?.totalPrice || 0),
       0
     );
     values.total = total; // Maintain total before discount
     const balance = values.total - values.amountPaid - values.discount;
 
     try {
+      const errors = validateReceiptDetail(values);
+      if (Object.keys(errors).length > 0) {
+        setError("Please correct the errors before submitting.");
+        return; // Stop execution if validation fails
+      }
+
       if (!values.customerName) {
         setError("Customer Name should not be empty");
-      } else if (!values.amountPaid) {
-        setError("Amount Paid should not be empty!");
-      } else {
-        setLoading(true);
-        setSubmitting(true);
-
-        // Call the API to add receipt and check for debt
-        const results = await tableActions.addReceipt(
-          { ...values, balance },
-          companyId,
-          workerId,
-          checkDebt
-        );
-
-        // Check if debt exists in the response
-        if (results.existingDebt) {
-          setOwesDebt(true);
-          setModalMessage(
-            `Customer has existing debt of ${results.existingDebt.amount}.`
-          );
-          setOpen(true); // Open modal to show debt information
-        } else {
-          setModalMessage("Receipt added successfully!");
-          setOpen(true);
-        }
-
-        // Update inventory onhand after sale
-        const newData = updateOnhandAfterSale(productOptions, values);
-        setProductOptions(newData);
-
-        // Store values for printing if applicable
-        if (print) {
-          setPrintValues({ ...values, balance });
-        }
-        // Reset form after a short delay
-        setTimeout(() => {
-          resetForm();
-        }, 1000);
+        return;
       }
+
+      if (!values.amountPaid) {
+        setError("Amount Paid should not be empty!");
+        return;
+      }
+
+      setLoading(true);
+      setSubmitting(true);
+
+      // Call the API to add receipt and check for debt
+      const results = await tableActions.addReceipt(
+        { ...values, balance },
+        companyId,
+        workerId,
+        checkDebt
+      );
+
+      // Check if debt exists in the response
+      if (results.existingDebt) {
+        setOwesDebt(true);
+        setModalMessage(
+          `Customer has existing debt of ${results.existingDebt.amount}.`
+        );
+        setOpen(true); // Open modal to show debt information
+      } else {
+        setModalMessage("Receipt added successfully!");
+        setOpen(true);
+      }
+
+      // Update inventory onhand after sale
+      const newData = updateOnhandAfterSale(productOptions, values);
+      setProductOptions(newData);
+
+      // Store values for printing if applicable
+      if (print) {
+        setPrintValues({ ...values, balance });
+      }
+
+      // Reset form after a short delay
+      setTimeout(() => {
+        resetForm();
+      }, 1000);
     } catch (error) {
       console.log(error);
       setError(error.message || "An error occurred");
@@ -473,29 +578,16 @@ const [newProduct, setNewProduct] = useState({
                               minWidth: 150,
                             }}
                             as={TextField}
+                            error={
+                              !!detailError?.[`products.${index}.quantity`]
+                            }
+                            helperText={
+                              detailError?.[`products.${index}.quantity`] || ""
+                            }
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number" // Use "number" to ensure numeric keyboard on mobile
                             step="any" // Allow for decimal values
-                            // validate={(value) => {
-                            //   const selectedProduct = productOptions.find(
-                            //     (p) => p.name === product.name
-                            //   );
-
-                            //   const numericValue = parseFloat(value);
-
-                            //   // Ensure the quantity is at least 0.25 (or 1/4)
-                            //   if (numericValue < 0.25) {
-                            //     return "Quantity must be at least 1/4";
-                            //   }
-
-                            //   // Optional: Validate against available stock
-                            //   if (numericValue > selectedProduct?.onhand) {
-                            //     return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
-                            //   }
-
-                            //   return undefined;
-                            // }}
                             onChange={(event) => {
                               const value = event.target.value;
                               const newQuantity = parseFloat(value);
@@ -532,7 +624,6 @@ const [newProduct, setNewProduct] = useState({
                             }}
                             onBlur={(event) => {
                               const value = parseFloat(event.target.value);
-
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
