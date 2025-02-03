@@ -801,7 +801,7 @@ const [newProduct, setNewProduct] = useState({
               justifyContent: "center",
               alignContent: "center",
               width: 316,
-              height: 400,
+              height: 300,
             }}>
             <Loader type={3} />
           </div>
@@ -843,20 +843,20 @@ const [newProduct, setNewProduct] = useState({
                 }
               />
             </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setNewCustomerDialogOpen(false)}
+                color="primary">
+                Cancel
+              </Button>
+              {newCustomerName && (
+                <Button onClick={handleNewCustomerSubmit} color="primary">
+                  Add
+                </Button>
+              )}
+            </DialogActions>
           </>
         )}
-        <DialogActions>
-          <Button
-            onClick={() => setNewCustomerDialogOpen(false)}
-            color="primary">
-            Cancel
-          </Button>
-          {newCustomerName && (
-            <Button onClick={handleNewCustomerSubmit} color="primary">
-              Add
-            </Button>
-          )}
-        </DialogActions>
       </Dialog>
 
       {/* Dialog for new products */}
@@ -876,75 +876,76 @@ const [newProduct, setNewProduct] = useState({
             <Loader type={3} />
           </div>
         ) : (
-          <DialogContent>
-            <DialogContentText>
-              Please enter the details of the new product.
-            </DialogContentText>
+          <>
+            <DialogContent>
+              <DialogContentText>
+                Please enter the details of the new product.
+              </DialogContentText>
 
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Product Name"
-              name="name"
-              fullWidth
-              required
-              value={newProduct.name}
-              onChange={handleInputChange} // ✅ Use the same function
-              error={!!errors.name}
-              helperText={errors.name}
-            />
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Product Name"
+                name="name"
+                fullWidth
+                required
+                value={newProduct.name}
+                onChange={handleInputChange} // ✅ Use the same function
+                error={!!errors.name}
+                helperText={errors.name}
+              />
 
-            <TextField
-              margin="dense"
-              label="Sales Price"
-              type="number"
-              name="salesPrice"
-              fullWidth
-              required
-              value={newProduct.salesPrice}
-              onChange={handleInputChange}
-              error={!!errors.salesPrice}
-              helperText={errors.salesPrice}
-            />
+              <TextField
+                margin="dense"
+                label="Sales Price"
+                type="number"
+                name="salesPrice"
+                fullWidth
+                required
+                value={newProduct.salesPrice}
+                onChange={handleInputChange}
+                error={!!errors.salesPrice}
+                helperText={errors.salesPrice}
+              />
 
-            <TextField
-              margin="dense"
-              label="Cost Price"
-              type="number"
-              name="costPrice"
-              fullWidth
-              required
-              value={newProduct.costPrice}
-              onChange={handleInputChange}
-              error={!!errors.costPrice}
-              helperText={errors.costPrice}
-            />
+              <TextField
+                margin="dense"
+                label="Cost Price"
+                type="number"
+                name="costPrice"
+                fullWidth
+                required
+                value={newProduct.costPrice}
+                onChange={handleInputChange}
+                error={!!errors.costPrice}
+                helperText={errors.costPrice}
+              />
 
-            <TextField
-              margin="dense"
-              label="Available Quantity"
-              type="number"
-              name="onhand"
-              fullWidth
-              required
-              value={newProduct.onhand}
-              onChange={handleInputChange}
-              error={!!errors.onhand}
-              helperText={errors.onhand}
-            />
-          </DialogContent>
+              <TextField
+                margin="dense"
+                label="Available Quantity"
+                type="number"
+                name="onhand"
+                fullWidth
+                required
+                value={newProduct.onhand}
+                onChange={handleInputChange}
+                error={!!errors.onhand}
+                helperText={errors.onhand}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setNewProductDialogOpen(false)}
+                color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleNewProductSubmit} color="primary">
+                Add Product
+              </Button>
+            </DialogActions>
+          </>
         )}
-
-        <DialogActions>
-          <Button
-            onClick={() => setNewProductDialogOpen(false)}
-            color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleNewProductSubmit} color="primary">
-            Add Product
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Receipt Template for printing */}
