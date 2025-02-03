@@ -123,15 +123,17 @@ const [newProduct, setNewProduct] = useState({
       details.forEach((detail, index) => {
         console.log(detail.name, detail.quantity, detail.price);
 
-        if (!detail.product) {
+        if (!detail.name) {
           detailErrors[`products.${index}.product`] =
-            "Product name is required";
+            `Product ${index+1}'s name is required`;
         }
         if (!detail.quantity) {
-          detailErrors[`products.${index}.quantity`] = "Quantity is required";
+          detailErrors[`products.${index}.quantity`] = `Product ${index+1}'s quantity is required`;
         }
         if (!detail.price) {
-          detailErrors[`products.${index}.price`] = "Price is required";
+          detailErrors[`products.${index}.price`] = `Product ${
+            index + 1
+          }'s price is required`;;
         }
       });
     }
@@ -206,7 +208,79 @@ const [newProduct, setNewProduct] = useState({
   //   }
   // };
 
+  // const handleSubmit = async (values, setSubmitting, resetForm) => {
+  //   const total = values.products.reduce(
+  //     (sum, product) => sum + (product?.totalPrice || 0),
+  //     0
+  //   );
+  //   values.total = total; // Maintain total before discount
+  //   const balance = values.total - values.amountPaid - values.discount;
+
+  //   try {
+  //     const errors = validateReceiptDetail(values);
+  //     if (errors) {
+  //       console.log(errors)
+  //       setError(detailError.name || detailError.quantity || detailError.price);
+  //       return; // Stop execution if validation fails
+  //     }
+
+  //     if (!values.customerName) {
+  //       setError("Customer Name should not be empty");
+  //       return;
+  //     }
+
+  //     if (!values.amountPaid) {
+  //       setError("Amount Paid should not be empty!");
+  //       return;
+  //     }
+
+  //     setLoading(true);
+  //     setSubmitting(true);
+
+  //     // Call the API to add receipt and check for debt
+  //     const results = await tableActions.addReceipt(
+  //       { ...values, balance },
+  //       companyId,
+  //       workerId,
+  //       checkDebt
+  //     );
+
+  //     // Check if debt exists in the response
+  //     if (results.existingDebt) {
+  //       setOwesDebt(true);
+  //       setModalMessage(
+  //         `Customer has existing debt of ${results.existingDebt.amount}.`
+  //       );
+  //       setOpen(true); // Open modal to show debt information
+  //     } else {
+  //       setModalMessage("Receipt added successfully!");
+  //       setOpen(true);
+  //     }
+
+  //     // Update inventory onhand after sale
+  //     const newData = updateOnhandAfterSale(productOptions, values);
+  //     setProductOptions(newData);
+
+  //     // Store values for printing if applicable
+  //     if (print) {
+  //       setPrintValues({ ...values, balance });
+  //     }
+
+  //     // Reset form after a short delay
+  //     setTimeout(() => {
+  //       resetForm();
+  //     }, 1000);
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError(error.message || "An error occurred");
+  //   } finally {
+  //     setSubmitting(false);
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (values, setSubmitting, resetForm) => {
+    // Calculate total price
     const total = values.products.reduce(
       (sum, product) => sum + (product?.totalPrice || 0),
       0
@@ -215,18 +289,22 @@ const [newProduct, setNewProduct] = useState({
     const balance = values.total - values.amountPaid - values.discount;
 
     try {
+      // Validate product details
       const errors = validateReceiptDetail(values);
       if (Object.keys(errors).length > 0) {
-        setError("Please correct the errors before submitting.");
+        console.log(errors);
+        setError("Please fill in all required fields correctly.");
         return; // Stop execution if validation fails
       }
 
-      if (!values.customerName) {
+      // Validate customer name
+      if (!values.customerName?.trim()) {
         setError("Customer Name should not be empty");
         return;
       }
 
-      if (!values.amountPaid) {
+      // Validate amount paid
+      if (values.amountPaid === undefined || values.amountPaid === "") {
         setError("Amount Paid should not be empty!");
         return;
       }
@@ -234,7 +312,7 @@ const [newProduct, setNewProduct] = useState({
       setLoading(true);
       setSubmitting(true);
 
-      // Call the API to add receipt and check for debt
+      // Call API to add receipt and check for debt
       const results = await tableActions.addReceipt(
         { ...values, balance },
         companyId,
@@ -242,13 +320,13 @@ const [newProduct, setNewProduct] = useState({
         checkDebt
       );
 
-      // Check if debt exists in the response
+      // Handle existing debt scenario
       if (results.existingDebt) {
         setOwesDebt(true);
         setModalMessage(
-          `Customer has existing debt of ${results.existingDebt.amount}.`
+          `Customer has an existing debt of ${results.existingDebt.amount}.`
         );
-        setOpen(true); // Open modal to show debt information
+        setOpen(true);
       } else {
         setModalMessage("Receipt added successfully!");
         setOpen(true);
@@ -258,7 +336,7 @@ const [newProduct, setNewProduct] = useState({
       const newData = updateOnhandAfterSale(productOptions, values);
       setProductOptions(newData);
 
-      // Store values for printing if applicable
+      // Store values for printing, if applicable
       if (print) {
         setPrintValues({ ...values, balance });
       }
@@ -563,6 +641,16 @@ const [newProduct, setNewProduct] = useState({
                                     {...params}
                                     label="Product Name"
                                     fullWidth
+                                    error={
+                                      !!detailError?.[
+                                        `products.${index}.product`
+                                      ]
+                                    }
+                                    helperText={
+                                      detailError?.[
+                                        `products.${index}.product`
+                                      ] || ""
+                                    }
                                   />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
@@ -642,7 +730,7 @@ const [newProduct, setNewProduct] = useState({
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          <Field name={`products.${index}.price`}>
+                          {/* <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <TextField
                                 {...field}
@@ -672,8 +760,40 @@ const [newProduct, setNewProduct] = useState({
                                 }}
                               />
                             )}
+                          </Field> */}
+                          <Field name={`products.${index}.price`}>
+                            {({ field }) => (
+                              <TextField
+                                {...field}
+                                label="Price"
+                                type="number"
+                                style={{ minWidth: 150 }}
+                                fullWidth
+                                error={
+                                  !!detailError?.[`products.${index}.price`]
+                                }
+                                helperText={
+                                  detailError?.[`products.${index}.price`] || ""
+                                }
+                                onChange={(event) => {
+                                  const newPrice = parseFloat(
+                                    event.target.value
+                                  );
+                                  setFieldValue(
+                                    `products.${index}.price`,
+                                    newPrice
+                                  );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
+                                  setFieldValue(
+                                    `products.${index}.totalPrice`,
+                                    Math.ceil(newTotalPrice)
+                                  );
+                                  validateReceiptDetail(values);
+                                }}
+                              />
+                            )}
                           </Field>
-
                           <Field name={`products.${index}.totalPrice`}>
                             {({ field }) => (
                               <Input
