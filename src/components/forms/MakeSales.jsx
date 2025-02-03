@@ -313,11 +313,8 @@ const [newProduct, setNewProduct] = useState({
       ]);
 
       // Close dialog and reset form
-      setTimeout(() => {
-        setNewProductDialogOpen(false);
-        setSubmittingForm(false);
-        
-      }, 5000);
+      setNewProductDialogOpen(false);
+      setSubmittingForm(false);
       setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
       setSubmittingForm(false)
