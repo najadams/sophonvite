@@ -262,7 +262,7 @@ export const tableActions = {
         name: item.name,
         costPrice: item.costPrice,
         salesPrice: item.salesPrice,
-        onHand: item.onhand,
+        onhand: item.onhand,
       }));
       // const page = response.page
       return data;
@@ -355,14 +355,14 @@ export const tableActions = {
     }
   },
 
-  updateProduct: async ({ id, name, costPrice, salesPrice, onHand }) => {
+  updateProduct: async ({ id, name, costPrice, salesPrice, onhand }) => {
     try {
       const product = await axios.patch(`/api/product/${id}`, {
         id,
         name,
         costPrice: costPrice,
         salesPrice: salesPrice,
-        onhand: onHand,
+        onhand: onhand,
       });
       if (product.status === 200) {
         return null;
@@ -789,7 +789,7 @@ export const updateValuesAfterRestock = (products, values) => {
       (product) => product.name === receivedItem.name
     );
     if (productToUpdate) {
-      productToUpdate.onHand += receivedItem.quantity;
+      productToUpdate.onhand += receivedItem.quantity;
       productToUpdate.costPrice = receivedItem.costPrice;
       productToUpdate.salesPrice = receivedItem.salesPrice;
     }

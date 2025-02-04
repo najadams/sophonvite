@@ -18,7 +18,7 @@ const fetchProducts = async (companyId) => {
       name: item.name,
       costPrice: item.costPrice,
       salesPrice: item.salesPrice,
-      onHand: item.onhand,
+      onhand: item.onhand,
     }));
     return data;
   } catch (error) {
@@ -58,7 +58,7 @@ const ProductCatalogue = () => {
   // const myFunc = (product) => console.log("from parent ", product)
   // myFunc()
   const handleProductUpdate = (newProduct) => {
-    const newData = [...products,newProduct]
+    const newData = [...products, newProduct];
     setProducts(newData);
   };
   const companyId = useSelector((state) => state.companyState.data.id);
@@ -71,7 +71,7 @@ const ProductCatalogue = () => {
   );
 
   const handleChange = (event, newValue) => {
-    setValue(newValue)
+    setValue(newValue);
   };
 
   if (isLoading) return <Loader />;

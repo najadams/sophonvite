@@ -54,7 +54,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
     "<<<< Add New Customer >>>>",
     ...customers,
   ]);
-  useEffect(() => console.log(customers) , [])
+  useEffect(() => console.log(customers), []);
 
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -240,7 +240,7 @@ const SalesOrderForms = ({ customers, Products, handleClose }) => {
                                 (p) => p.name === product.name
                               );
                               if (value > selectedProduct?.onhand) {
-                                return `Quantity cannot exceed available stock (${selectedProduct?.onHand})`;
+                                return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
                               }
                             }}
                             onChange={(event) => {
