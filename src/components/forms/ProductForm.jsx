@@ -14,7 +14,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
   costPrice: Yup.number().required("Required"),
   salesPrice: Yup.number().required("Required"),
-  onHand: Yup.number().required("Required"),
+  onhand: Yup.number().required("Required"),
 });
 
 const ProductForm = ({ data, editMutation }) => {
@@ -34,7 +34,7 @@ const ProductForm = ({ data, editMutation }) => {
             name: "",
             costPrice: "",
             salesPrice: "",
-            onHand: "",
+            onhand: "",
           }
         }
         validationSchema={validationSchema}
@@ -106,8 +106,8 @@ const ProductForm = ({ data, editMutation }) => {
            <Field
               component={TextField}
               type="number"
-              label="onHand"
-              name="onHand"
+              label="onhand"
+              name="onhand"
               //disabled={data}
             />
             <br />
