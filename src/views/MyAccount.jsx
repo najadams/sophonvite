@@ -26,9 +26,8 @@ const StyledField = styled(Field)({
 
 const Privileges = ({ user }) => {
   const userRole = user.role;
-  const userPermissions = rolePermissions[userRole];
+  const userPermissions = rolePermissions[userRole] || [];
 
-  // Function to chunk the permissions array into pairs
   const chunkArray = (array, size) => {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
@@ -66,21 +65,112 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
   username: Yup.string().required("Required"),
   role: Yup.string().required("Required"),
-  contact: Yup.number().required("Required").typeError("Must be a number"),
+  contact: Yup.string(),
   email: Yup.string().email("Invalid email"),
   password: Yup.string(),
 });
-
-const disapbleRole = (user) => {
-  return user.role !== undefined;
-};
 
 const MyAccount = () => {
   const user = useSelector((state) => state.userState.currentUser);
   const userId = user._id;
   const dispatch = useDispatch();
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
- console.log(user.password)
+
+  // const handleSubmit = async (values, { setSubmitting }) => {
+  //   try {
+  //     const processedValues = {
+  //       ...values,
+  //       name: values.name.trim().toLowerCase(),
+  //       username: values.username.trim().toLowerCase(),
+  //       email: values.email.trim().toLowerCase(),
+  //       contact: values.contact.trim(),
+  //       role: values.role.trim().toLowerCase(),
+  //     };
+
+  //     if (values.password && values.password.trim() !== "") {
+  //       processedValues.password = await bcrypt.hash(values.password, 10);
+  //     } else {
+  //       delete processedValues.password; // Ensure it's not included in the update
+  //     }
+
+  //     const submissionData = { userId, ...processedValues };
+  //     await updateAccount(submissionData);
+  //     dispatch(
+  //       ActionCreators.setCurrentUser({
+  //         _id: userId,
+  //         ...processedValues,
+  //       })
+  //     );
+
+  //     setAlert({
+  //       show: true,
+  //       message: "Account updated successfully!",
+  //       type: "success",
+  //     });
+
+  //     console.log(submissionData);
+  //   } catch (error) {
+  //     setAlert({
+  //       show: true,
+  //       message: "Error updating account.",
+  //       type: "error",
+  //     });
+  //     console.error(error);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+
+      console.log(user)
+      // Process only changed values while keeping existing ones
+      const processedValues = {
+        name: values.name?.trim()?.toLowerCase() || user.name,
+        username:
+          values.username?.trim()?.toLowerCase() || user.username,
+        email: values.email?.trim()?.toLowerCase() || user.email,
+        contact: values.contact?.trim() || user.contact,
+        role: values.role?.trim()?.toLowerCase() || user.role,
+      };
+
+      // Only hash and update password if it's provided
+      if (values.password && values.password.trim() !== "") {
+        processedValues.password = await bcrypt.hash(values.password, 10);
+      }
+
+      const submissionData = { userId, ...processedValues };
+      await updateAccount(submissionData);
+
+      // Merge with the existing user data and update Redux state
+      dispatch(
+        ActionCreators.setCurrentUser({
+          _id: userId,
+          ...user, // Preserve unchanged fields
+          ...processedValues, // Update only changed fields
+        })
+      );
+
+      setAlert({
+        show: true,
+        message: "Account updated successfully!",
+        type: "success",
+      });
+
+      console.log(submissionData);
+    } catch (error) {
+      setAlert({
+        show: true,
+        message: "Error updating account.",
+        type: "error",
+      });
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="page">
       <Container maxWidth="md">
@@ -97,44 +187,8 @@ const MyAccount = () => {
             password: "",
           }}
           validationSchema={validationSchema}
-          onSubmit={async (values, { setSubmitting }) => {
-            setSubmitting(true);
-            const hashpassword = await bcrypt.hash(values.password, 10);
-            const processedValues = {
-              ...values,
-              name: values.name.trim().toLowerCase(),
-              username: values.username.trim().toLowerCase(),
-              email: values.email.trim().toLowerCase(),
-              contact: values.contact.trim(),
-              role: values.role.trim().toLowerCase(),
-              password: hashpassword,
-            };
-
-            try {
-              const submissionData = { userId, ...processedValues };
-              await updateAccount(submissionData);
-              dispatch(
-                ActionCreators.setCurrentUser({
-                  _id: userId,
-                  ...processedValues,
-                })
-              );
-              setAlert({
-                show: true,
-                message: "Account updated successfully!",
-                type: "success",
-              });
-              console.log(submissionData);
-            } catch (error) {
-              setAlert({
-                show: true,
-                message: "Error updating account.",
-                type: "error",
-              });
-              console.log(error);
-            }
-            setSubmitting(false);
-          }}>
+          onSubmit={handleSubmit} // ✅ Corrected Formik submission
+        >
           {({
             values,
             handleChange,
@@ -195,7 +249,7 @@ const MyAccount = () => {
                   }}
                   isOptionEqualToValue={(option, value) => option === value}
                   disableClearable
-                  disabled={disapbleRole(user)}
+                  disabled={!!user.role} // ✅ Prevent role change if already set
                 />
                 <StyledField
                   as={TextField}
@@ -225,7 +279,6 @@ const MyAccount = () => {
                   value={values.contact}
                   onChange={handleChange}
                 />
-
                 <Privileges user={user} />
               </Box>
 
@@ -240,7 +293,7 @@ const MyAccount = () => {
               {isSubmitting && <LinearProgress />}
               <Box mt={3}>
                 <Button
-                  type="submit"
+                  type="submit" // ✅ Corrected to allow Formik to handle submission
                   variant="contained"
                   color="primary"
                   disabled={isSubmitting}
