@@ -299,7 +299,7 @@ const Debt = () => {
                 <UsersCard
                   key={debt.id}
                   main={`₵${debt.amount}`}
-                  sub={debt.customerCompany || debt.customerName}
+                  sub={debt.customerCompany !== 'NoCompany' ? debt.customerCompany : debt.customerName}
                   contact={debt.contact}
                   onClick={() => handleCardClick(debt)}
                   additionalInfo={`Debt Date: ${new Date(
@@ -312,7 +312,7 @@ const Debt = () => {
                   top={new Date(debt.date).toLocaleDateString()}
                   main={`₵${debt.amount}`}
                   sub={
-                    debt.customerCompany
+                    debt.customerCompany !== 'NoCompany'
                       ? debt.customerCompany
                       : debt.customerName
                   }
