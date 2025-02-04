@@ -11,7 +11,7 @@ const SummaryReport = ({ data }) => {
   const totalCash = totalCashReceived?.cash + totalCashReceived?.momo;
 
   return (
-    <div className="content" >
+    <div className="content">
       <Typography variant="h4" gutterBottom>
         Summary Report
       </Typography>
@@ -32,7 +32,7 @@ const SummaryReport = ({ data }) => {
               Total Sales
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(sales.totalSales)}
+              ₵{formatNumber(sales.totalSales)}
             </Typography>
           </Card>
         </Grid>
@@ -51,7 +51,7 @@ const SummaryReport = ({ data }) => {
               Total Debt Payments
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(debtPayments.totalPaid)}
+              ₵{formatNumber(debtPayments.totalPaid)}
             </Typography>
           </Card>
         </Grid>
@@ -70,7 +70,7 @@ const SummaryReport = ({ data }) => {
               Debts Acquired
             </Typography>
             <Typography variant="h4" fontWeight="bold">
-              ${formatNumber(debtsAcquired.totalDebts)}
+              ₵{formatNumber(debtsAcquired.totalDebts)}
             </Typography>
           </Card>
         </Grid>
@@ -91,7 +91,7 @@ const SummaryReport = ({ data }) => {
             <Typography variant="h4" fontWeight="bold">
               {/* Momo: ${formatNumber(totalCashReceived.momo)} <br />
               Cash: ${formatNumber(totalCashReceived.cash)} */}
-              {formatNumber(totalCash)}
+              ₵{formatNumber(totalCash)}
             </Typography>
           </Card>
         </Grid>
@@ -106,15 +106,15 @@ const SummaryReport = ({ data }) => {
         <Grid item xs={12} sm={6}>
           <Typography variant="body1">
             <strong>Sales Breakdown:</strong> <br />
-            Momo: ${formatNumber(sales.momo)} <br />
-            Cash: ${formatNumber(sales.cash)}
+            Momo: ₵{formatNumber(sales.momo)} <br />
+            Cash: ₵{formatNumber(sales.cash)}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Typography variant="body1">
             <strong>Debt Payments Breakdown:</strong> <br />
-            Momo: ${formatNumber(debtPayments.momo)} <br />
-            Cash: ${formatNumber(debtPayments.cash)}
+            Momo: ₵{formatNumber(debtPayments.momo)} <br />
+            Cash: ₵{formatNumber(debtPayments.cash)}
           </Typography>
         </Grid>
       </Grid>
