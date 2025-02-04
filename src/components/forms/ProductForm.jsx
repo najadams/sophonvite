@@ -39,6 +39,7 @@ const ProductForm = ({ data, editMutation }) => {
         }
         validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting }) => {
+          setError(null);
           setSubmitting(true);
           try {
             let error;
