@@ -6,10 +6,13 @@ import { formatNumber } from "../../config/Functions";
 const SummaryReport = ({ data }) => {
   const {
     totalCashReceived,
+    totalCashReceivedAmount,
     summary: { sales, debtPayments, debtsAcquired },
   } = data;
-  const totalCash = totalCashReceived?.cash + totalCashReceived?.momo;
+  // const totalCash = totalCashReceived?.cash + totalCashReceived?.momo;
+  const totalCash = totalCashReceivedAmount
 
+// 
   return (
     <div className="content">
       <Typography variant="h4" gutterBottom>
