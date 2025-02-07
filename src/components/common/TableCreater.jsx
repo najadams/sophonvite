@@ -62,46 +62,6 @@ const TableCreater = ({ companyId, data, type }) => {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("mymd"));
   const dispatch = useDispatch();
 
-// const fetchData = useCallback(async () => {
-//   try {
-//     let transformRecord = (record) => ({
-//       ...record,
-//       phone: Array.isArray(record.phone) ? record.phone[0] : record.phone,
-//       email: Array.isArray(record.email) ? record.email[0] : record.email,
-//     });
-
-//     let fetchedData;
-
-//     if (data) {
-//       // If data already exists, just transform it
-//       fetchedData = transformRecord(data);
-//     } else {
-//       // Fetch new data based on type
-//       if (type === "customers") {
-//         console.log(first)
-//         const raw = await tableActions.fetchCustomers(companyId);
-//         fetchedData = transformRecord(raw);
-//       } else if (type === "products") {
-//         fetchedData = await tableActions.fetchProducts(companyId);
-//       }
-
-//       // Transform fetched data if it's an array
-//       if (Array.isArray(fetchedData)) {
-//         fetchedData = fetchedData.map(transformRecord);
-//       }
-//     }
-
-//     // Set headers based on first record if we have an array
-//     if (Array.isArray(fetchedData) && fetchedData.length > 0) {
-//       setHeaders(Object.keys(fetchedData[0]).filter((key) => key !== "id"));
-//     }
-
-//     setData(fetchedData);
-//   } catch (error) {
-//     console.error("Failed to fetch data:", error);
-//   }
-// }, [companyId, type, data]);
-
   const fetchData = useCallback(async () => {
     try {
       let fetchedData;
@@ -134,8 +94,6 @@ const TableCreater = ({ companyId, data, type }) => {
       console.error("Failed to fetch data:", error);
     }
   }, [companyId, type, data]);
-
-  useEffect(() => { console.log(fetchedData) }, [fetchData]);
 
   const deleteRowConfirmed = () => {
     if (type === "products") {
