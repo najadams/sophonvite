@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import { Tooltip, Menu, MenuItem } from "@mui/material";
@@ -22,6 +22,8 @@ import { capitalizeFirstLetter } from "../../config/Functions";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import axios from "../../config/index";
 import { formatNumber } from "../../config/Functions";
+import { useSelector } from "react-redux";
+import React from "react";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -53,7 +55,9 @@ function Row({ row, onFlagChange, setValue }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
+  const companyId = useSelector((state) => state.companyState.data.id);
 
+  
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
   };
@@ -85,6 +89,7 @@ function Row({ row, onFlagChange, setValue }) {
     try {
       await axios.patch(`/api/receipts/${row._id}/flag`, {
         flagged: updatedFlag,
+        companyId
       });
       onFlagChange(row._id, updatedFlag);
     } catch (error) {
