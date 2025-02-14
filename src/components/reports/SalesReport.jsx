@@ -180,7 +180,7 @@ const SalesTable = ({ salesTransactions = [] }) => {
                 {new Date(transaction.date).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {capitalizeFirstLetter(transaction.customerName)}
+                {capitalizeFirstLetter(`${transaction.customerName} - ${transaction.customerCompany}`)}
               </TableCell>
               <TableCell align="right">
                 {capitalizeFirstLetter(transaction.workerName)}
