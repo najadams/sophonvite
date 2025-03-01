@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import { useLocation, useNavigate } from "react-router-dom";
+import { set } from "date-fns";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
@@ -269,6 +270,9 @@ const MakeSales = () => {
         setError(response);
         setSubmittingForm(false);
         return;
+      } else {
+        setCustomerError("");
+        setNewCustomerDialogOpen(false);
       }
 
       // if (!response.name) {
@@ -298,15 +302,6 @@ const MakeSales = () => {
             displayName,
             ...filteredOptions,
           ].sort((data) => data.name);
-        });
-
-        // Update parent component's customer list
-        handleCustomerUpdate((prevOptions) => {
-          const filteredOptions = prevOptions.filter(
-            (option) =>
-              option !== "<<<< Add New Customer >>>>" && option !== displayName
-          );
-          return [...filteredOptions, displayName].sort();
         });
 
         // Reset form and close dialog
