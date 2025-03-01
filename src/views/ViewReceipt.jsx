@@ -16,6 +16,7 @@ const ViewReceipt = () => {
 
   const {
     customerName,
+     customerCompany,
     detail,
     amountPaid,
     total,
@@ -83,7 +84,7 @@ const secondaryColor = "#004D40"; // Darker shade for contrast
               Customer:
             </Typography>
             <Typography variant="body1">
-              {capitalizeFirstLetter(customerName)}
+              {capitalizeFirstLetter(customerName)} - {capitalizeFirstLetter(customerCompany)} 
             </Typography>
           </Grid>
           <Grid item xs={6} sm={4} md={4}>
