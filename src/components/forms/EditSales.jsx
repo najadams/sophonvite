@@ -12,6 +12,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { Navigate } from "react-router-dom";
+import Loader from "../common/Loader";
+import ErrorAlert from "../../utils/Error";
 import { Autocomplete } from "@mui/material";
 import { Input } from "@mui/material";
 import * as Yup from "yup";
@@ -31,15 +34,6 @@ const validationSchema = Yup.object().shape({
     Yup.object().shape({
       name: Yup.string().required("Product name is required"),
       quantity: Yup.number().required("Quantity is required"),
-      // .test(
-      //   "is-valid-fraction",
-      //   "Quantity must be a valid number or fraction (e.g., 1/2, 1/4)",
-      //   (value) => {
-      //     if (value < 0.1) return false; // Ensure at least 1/4 (0.25) as the minimum
-      //     return true;
-      //   }
-      // )
-      // .min(0.1, "Quantity must be at least 1/10"), // Allow for fractional quantities like 1/4 (0.25)
       price: Yup.number().required("Price is required"),
     })
   ),
@@ -48,13 +42,18 @@ const validationSchema = Yup.object().shape({
   discount: Yup.number().min(0, "Discount cannot be negative"),
 });
 
-const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
+const MakeSales = () => {
+  const navigate = useNavigate();
+  const checkDebt = true;
   const location = useLocation();
   const { row } = location.state || {};
   const worker = useSelector((state) => state.userState.currentUser);
   const workerId = worker._id;
   const companyId = useSelector((state) => state.companyState.data.id);
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [detailError, setDetailErrors] = useState({});
+  const [owesDebt, setOwesDebt] = useState(false);
   const [open, setOpen] = useState(false);
   const [print, setPrint] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -64,18 +63,43 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
   const printRef = useRef();
   const [printValues, setPrintValues] = useState(null);
   const today = new Date().toLocaleDateString();
-  const navigate = useNavigate();
-
-  const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
-  const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
-  const [newCustomerName, setNewCustomerName] = useState("");
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductSalesPrice, setNewProductSalesPrice] = useState("");
-  const [newProductCostPrice, setNewProductCostPrice] = useState("");
-  const [newProductOnhand, setNewProductOnhand] = useState("");
+  const [customerError, setCustomerError] = useState("");
+  const [submittingForm, setSubmittingForm] = useState(false);
   const [customerOptions, setCustomerOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
+  const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false);
+  const [newProductDialogOpen, setNewProductDialogOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      const response = await tableActions.fetchCustomersNames(companyId);
+      setCustomerOptions(["<<<< Add New Customer >>>>", ...response]);
+    };
+    fetchCustomers();
+  }, [companyId]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await tableActions.fetchProductNames(companyId);
+      setProductOptions([
+        {
+          id: 1,
+          name: "<<<< Add New Product >>>>",
+        },
+        ...response,
+      ]);
+    };
+    fetchProducts();
+  }, [companyId]);
+
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerCompany, setNewCustomerCompany] = useState("");
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    salesPrice: "",
+    costPrice: "",
+    onhand: "",
+  });
   const getInitialValues = () => {
     if (row) {
       // Populate the form with existing data when editing
@@ -120,65 +144,97 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
     }
   };
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      const response = await tableActions.fetchCustomersNames(companyId);
-      setCustomerOptions(["<<<< Add New Customer >>>>", ...response]);
-    };
-    fetchCustomers();
-  }, [companyId]);
+  const validateReceiptDetail = (values) => {
+    let detailErrors = {};
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await tableActions.fetchProductNames(companyId);
-      setProductOptions([
-        {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
-        },
-        ...response,
-      ]);
-    };
-    fetchProducts();
-  }, [companyId]);
+    console.log(values.products);
+    const details = values.products;
+
+    if (details) {
+      details.forEach((detail, index) => {
+        console.log(detail.name, detail.quantity, detail.price);
+
+        if (!detail.name) {
+          detailErrors[`products.${index}.product`] = `Product ${
+            index + 1
+          }'s name is required`;
+        }
+        if (!detail.quantity) {
+          detailErrors[`products.${index}.quantity`] = `Product ${
+            index + 1
+          }'s quantity is required`;
+        }
+        if (!detail.price) {
+          detailErrors[`products.${index}.price`] = `Product ${
+            index + 1
+          }'s price is required`;
+        }
+      });
+    }
+
+    setDetailErrors(detailErrors);
+    return detailErrors; // Return the error object
+  };
 
   const handleSubmit = async (values, setSubmitting, resetForm) => {
+    // Calculate total price
     const total = values.products.reduce(
-      (sum, product) => sum + product?.totalPrice,
+      (sum, product) => sum + (product?.totalPrice || 0),
       0
     );
     values.total = total; // Maintain total before discount
     const balance = values.total - values.amountPaid - values.discount;
 
     try {
-      if (!values.customerName) {
-        setError("Customer Name Should not be Empty");
-      } else if (!values.amountPaid) {
-        setError("Amount Paid Should not be Empty!");
-      } else {
-        setLoading(true);
-        setSubmitting(true);
-        await tableActions.updateReceipt(
-          row._id,
-          { ...values, balance },
-          companyId,
-          workerId
-        );
-        console.log(values);
-        const newData = updateOnhandAfterSale(productOptions, values);
-        setProductOptions(newData);
-        setOpen(true);
-        if (print) {
-          setPrintValues({ ...values, balance }); // Store values for printing
-        }
-        setTimeout(() => {
-          navigate("/sales");
-          resetForm();
-        }, 1000);
+      // Validate product details
+      const errors = validateReceiptDetail(values);
+      if (Object.keys(errors).length > 0) {
+        console.log(errors);
+        setError("Please fill in all required fields correctly.");
+        return; // Stop execution if validation fails
       }
+
+      // Validate customer name
+      if (!values.customerName?.trim()) {
+        setError("Customer Name should not be empty");
+        return;
+      }
+
+      // Validate amount paid
+      if (values.amountPaid === undefined || values.amountPaid === "") {
+        setError("Amount Paid should not be empty!");
+        return;
+      }
+
+      setLoading(true);
+      setSubmitting(true);
+
+      // Call API to add receipt and check for debt
+      const results = await tableActions.updateReceipt(
+        row._id,
+        { ...values, balance },
+        companyId,
+        workerId
+      );
+
+      setModalMessage("Receipt added successfully!");
+
+      // Update inventory onhand after sale
+      const newData = updateOnhandAfterSale(productOptions, values);
+      setProductOptions(newData);
+
+      // Store values for printing, if applicable
+      if (print) {
+        setPrintValues({ ...values, balance });
+      }
+
+      // Reset form after a short delay
+      setTimeout(() => {
+        navigate("/sales");
+      }, 1000);
     } catch (error) {
       console.log(error);
-      setError(error);
+      setError(error.message || "An error occurred");
     } finally {
       setSubmitting(false);
       setLoading(false);
@@ -187,93 +243,170 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
 
   const handleNewCustomerSubmit = async () => {
     try {
-      const newCustomer = await tableActions.addCustomer({
-        name: newCustomerName,
+      setSubmittingForm(true);
+      setCustomerError(""); // Reset error state
+
+      // Input validation
+      if (!newCustomerName.trim()) {
+        setCustomerError("Customer name is required");
+        return;
+      }
+
+      const formattedName = newCustomerName.trim().toLowerCase();
+
+      // Create customer object with company
+      const customerData = {
+        name: formattedName,
+        company: newCustomerCompany.trim(),
         companyId,
-      });
-      setCustomerOptions((prevOptions) => [
-        "<<<< Add New Customer >>>>",
-        ...prevOptions.filter(
-          (option) => option !== "<<<< Add New Customer >>>>"
-        ),
-        `None - ${newCustomer.name}`,
-      ]);
-      setNewCustomerDialogOpen(false); // Close the dialog
-      setNewCustomerName(""); // Clear the input field
-      handleCustomerUpdate((prevOptions) => [
-        ...prevOptions.filter(
-          (option) => option !== "<<<< Add New Customer >>>>"
-        ),
-        `None - ${newCustomer.name}`,
-      ]);
+      };
+
+      // Make the API call
+      const response = await tableActions.addCustomer(customerData);
+
+      // Validate API response
+      if (!response || typeof response !== "object") {
+        setError(response);
+        setSubmittingForm(false);
+        return;
+      }
+
+      // if (!response.name) {
+      //   throw new Error("Customer name is missing in server response");
+      // }
+
+      // Format the display name only after confirming we have valid data
+      let displayName;
+      if (response.company && response.company.trim()) {
+        displayName = `${capitalizeFirstLetter(
+          response.company
+        )} - ${capitalizeFirstLetter(response.name)}`;
+      } else {
+        displayName = capitalizeFirstLetter(response.name); // Remove the "None -" prefix
+      }
+
+      // Update customer options only if we have a valid displayName
+      if (displayName) {
+        // Update customer options
+        setCustomerOptions((prevOptions) => {
+          const filteredOptions = prevOptions.filter(
+            (option) =>
+              option !== "<<<< Add New Customer >>>>" && option !== displayName // Remove any existing entry for this customer
+          );
+          return [
+            "<<<< Add New Customer >>>>",
+            displayName,
+            ...filteredOptions,
+          ].sort((data) => data.name);
+        });
+
+        // Update parent component's customer list
+        handleCustomerUpdate((prevOptions) => {
+          const filteredOptions = prevOptions.filter(
+            (option) =>
+              option !== "<<<< Add New Customer >>>>" && option !== displayName
+          );
+          return [...filteredOptions, displayName].sort();
+        });
+
+        // Reset form and close dialog
+        setSubmittingForm(false);
+        setNewCustomerDialogOpen(false);
+        setNewCustomerName("");
+        setNewCustomerCompany("");
+        setCustomerError("");
+      } else {
+        setSubmittingForm(false);
+        setCustomerError(error.message || "Duplicate customer details");
+        throw new Error("Failed to format customer name");
+      }
     } catch (error) {
-      console.log(error);
-      setError("Failed to add new customer");
+      setSubmittingForm(false);
+      if (error.response) {
+        console.log("error part");
+        setError(error.response.message || "Failed to add new customer");
+      }
+      <ErrorAlert error={error} onClose={() => setError(null)} />;
+      console.error("Error adding new customer:", error);
+      setSubmittingForm(false);
+      setCustomerError(error.message || "Failed to add new customer");
+      // Don't close the dialog when there's an error
     }
   };
 
   const handleNewProductSubmit = async () => {
     try {
-      console.log(newProductOnhand);
+      if (!validateFields(newProduct, setErrors)) return; // Validate the input fields
+      setSubmittingForm(true);
+      // Ensure the product
+      // name is properly formatted
+      const formattedProductName = newProduct.name.trim().toLowerCase();
+
+      // Send request to add product
       const data = await tableActions.addProduct({
-        name: newProductName,
-        costPrice: newProductCostPrice,
-        salesPrice: newProductSalesPrice,
-        onhand: newProductOnhand,
+        ...newProduct,
+        name: formattedProductName,
         companyId,
       });
 
-      const newProduct = data.data;
+      if (!data || !data.data) throw new Error(data);
 
-      // Update product options using a functional state update
-      setProductOptions((prevOptions) => [
-        {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
-        },
-        ...prevOptions.filter(
+      const addedProduct = data.data;
+
+      // Update product options properly
+      setProductOptions((prevOptions) => {
+        const filteredOptions = prevOptions.filter(
           (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
-        {
-          name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
-      ]);
+        );
+        return [
+          { id: 1, name: "<<<< Add New Product >>>>" },
+          ...filteredOptions,
+          {
+            name: capitalizeFirstLetter(addedProduct.name),
+            salesPrice: addedProduct.salesPrice || 0,
+            onhand: addedProduct.onhand || 0,
+          },
+        ].sort((a, b) => a.name.localeCompare(b.name));
+      });
 
+      // Update parent component's product list
       handleProductUpdate((prevOptions) => [
+        { id: 1, name: "<<<< Add New Product >>>>" },
         {
-          id: 1,
-          name: "<<<< Add New Product >>>>",
+          name: capitalizeFirstLetter(addedProduct.name),
+          salesPrice: addedProduct.salesPrice || 0,
+          onhand: addedProduct.onhand || 0,
         },
         ...prevOptions.filter(
           (option) => option.name !== "<<<< Add New Product >>>>"
         ),
-        {
-          name: newProductName,
-          salesPrice: parseFloat(newProductSalesPrice) || 0, // Ensure numeric value
-          onhand: parseInt(newProductOnhand, 10) || 0, // Ensure numeric value
-        },
       ]);
 
-      setNewProductDialogOpen(false); // Close the dialog
-      setNewProductName(""); // Clear the input fields
-      setNewProductSalesPrice("");
-      setNewProductCostPrice("");
-      setNewProductOnhand("");
+      // Close dialog and reset form
+      setNewProductDialogOpen(false);
+      setSubmittingForm(false);
+      setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
-      console.log(error);
-      setError("Failed to add new product");
+      setSubmittingForm(false);
+      setError(error.message || "Failed to add new product");
     }
+  };
+
+  // handle new product creation
+  // Handle input change for new product
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
     <div className="page">
-      <div className="heading">
-        <div>
-          <h1 style={{ fontWeight: 200, padding: 10 }}>Edit Sales</h1>
-        </div>{" "}
-      </div>
+      <Typography variant="h5" style={{ marginBottom: 20 }}>
+        {row ? "Edit Sales" : "Make Sales"}
+      </Typography>
       <Formik
         initialValues={getInitialValues()}
         validationSchema={validationSchema}
@@ -361,13 +494,12 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                                     const selectedProduct = productOptions.find(
                                       (p) => p.name === newValue
                                     );
-                                    const newTotalPrice = Math.ceil(
+                                    const newTotalPrice =
                                       product.quantity *
-                                        selectedProduct?.salesPrice
-                                    );
+                                      selectedProduct?.salesPrice;
                                     setFieldValue(
                                       `products.${index}.totalPrice`,
-                                      newTotalPrice
+                                      Math.ceil(newTotalPrice)
                                     );
                                     setFieldValue(
                                       `products.${index}.price`,
@@ -384,6 +516,16 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                                     {...params}
                                     label="Product Name"
                                     fullWidth
+                                    error={
+                                      !!detailError?.[
+                                        `products.${index}.product`
+                                      ]
+                                    }
+                                    helperText={
+                                      detailError?.[
+                                        `products.${index}.product`
+                                      ] || ""
+                                    }
                                   />
                                 )}
                                 autoSelect // not working : supposed to autoselect the first name
@@ -391,79 +533,6 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                             )}
                           </Field>
 
-                          {/* <Field
-                            style={{
-                              paddingRight: 0,
-                              flex: 1,
-                              width: "50%",
-                              minWidth: 150,
-                            }}
-                            as={TextField}
-                            name={`products.${index}.quantity`}
-                            label="Quantity"
-                            type="number"
-                            step="any"
-                            validate={(value) => {
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-                              // if (value > selectedProduct?.onhand) {
-                              //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
-                              // }
-                            }}
-                            onChange={(event) => {
-                              const newQuantity = parseInt(
-                                event.target.value,
-                                10
-                              );
-
-                              // First, set the new quantity value
-                              setFieldValue(
-                                `products.${index}.quantity`,
-                                newQuantity
-                              );
-
-                              // Find the selected product
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Ensure we have a valid selected product
-                              if (selectedProduct) {
-                                // Get the current price from the field or fallback to the selected product's sales price
-                                const currentPrice =
-                                  values.products[index].price ||
-                                  selectedProduct.salesPrice;
-
-                                // Calculate the new total price based on quantity and price
-                                const newTotalPrice =
-                                  newQuantity * currentPrice;
-
-                                // Set the new total price
-                                setFieldValue(
-                                  `products.${index}.totalPrice`,
-                                  newTotalPrice
-                                );
-                              }
-                            }}
-                            onBlur={(event) => {
-                              const value = parseInt(event.target.value, 10);
-                              const selectedProduct = productOptions.find(
-                                (p) => p.name === product.name
-                              );
-
-                              // Check if the quantity exceeds available stock
-                              if (
-                                selectedProduct &&
-                                value > selectedProduct.onhand
-                              ) {
-                                setModalMessage(
-                                  `Quantity cannot exceed available stock (${selectedProduct?.onhand})`
-                                );
-                                setModalOpen(true);
-                              }
-                            }}
-                          /> */}
                           <Field
                             style={{
                               paddingRight: 0,
@@ -472,29 +541,16 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                               minWidth: 150,
                             }}
                             as={TextField}
+                            error={
+                              !!detailError?.[`products.${index}.quantity`]
+                            }
+                            helperText={
+                              detailError?.[`products.${index}.quantity`] || ""
+                            }
                             name={`products.${index}.quantity`}
                             label="Quantity"
                             type="number" // Use "number" to ensure numeric keyboard on mobile
                             step="any" // Allow for decimal values
-                            // validate={(value) => {
-                            //   const selectedProduct = productOptions.find(
-                            //     (p) => p.name === product.name
-                            //   );
-
-                            //   const numericValue = parseFloat(value);
-
-                            //   // Ensure the quantity is at least 0.25 (or 1/4)
-                            //   if (numericValue < 0.25) {
-                            //     return "Quantity must be at least 1/4";
-                            //   }
-
-                            //   // Optional: Validate against available stock
-                            //   // if (numericValue > selectedProduct?.onhand) {
-                            //   //   return `Quantity cannot exceed available stock (${selectedProduct?.onhand})`;
-                            //   // }
-
-                            //   return undefined;
-                            // }}
                             onChange={(event) => {
                               const value = event.target.value;
                               const newQuantity = parseFloat(value);
@@ -531,7 +587,6 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                             }}
                             onBlur={(event) => {
                               const value = parseFloat(event.target.value);
-
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
@@ -550,7 +605,7 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                           />
                         </div>
                         <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          <Field name={`products.${index}.price`}>
+                          {/* <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <TextField
                                 {...field}
@@ -571,18 +626,49 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
                                   );
 
                                   // Then calculate and set the new total price
-                                  const newTotalPrice = Math.ceil(
-                                    product.quantity * newPrice
-                                  );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
                                   setFieldValue(
                                     `products.${index}.totalPrice`,
-                                    newTotalPrice
+                                    Math.ceil(newTotalPrice)
                                   );
                                 }}
                               />
                             )}
+                          </Field> */}
+                          <Field name={`products.${index}.price`}>
+                            {({ field }) => (
+                              <TextField
+                                {...field}
+                                label="Price"
+                                type="number"
+                                style={{ minWidth: 150 }}
+                                fullWidth
+                                error={
+                                  !!detailError?.[`products.${index}.price`]
+                                }
+                                helperText={
+                                  detailError?.[`products.${index}.price`] || ""
+                                }
+                                onChange={(event) => {
+                                  const newPrice = parseFloat(
+                                    event.target.value
+                                  );
+                                  setFieldValue(
+                                    `products.${index}.price`,
+                                    newPrice
+                                  );
+                                  const newTotalPrice =
+                                    product.quantity * newPrice;
+                                  setFieldValue(
+                                    `products.${index}.totalPrice`,
+                                    Math.ceil(newTotalPrice)
+                                  );
+                                  validateReceiptDetail(values);
+                                }}
+                              />
+                            )}
                           </Field>
-
                           <Field name={`products.${index}.totalPrice`}>
                             {({ field }) => (
                               <Input
@@ -630,10 +716,10 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
               )}
             </FieldArray>
             <Field name="total">
-              {({ field }) => (
+              {() => (
                 <Input
                   value={values.products?.reduce(
-                    (sum, product) => sum + product?.totalPrice,
+                    (sum, product) => sum + (product?.totalPrice || 0),
                     0
                   )}
                   label="Total"
@@ -750,16 +836,17 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
           </Form>
         )}
       </Formik>
-      {error && (
-        <Typography align="center" color="red">
-          {error.message}
-        </Typography>
-      )}
+      {error && <ErrorAlert error={error} onClose={() => setError(null)} />}
       <Snackbar
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            color: owesDebt ? "red" : "white",
+          },
+        }}
         open={open}
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
-        message={"Changes successfully Made"}
+        message={modalMessage || "Sales successfully Recorded"}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       />
 
@@ -793,86 +880,158 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
         <DialogTitle id="new-customer-dialog-title">
           {"Add New Customer"}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="new-customer-dialog-description">
-            Enter the name of the new customer:
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="new-customer-name"
-            label="Customer Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={newCustomerName}
-            onChange={(e) => setNewCustomerName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setNewCustomerDialogOpen(false)}
-            color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleNewCustomerSubmit} color="primary">
-            Add
-          </Button>
-        </DialogActions>
+        {submittingForm ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              width: 316,
+              height: 300,
+            }}>
+            <Loader type={3} />
+          </div>
+        ) : (
+          <>
+            <DialogContent>
+              <DialogContentText id="new-customer-dialog-description">
+                Enter the name of the new customer:
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="new-customer-name"
+                label="Customer Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={newCustomerName}
+                onChange={(e) =>
+                  setNewCustomerName(e.target.value.toLowerCase())
+                }
+              />
+            </DialogContent>
+            <DialogContent>
+              <DialogContentText id="new-customer-dialog-description">
+                Enter Company Name:
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="new-customer-company"
+                label="Company Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={newCustomerCompany}
+                onChange={(e) =>
+                  setNewCustomerCompany(e.target.value.toLowerCase())
+                }
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setNewCustomerDialogOpen(false)}
+                color="primary">
+                Cancel
+              </Button>
+              {newCustomerName && (
+                <Button onClick={handleNewCustomerSubmit} color="primary">
+                  Add
+                </Button>
+              )}
+            </DialogActions>
+          </>
+        )}
       </Dialog>
 
-      {/* Dialog for adding new products */}
+      {/* Dialog for new products */}
       <Dialog
         open={newProductDialogOpen}
         onClose={() => setNewProductDialogOpen(false)}>
         <DialogTitle>Add New Product</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the details of the new product.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Product Name"
-            fullWidth
-            value={newProductName}
-            onChange={(e) => setNewProductName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Sales Price"
-            type="number"
-            fullWidth
-            value={newProductSalesPrice}
-            onChange={(e) => setNewProductSalesPrice(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Cost Price"
-            type="number"
-            fullWidth
-            value={newProductCostPrice}
-            onChange={(e) => setNewProductCostPrice(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Available Quantity"
-            type="number"
-            fullWidth
-            value={newProductOnhand}
-            onChange={(e) => setNewProductOnhand(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setNewProductDialogOpen(false)}
-            color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleNewProductSubmit} color="primary">
-            Add Product
-          </Button>
-        </DialogActions>
+        {submittingForm ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              width: 600,
+              height: 316,
+            }}>
+            <Loader type={3} />
+          </div>
+        ) : (
+          <>
+            <DialogContent>
+              <DialogContentText>
+                Please enter the details of the new product.
+              </DialogContentText>
+
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Product Name"
+                name="name"
+                fullWidth
+                required
+                value={newProduct.name}
+                onChange={handleInputChange} // ✅ Use the same function
+                error={!!errors.name}
+                helperText={errors.name}
+              />
+
+              <TextField
+                margin="dense"
+                label="Sales Price"
+                type="number"
+                name="salesPrice"
+                fullWidth
+                required
+                value={newProduct.salesPrice}
+                onChange={handleInputChange}
+                error={!!errors.salesPrice}
+                helperText={errors.salesPrice}
+              />
+
+              <TextField
+                margin="dense"
+                label="Cost Price"
+                type="number"
+                name="costPrice"
+                fullWidth
+                required
+                value={newProduct.costPrice}
+                onChange={handleInputChange}
+                error={!!errors.costPrice}
+                helperText={errors.costPrice}
+              />
+
+              <TextField
+                margin="dense"
+                label="Available Quantity"
+                type="number"
+                name="onhand"
+                fullWidth
+                required
+                value={newProduct.onhand}
+                onChange={handleInputChange}
+                error={!!errors.onhand}
+                helperText={errors.onhand}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setNewProductDialogOpen(false)}
+                color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleNewProductSubmit} color="primary">
+                Add Product
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
 
       {/* Receipt Template for printing */}
@@ -881,13 +1040,14 @@ const MakeSales = ({ handleCustomerUpdate, handleProductUpdate }) => {
           <ReceiptTemplate
             ref={printRef}
             customerName={printValues.customerName}
+            customerCompany={printValues.customerCompany}
             products={printValues.products}
             total={printValues.total}
             balance={printValues.balance}
             amountPaid={printValues.amountPaid}
             discount={printValues.discount}
             date={today}
-            workerName={worker.name}
+            workerName={worker.username ? worker.username : worker.name}
           />
         </div>
       )}
