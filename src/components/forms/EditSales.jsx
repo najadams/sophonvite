@@ -12,7 +12,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { Navigate } from "react-router-dom";
+import { validateFields } from "../../config/Functions";
 import Loader from "../common/Loader";
 import ErrorAlert from "../../utils/Error";
 import { Autocomplete } from "@mui/material";
@@ -368,19 +368,6 @@ const MakeSales = () => {
           },
         ].sort((a, b) => a.name.localeCompare(b.name));
       });
-
-      // Update parent component's product list
-      handleProductUpdate((prevOptions) => [
-        { id: 1, name: "<<<< Add New Product >>>>" },
-        {
-          name: capitalizeFirstLetter(addedProduct.name),
-          salesPrice: addedProduct.salesPrice || 0,
-          onhand: addedProduct.onhand || 0,
-        },
-        ...prevOptions.filter(
-          (option) => option.name !== "<<<< Add New Product >>>>"
-        ),
-      ]);
 
       // Close dialog and reset form
       setNewProductDialogOpen(false);
