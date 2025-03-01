@@ -28,16 +28,6 @@ const Reports = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   // const matchesMobile = useMediaQuery("(max-width:600px)");
   const [showFilters, setShowFilters] = useState(false);
-
-  // const {
-  //   data: summaryData,
-  //   isLoading: isSummaryLoading,
-  //   isError: isSummaryError,
-  // } = useQuery(
-  //   ["summary", companyId, filters],
-  //   () => fetchReportData(companyId, "summary", filters),
-  //   { enabled: value === 0, keepPreviousData: true }
-  //   );
   
   const {
     data: summaryData,
