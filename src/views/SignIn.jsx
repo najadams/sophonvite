@@ -19,6 +19,7 @@ import axios from "../config/";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { ActionCreators } from "../actions/action";
+import { motion } from "framer-motion";
 
 function Copyright(props) {
   return (
@@ -37,7 +38,42 @@ function Copyright(props) {
   );
 }
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#2196f3",
+    },
+    secondary: {
+      main: "#f50057",
+    },
+    background: {
+      default: "#f5f5f5",
+    },
+  },
+  typography: {
+    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: "none",
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+  },
+});
 
 const SignIn = ({ isLoggedIn }) => {
   const [loading, setLoading] = useState(false);
@@ -75,7 +111,7 @@ const SignIn = ({ isLoggedIn }) => {
 
       return response.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       const message =
         error.response?.status === 401
           ? error.response?.data?.message
@@ -117,7 +153,6 @@ const SignIn = ({ isLoggedIn }) => {
             md={7}
             sx={{
               backgroundImage: "url(/logo.png)",
-                // "url(https://source.unsplash.com/random?wallpapers)",
               backgroundRepeat: "no-repeat",
               backgroundColor: (t) =>
                 t.palette.mode === "light"
@@ -125,8 +160,24 @@ const SignIn = ({ isLoggedIn }) => {
                   : t.palette.grey[900],
               backgroundSize: "cover",
               backgroundPosition: "center",
-            }}
-          />
+              position: "relative",
+              overflow: "hidden",
+            }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:
+                  "linear-gradient(45deg, rgba(33,150,243,0.3), rgba(245,0,87,0.3))",
+              }}
+            />
+          </Grid>
           <Grid
             item
             xs={12}
@@ -143,65 +194,125 @@ const SignIn = ({ isLoggedIn }) => {
                 flexDirection: "column",
                 alignItems: "center",
               }}>
-              <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <Typography component="h1" variant="h5">
-                Sign in
-              </Typography>
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}>
+                <Avatar
+                  sx={{
+                    m: 1,
+                    bgcolor: "secondary.main",
+                    width: 56,
+                    height: 56,
+                  }}>
+                  <LockOutlinedIcon />
+                </Avatar>
+              </motion.div>
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}>
+                <Typography
+                  component="h1"
+                  variant="h4"
+                  sx={{ fontWeight: 600, mb: 3 }}>
+                  Welcome Back
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 4 }}>
+                  Sign in to your POS account
+                </Typography>
+              </motion.div>
               <Box
                 component="form"
                 noValidate
                 onSubmit={handleSubmit}
-                sx={{ mt: 1 }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="company"
-                  label="Company Name"
-                  name="company"
-                  autoComplete="company"
-                  autoFocus
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                />
-                <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
-                  label="Remember me"
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                  disabled={loading}>
-                  {loading ? <CircularProgress size={24} /> : "Sign In"}
-                </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link href="#" variant="body2">
+                sx={{ mt: 1, width: "100%" }}>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="company"
+                    label="Company Name"
+                    name="company"
+                    autoComplete="company"
+                    autoFocus
+                  />
+                </motion.div>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                </motion.div>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}>
+                  <FormControlLabel
+                    control={<Checkbox value="remember" color="primary" />}
+                    label="Remember me"
+                  />
+                </motion.div>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 1 }}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2, py: 1.5 }}
+                    disabled={loading}>
+                    {loading ? <CircularProgress size={24} /> : "Sign In"}
+                  </Button>
+                </motion.div>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Link
+                      href="#"
+                      variant="body2"
+                      sx={{ textDecoration: "none" }}>
                       Forgot password?
                     </Link>
                   </Grid>
-                  <Grid item>
-                    <Link href="/register" variant="body2">
+                  <Grid item xs={6} sx={{ textAlign: "right" }}>
+                    <Link
+                      href="/register"
+                      variant="body2"
+                      sx={{ textDecoration: "none" }}>
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </Grid>
                 </Grid>
                 {error && (
-                  <Typography variant="body2" align="center" color="error">
-                    {error}
-                  </Typography>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}>
+                    <Typography
+                      variant="body2"
+                      align="center"
+                      color="error"
+                      sx={{ mt: 2 }}>
+                      {error}
+                    </Typography>
+                  </motion.div>
                 )}
                 <Copyright sx={{ mt: 5 }} />
               </Box>
