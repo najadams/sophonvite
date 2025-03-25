@@ -27,6 +27,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptTemplate from "../compPrint/ReceiptTemplate";
 import { useLocation } from "react-router-dom";
 import Loader from "../common/Loader";
+import { motion } from "framer-motion";
 const validationSchema = Yup.object().shape({
   customerName: Yup.string().required("Customer name is required"),
   total: Yup.number().required(),
@@ -64,7 +65,9 @@ const MakeSales = ({
   const [submittingForm, setSubmittingForm] = useState(false);
   const [customerOptions, setCustomerOptions] = useState([
     "<<<< Add New Customer >>>>",
-    ...customers.sort().filter((options) => options !== "<<<< Add New Customer >>>>"),
+    ...customers
+      .sort()
+      .filter((options) => options !== "<<<< Add New Customer >>>>"),
   ]);
   const [productOptions, setProductOptions] = useState([
     {
@@ -73,8 +76,7 @@ const MakeSales = ({
     },
 
     ...Products.sort((a, b) => a.name.localeCompare(b.name)).filter(
-      (option) =>
-        option !== "<<<< Add New Product >>>>" 
+      (option) => option !== "<<<< Add New Product >>>>"
     ),
   ]);
 
@@ -97,8 +99,8 @@ const MakeSales = ({
       amountPaid: "",
       discount: 0,
     };
-};
-  
+  };
+
   const validateReceiptDetail = (values) => {
     let detailErrors = {};
 
@@ -110,16 +112,19 @@ const MakeSales = ({
         console.log(detail.name, detail.quantity, detail.price);
 
         if (!detail.name) {
-          detailErrors[`products.${index}.product`] =
-            `Product ${index+1}'s name is required`;
+          detailErrors[`products.${index}.product`] = `Product ${
+            index + 1
+          }'s name is required`;
         }
         if (!detail.quantity) {
-          detailErrors[`products.${index}.quantity`] = `Product ${index+1}'s quantity is required`;
+          detailErrors[`products.${index}.quantity`] = `Product ${
+            index + 1
+          }'s quantity is required`;
         }
         if (!detail.price) {
           detailErrors[`products.${index}.price`] = `Product ${
             index + 1
-          }'s price is required`;;
+          }'s price is required`;
         }
       });
     }
@@ -228,8 +233,8 @@ const MakeSales = ({
 
       // Validate API response
       if (!response || typeof response !== "object") {
-        setError(response)
-        setSubmittingForm(false)
+        setError(response);
+        setSubmittingForm(false);
         return;
       }
 
@@ -240,9 +245,9 @@ const MakeSales = ({
       // Format the display name only after confirming we have valid data
       let displayName;
       if (response.company && response.company.trim()) {
-        displayName = `${capitalizeFirstLetter(response.company)} - ${
-          capitalizeFirstLetter(response.name)
-        }`;
+        displayName = `${capitalizeFirstLetter(
+          response.company
+        )} - ${capitalizeFirstLetter(response.name)}`;
       } else {
         displayName = capitalizeFirstLetter(response.name); // Remove the "None -" prefix
       }
@@ -285,12 +290,12 @@ const MakeSales = ({
     } catch (error) {
       setSubmittingForm(false);
       if (error.response) {
-        console.log("error part")
+        console.log("error part");
         setError(error.response.message || "Failed to add new customer");
       }
       <ErrorAlert error={error} onClose={() => setError(null)} />;
       console.error("Error adding new customer:", error);
-      setSubmittingForm(false)
+      setSubmittingForm(false);
       setCustomerError(error.message || "Failed to add new customer");
       // Don't close the dialog when there's an error
     }
@@ -300,7 +305,7 @@ const MakeSales = ({
     try {
       if (!validateFields(newProduct, setErrors)) return; // Validate the input fields
       setSubmittingForm(true);
-      // Ensure the product 
+      // Ensure the product
       // name is properly formatted
       const formattedProductName = newProduct.name.trim().toLowerCase();
 
@@ -349,11 +354,10 @@ const MakeSales = ({
       setSubmittingForm(false);
       setNewProduct({ name: "", salesPrice: "", costPrice: "", onhand: "" });
     } catch (error) {
-      setSubmittingForm(false)
-      setError(error.message|| "Failed to add new product");
+      setSubmittingForm(false);
+      setError(error.message || "Failed to add new product");
     }
   };
-
 
   // handle new product creation
   // Handle input change for new product
@@ -366,7 +370,30 @@ const MakeSales = ({
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="page">
+      <div
+        className="heading"
+        style={{ background: "none", marginBottom: "2rem" }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 500,
+            color: "#333",
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+          }}>
+          <i
+            className="bx bx-cart-add"
+            style={{ fontSize: "2rem", color: "#2196f3" }}></i>
+          Make Sales
+        </Typography>
+      </div>
+
       <Formik
         initialValues={getInitialValues()}
         validationSchema={validationSchema}
@@ -374,7 +401,15 @@ const MakeSales = ({
           handleSubmit(values, setSubmitting, resetForm);
         }}>
         {({ values, submitForm, setFieldValue, isSubmitting, resetForm }) => (
-          <Form className="form" style={{ margin: 10 }}>
+          <Form
+            className="form"
+            style={{
+              margin: "1rem",
+              padding: "2rem",
+              background: "white",
+              borderRadius: "12px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            }}>
             <Field name="customerName">
               {({ field, form }) => {
                 const hasError = Boolean(
@@ -397,11 +432,20 @@ const MakeSales = ({
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        style={{ paddingBottom: 10 }}
+                        style={{ marginBottom: "1.5rem" }}
                         label="Customer Name"
                         fullWidth
                         error={hasError}
                         helperText={hasError ? form.errors.customerName : ""}
+                        variant="outlined"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: "#666",
+                          },
+                        }}
                       />
                     )}
                   />
@@ -409,26 +453,43 @@ const MakeSales = ({
               }}
             </Field>
 
-            <hr
-              style={{ height: 5, backgroundColor: "black", marginBottom: 20 }}
+            <div
+              style={{
+                height: "2px",
+                background: "linear-gradient(90deg, #2196f3, #f50057)",
+                marginBottom: "2rem",
+                borderRadius: "2px",
+              }}
             />
+
             <FieldArray name="products">
               {({ push, remove }) => (
                 <div
-                  style={{ display: "flex", gap: 10, flexDirection: "column" }}>
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                    flexDirection: "column",
+                  }}>
                   {values.products?.map((product, index) => {
                     const productItems = productOptions.map(
                       (p) => p?.name || ""
                     );
                     return (
-                      <div
+                      <motion.div
                         key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
                         style={{
                           display: "flex",
                           flex: 1,
-                          gap: 10,
+                          gap: "1rem",
                           flexWrap: "wrap",
                           flexDirection: matchesMobile ? "column" : "row",
+                          padding: "1rem",
+                          background: "#f8f9fa",
+                          borderRadius: "8px",
+                          marginBottom: "1rem",
                         }}>
                         <div
                           style={{
@@ -464,14 +525,14 @@ const MakeSales = ({
                                     setFieldValue(
                                       `products.${index}.price`,
                                       selectedProduct?.salesPrice || 0
-                                    ); // Update price
+                                    );
                                   }
                                 }}
                                 renderInput={(params) => (
                                   <TextField
                                     style={{
                                       flex: 1,
-                                      width: matchesMobile ? 150 : 400,
+                                      width: matchesMobile ? "100%" : "400px",
                                     }}
                                     {...params}
                                     label="Product Name"
@@ -486,20 +547,22 @@ const MakeSales = ({
                                         `products.${index}.product`
                                       ] || ""
                                     }
+                                    variant="outlined"
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "8px",
+                                      },
+                                      "& .MuiInputLabel-root": {
+                                        color: "#666",
+                                      },
+                                    }}
                                   />
                                 )}
-                                autoSelect // not working : supposed to autoselect the first name
                               />
                             )}
                           </Field>
 
                           <Field
-                            style={{
-                              paddingRight: 0,
-                              flex: 1,
-                              width: "50%",
-                              minWidth: 150,
-                            }}
                             as={TextField}
                             error={
                               !!detailError?.[`products.${index}.quantity`]
@@ -509,36 +572,28 @@ const MakeSales = ({
                             }
                             name={`products.${index}.quantity`}
                             label="Quantity"
-                            type="number" // Use "number" to ensure numeric keyboard on mobile
-                            step="any" // Allow for decimal values
+                            type="number"
+                            step="any"
+                            style={{
+                              width: matchesMobile ? "100%" : "150px",
+                            }}
                             onChange={(event) => {
                               const value = event.target.value;
                               const newQuantity = parseFloat(value);
-
-                              // First, set the new quantity value
                               setFieldValue(
                                 `products.${index}.quantity`,
                                 newQuantity
                               );
-
-                              // Find the selected product
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-
-                              // Ensure we have a valid selected product
                               if (selectedProduct) {
-                                // Get the current price from the field or fallback to the selected product's sales price
                                 const currentPrice =
                                   values.products[index].price ||
                                   selectedProduct.salesPrice;
-
-                                // Calculate the new total price based on quantity and price
                                 const newTotalPrice = Math.ceil(
                                   newQuantity * currentPrice
                                 );
-
-                                // Set the new total price
                                 setFieldValue(
                                   `products.${index}.totalPrice`,
                                   newTotalPrice
@@ -550,8 +605,6 @@ const MakeSales = ({
                               const selectedProduct = productOptions.find(
                                 (p) => p.name === product.name
                               );
-
-                              // Check if the quantity exceeds available stock
                               if (
                                 selectedProduct &&
                                 value > selectedProduct.onhand
@@ -562,47 +615,35 @@ const MakeSales = ({
                                 setModalOpen(true);
                               }
                             }}
+                            variant="outlined"
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                color: "#666",
+                              },
+                            }}
                           />
                         </div>
-                        <div style={{ display: "flex", flex: 1, gap: 10 }}>
-                          {/* <Field name={`products.${index}.price`}>
-                            {({ field }) => (
-                              <TextField
-                                {...field}
-                                label="Price"
-                                type="number"
-                                style={{ minWidth: 150 }}
-                                fullWidth
-                                InputProps={{ style: { textAlign: "right" } }}
-                                onChange={(event) => {
-                                  const newPrice = parseFloat(
-                                    event.target.value
-                                  );
-
-                                  // First, set the new price in the form state
-                                  setFieldValue(
-                                    `products.${index}.price`,
-                                    newPrice
-                                  );
-
-                                  // Then calculate and set the new total price
-                                  const newTotalPrice =
-                                    product.quantity * newPrice;
-                                  setFieldValue(
-                                    `products.${index}.totalPrice`,
-                                    Math.ceil(newTotalPrice)
-                                  );
-                                }}
-                              />
-                            )}
-                          </Field> */}
+                        <div
+                          style={{
+                            display: "flex",
+                            flex: 1,
+                            gap: "1rem",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                          }}>
                           <Field name={`products.${index}.price`}>
                             {({ field }) => (
                               <TextField
                                 {...field}
                                 label="Price"
                                 type="number"
-                                style={{ minWidth: 150 }}
+                                style={{
+                                  width: matchesMobile ? "100%" : "150px",
+                                  flex: 1,
+                                }}
                                 fullWidth
                                 error={
                                   !!detailError?.[`products.${index}.price`]
@@ -610,6 +651,7 @@ const MakeSales = ({
                                 helperText={
                                   detailError?.[`products.${index}.price`] || ""
                                 }
+                                variant="outlined"
                                 onChange={(event) => {
                                   const newPrice = parseFloat(
                                     event.target.value
@@ -626,30 +668,55 @@ const MakeSales = ({
                                   );
                                   validateReceiptDetail(values);
                                 }}
+                                sx={{
+                                  "& .MuiOutlinedInput-root": {
+                                    borderRadius: "8px",
+                                  },
+                                  "& .MuiInputLabel-root": {
+                                    color: "#666",
+                                  },
+                                }}
                               />
                             )}
                           </Field>
                           <Field name={`products.${index}.totalPrice`}>
                             {({ field }) => (
-                              <Input
+                              <TextField
+                                {...field}
                                 value={product.totalPrice}
                                 label="Total Price"
                                 readOnly
-                                inputProps={{
-                                  style: { textAlign: "right" },
+                                style={{
+                                  width: matchesMobile ? "100%" : "150px",
+                                  flex: 1,
+                                }}
+                                variant="outlined"
+                                sx={{
+                                  "& .MuiOutlinedInput-root": {
+                                    borderRadius: "8px",
+                                    backgroundColor: "#f8f9fa",
+                                  },
+                                  "& .MuiInputLabel-root": {
+                                    color: "#666",
+                                  },
                                 }}
                               />
                             )}
                           </Field>
                           <Button
-                            style={{ height: "80%", marginTop: 10 }}
                             variant="contained"
                             color="error"
-                            onClick={() => remove(index)}>
+                            onClick={() => remove(index)}
+                            sx={{
+                              borderRadius: "8px",
+                              textTransform: "none",
+                              height: "40px",
+                              minWidth: "100px",
+                            }}>
                             Remove
                           </Button>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                   <Button
@@ -669,133 +736,230 @@ const MakeSales = ({
                       !Object.values(
                         values.products[values.products.length - 1]
                       ).every(Boolean)
-                    }>
+                    }
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      height: "45px",
+                      marginTop: "1rem",
+                    }}>
+                    <i
+                      className="bx bx-plus"
+                      style={{ marginRight: "8px" }}></i>
                     Add Product
                   </Button>
                 </div>
               )}
             </FieldArray>
-            <Field name="total">
-              {() => (
-                <Input
-                  value={values.products?.reduce(
-                    (sum, product) => sum + (product?.totalPrice || 0),
-                    0
-                  )}
-                  label="Total"
-                  readOnly
-                  inputProps={{
-                    style: { textAlign: "right" },
-                  }}
-                />
-              )}
-            </Field>
+
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                flexWrap: "wrap",
+                marginTop: "2rem",
+                padding: "1.5rem",
+                background: "#f8f9fa",
+                borderRadius: "8px",
               }}>
-              <Field name="amountPaid">
-                {({ field, form }) => {
-                  const hasError = Boolean(
-                    form.errors.amountPaid && form.touched.amountPaid
-                  );
-                  return (
-                    <TextField
-                      style={{ flex: 1 }}
-                      {...field}
-                      label="Amount Paid"
-                      type="number"
-                      placeholder="Amount Paid"
-                      fullWidth
-                      error={hasError}
-                      helperText={hasError ? form.errors.amountPaid : ""}
-                      onChange={(event) => {
-                        setFieldValue("amountPaid", event.target.value || 0);
-                      }}
-                    />
-                  );
-                }}
-              </Field>
-              <Field name="discount">
-                {({ field, form }) => {
-                  const hasError = Boolean(
-                    form.errors.discount && form.touched.discount
-                  );
-                  return (
-                    <TextField
-                      {...field}
-                      style={{ width: "50%" }}
-                      label="Discount"
-                      type="number"
-                      placeholder="Discount"
-                      fullWidth
-                      error={hasError}
-                      helperText={hasError ? form.errors.discount : ""}
-                      onChange={(event) => {
-                        setFieldValue("discount", event.target.value);
-                      }}
-                    />
-                  );
-                }}
-              </Field>
-            </div>
-            <div style={{ display: "flex", gap: "2rem" }}>
-              <Typography
-                sx={{ fontSize: "20px", textDecoration: "underline", pt: 2 }}>
-                {" "}
-                Balance
-              </Typography>
-              <Field name="balance">
-                {() => (
-                  <Input
-                    value={
-                      values.products?.reduce(
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "1rem",
+                }}>
+                <Typography variant="h6" sx={{ color: "#333" }}>
+                  Total
+                </Typography>
+                <Field name="total">
+                  {() => (
+                    <Typography variant="h6" sx={{ color: "#2196f3" }}>
+                      $
+                      {values.products?.reduce(
+                        (sum, product) => sum + (product?.totalPrice || 0),
+                        0
+                      )}
+                    </Typography>
+                  )}
+                </Field>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  flexWrap: "wrap",
+                  marginBottom: "1rem",
+                }}>
+                <Field name="amountPaid">
+                  {({ field, form }) => {
+                    const hasError = Boolean(
+                      form.errors.amountPaid && form.touched.amountPaid
+                    );
+                    return (
+                      <TextField
+                        {...field}
+                        label="Amount Paid"
+                        type="number"
+                        placeholder="Amount Paid"
+                        fullWidth
+                        error={hasError}
+                        helperText={hasError ? form.errors.amountPaid : ""}
+                        variant="outlined"
+                        onChange={(event) => {
+                          setFieldValue("amountPaid", event.target.value || 0);
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: "#666",
+                          },
+                        }}
+                      />
+                    );
+                  }}
+                </Field>
+                <Field name="discount">
+                  {({ field, form }) => {
+                    const hasError = Boolean(
+                      form.errors.discount && form.touched.discount
+                    );
+                    return (
+                      <TextField
+                        {...field}
+                        label="Discount"
+                        type="number"
+                        placeholder="Discount"
+                        fullWidth
+                        error={hasError}
+                        helperText={hasError ? form.errors.discount : ""}
+                        variant="outlined"
+                        onChange={(event) => {
+                          setFieldValue("discount", event.target.value);
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: "#666",
+                          },
+                        }}
+                      />
+                    );
+                  }}
+                </Field>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "1rem",
+                  background: "white",
+                  borderRadius: "8px",
+                  border: "1px solid #e0e0e0",
+                }}>
+                <Typography variant="h6" sx={{ color: "#333" }}>
+                  Balance
+                </Typography>
+                <Field name="balance">
+                  {() => (
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color:
+                          values.products?.reduce(
+                            (sum, product) => sum + (product?.totalPrice || 0),
+                            0
+                          ) -
+                            values.amountPaid -
+                            values.discount >
+                          0
+                            ? "#f44336"
+                            : "#4caf50",
+                        fontWeight: 600,
+                      }}>
+                      $
+                      {values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0
                       ) -
-                      values.amountPaid -
-                      values.discount
-                    }
-                    label="Balance"
-                    readOnly
-                    inputProps={{
-                      style: { textAlign: "right" },
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                )}
-              </Field>
+                        values.amountPaid -
+                        values.discount}
+                    </Typography>
+                  )}
+                </Field>
+              </div>
             </div>
 
-            <div className="bottom_left">
+            <div
+              style={{
+                position: "fixed",
+                bottom: "2rem",
+                right: "2rem",
+                display: "flex",
+                gap: "1rem",
+                zIndex: 1000,
+                background: "white",
+                padding: "1rem",
+                borderRadius: "12px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              }}>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => {
                   setPrint(true);
-                  submitForm(); // Trigger form submission
+                  submitForm();
                 }}
-                disabled={loading || isSubmitting} // Disable button when loading or submitting
-              >
-                {loading ? <CircularProgress /> : "Save and Print"}
+                disabled={loading || isSubmitting}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  height: "45px",
+                  minWidth: "150px",
+                }}>
+                {loading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <>
+                    <i
+                      className="bx bx-printer"
+                      style={{ marginRight: "8px" }}></i>
+                    Save and Print
+                  </>
+                )}
               </Button>
               <Button
                 variant="contained"
                 color="success"
                 onClick={() => {
-                  submitForm(); // Trigger form submission
+                  submitForm();
                 }}
-                disabled={loading || isSubmitting} // Disable button when loading or submitting
-              >
-                {loading ? <CircularProgress /> : "Save"}
+                disabled={loading || isSubmitting}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  height: "45px",
+                  minWidth: "120px",
+                }}>
+                {loading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <>
+                    <i
+                      className="bx bx-save"
+                      style={{ marginRight: "8px" }}></i>
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           </Form>
         )}
       </Formik>
+
       {error && <ErrorAlert error={error} onClose={() => setError(null)} />}
       <Snackbar
         sx={{
@@ -1011,7 +1175,7 @@ const MakeSales = ({
           />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
