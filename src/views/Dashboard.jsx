@@ -3,7 +3,14 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  ShoppingCart,
+  People,
+  Inventory,
+  Group,
+} from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { Box, Grid, useTheme, useMediaQuery } from "@mui/material";
 import SlidingCard from "../components/common/SlidingCard";
@@ -66,13 +73,28 @@ const DummyCard = ({ children, title, sx }) => (
   </motion.div>
 );
 
-export const Widgets = ({ title, count }) => {
+export const Widgets = ({ title, count, icon }) => {
   const [isVisible, setIsVisible] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
+  };
+
+  const getIcon = () => {
+    switch (icon) {
+      case "sales":
+        return <ShoppingCart sx={{ fontSize: "2rem", color: "#2196f3" }} />;
+      case "employees":
+        return <People sx={{ fontSize: "2rem", color: "#4caf50" }} />;
+      case "products":
+        return <Inventory sx={{ fontSize: "2rem", color: "#ff9800" }} />;
+      case "customers":
+        return <Group sx={{ fontSize: "2rem", color: "#9c27b0" }} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -100,14 +122,17 @@ export const Widgets = ({ title, count }) => {
               alignItems: "center",
               mb: 2,
             }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontWeight: 500,
-                color: "#666",
-              }}>
-              {title}
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {getIcon()}
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 500,
+                  color: "#666",
+                }}>
+                {title}
+              </Typography>
+            </Box>
             <IconButton
               onClick={toggleVisibility}
               sx={{
@@ -188,16 +213,28 @@ const Dashboard = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <Widgets title="Sales" count={formatNumber(userCount)} />
+          <Widgets title="Sales" count={formatNumber(userCount)} icon="sales" />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Widgets title="Employees" count={formatNumber(userCount)} />
+          <Widgets
+            title="Employees"
+            count={formatNumber(userCount)}
+            icon="employees"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Widgets title="Products" count={formatNumber(productCount)} />
+          <Widgets
+            title="Products"
+            count={formatNumber(productCount)}
+            icon="products"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Widgets title="Customers" count={formatNumber(customerCount)} />
+          <Widgets
+            title="Customers"
+            count={formatNumber(customerCount)}
+            icon="customers"
+          />
         </Grid>
 
         <Grid item xs={12} md={6}>
