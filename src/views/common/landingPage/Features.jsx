@@ -12,6 +12,8 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 import EdgesensorHighRoundedIcon from "@mui/icons-material/EdgesensorHighRounded";
 import ViewQuiltRoundedIcon from "@mui/icons-material/ViewQuiltRounded";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 const items = [
   {
@@ -46,6 +48,8 @@ const items = [
 
 export default function Features() {
   const [selectedItemIndex, setSelectedItemIndex] = React.useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const handleItemClick = (index) => {
     setSelectedItemIndex(index);
@@ -54,13 +58,14 @@ export default function Features() {
   const selectedFeature = items[selectedItemIndex];
 
   return (
-    <Container id="features" sx={{
-      py: { xs: 8, sm: 16, },
-      pb: 0
-    }}>
+    <Container id="features" sx={{ py: { xs: 8, sm: 16 }, pb: 0 }}>
       <Grid container spacing={6}>
         <Grid item xs={12} md={6}>
-          <div>
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, x: -100 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}>
             <Typography component="h2" variant="h4" color="text.primary">
               Product features
             </Typography>
@@ -72,39 +77,50 @@ export default function Features() {
               product. For example, you could list the number of features, the
               types of features, add-ons, or the benefits of the features.
             </Typography>
-          </div>
+          </motion.div>
+
           <Grid
             container
             item
             gap={1}
             sx={{ display: { xs: "auto", sm: "none" } }}>
             {items.map(({ title }, index) => (
-              <Chip
+              <motion.div
                 key={index}
-                label={title}
-                onClick={() => handleItemClick(index)}
-                sx={{
-                  borderColor: (theme) => {
-                    if (theme.palette.mode === "light") {
+                initial={{ opacity: 0, y: 20 }}
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
+                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Chip
+                  label={title}
+                  onClick={() => handleItemClick(index)}
+                  sx={{
+                    borderColor: (theme) => {
+                      if (theme.palette.mode === "light") {
+                        return selectedItemIndex === index
+                          ? "primary.light"
+                          : "";
+                      }
                       return selectedItemIndex === index ? "primary.light" : "";
-                    }
-                    return selectedItemIndex === index ? "primary.light" : "";
-                  },
-                  background: (theme) => {
-                    if (theme.palette.mode === "light") {
+                    },
+                    background: (theme) => {
+                      if (theme.palette.mode === "light") {
+                        return selectedItemIndex === index ? "none" : "";
+                      }
                       return selectedItemIndex === index ? "none" : "";
-                    }
-                    return selectedItemIndex === index ? "none" : "";
-                  },
-                  backgroundColor:
-                    selectedItemIndex === index ? "primary.main" : "",
-                  "& .MuiChip-label": {
-                    color: selectedItemIndex === index ? "#fff" : "",
-                  },
-                }}
-              />
+                    },
+                    backgroundColor:
+                      selectedItemIndex === index ? "primary.main" : "",
+                    "& .MuiChip-label": {
+                      color: selectedItemIndex === index ? "#fff" : "",
+                    },
+                  }}
+                />
+              </motion.div>
             ))}
           </Grid>
+
           <Box
             component={Card}
             variant="outlined"
@@ -112,49 +128,55 @@ export default function Features() {
               display: { xs: "auto", sm: "none" },
               mt: 4,
             }}>
-            <Box
-              sx={{
-                backgroundRepeat: "none",
-                backgroundImage: (theme) =>
-                  theme.palette.mode === "light"
-                    ? items[selectedItemIndex].imageLight
-                    : items[selectedItemIndex].imageDark,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                minHeight: 280,
-              }}
-            />
-            <Box sx={{ px: 2, pb: 2 }}>
-              <Typography
-                color="text.primary"
-                variant="body2"
-                fontWeight="bold">
-                {selectedFeature.title}
-              </Typography>
-              <Typography
-                color="text.secondary"
-                variant="body2"
-                sx={{ my: 0.5 }}>
-                {selectedFeature.description}
-              </Typography>
-              <Link
-                color="primary"
-                variant="body2"
-                fontWeight="bold"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.5 }}>
+              <Box
                 sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  "& > svg": { transition: "0.2s" },
-                  "&:hover > svg": { transform: "translateX(2px)" },
-                }}>
-                <span>Learn more</span>
-                <ChevronRightRoundedIcon
-                  fontSize="small"
-                  sx={{ mt: "1px", ml: "2px" }}
-                />
-              </Link>
-            </Box>
+                  backgroundRepeat: "none",
+                  backgroundImage: (theme) =>
+                    theme.palette.mode === "light"
+                      ? items[selectedItemIndex].imageLight
+                      : items[selectedItemIndex].imageDark,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  minHeight: 280,
+                }}
+              />
+              <Box sx={{ px: 2, pb: 2 }}>
+                <Typography
+                  color="text.primary"
+                  variant="body2"
+                  fontWeight="bold">
+                  {selectedFeature.title}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  sx={{ my: 0.5 }}>
+                  {selectedFeature.description}
+                </Typography>
+                <Link
+                  color="primary"
+                  variant="body2"
+                  fontWeight="bold"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    "& > svg": { transition: "0.2s" },
+                    "&:hover > svg": { transform: "translateX(2px)" },
+                  }}>
+                  <span>Learn more</span>
+                  <ChevronRightRoundedIcon
+                    fontSize="small"
+                    sx={{ mt: "1px", ml: "2px" }}
+                  />
+                </Link>
+              </Box>
+            </motion.div>
           </Box>
+
           <Stack
             direction="column"
             justifyContent="center"
@@ -163,88 +185,99 @@ export default function Features() {
             useFlexGap
             sx={{ width: "100%", display: { xs: "none", sm: "flex" } }}>
             {items.map(({ icon, title, description }, index) => (
-              <Card
+              <motion.div
                 key={index}
-                variant="outlined"
-                component={Button}
-                onClick={() => handleItemClick(index)}
-                sx={{
-                  p: 3,
-                  height: "fit-content",
-                  width: "100%",
-                  background: "none",
-                  backgroundColor:
-                    selectedItemIndex === index ? "action.selected" : undefined,
-                  borderColor: (theme) => {
-                    if (theme.palette.mode === "light") {
-                      return selectedItemIndex === index
-                        ? "primary.light"
-                        : "grey.200";
-                    }
-                    return selectedItemIndex === index
-                      ? "primary.dark"
-                      : "grey.800";
-                  },
-                }}>
-                <Box
+                initial={{ opacity: 0, x: -50 }}
+                animate={
+                  isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }
+                }
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}>
+                <Card
+                  variant="outlined"
+                  component={Button}
+                  onClick={() => handleItemClick(index)}
                   sx={{
+                    p: 3,
+                    height: "fit-content",
                     width: "100%",
-                    display: "flex",
-                    textAlign: "left",
-                    flexDirection: { xs: "column", md: "row" },
-                    alignItems: { md: "center" },
-                    gap: 2.5,
+                    background: "none",
+                    backgroundColor:
+                      selectedItemIndex === index
+                        ? "action.selected"
+                        : undefined,
+                    borderColor: (theme) => {
+                      if (theme.palette.mode === "light") {
+                        return selectedItemIndex === index
+                          ? "primary.light"
+                          : "grey.200";
+                      }
+                      return selectedItemIndex === index
+                        ? "primary.dark"
+                        : "grey.800";
+                    },
                   }}>
                   <Box
                     sx={{
-                      color: (theme) => {
-                        if (theme.palette.mode === "light") {
+                      width: "100%",
+                      display: "flex",
+                      textAlign: "left",
+                      flexDirection: { xs: "column", md: "row" },
+                      alignItems: { md: "center" },
+                      gap: 2.5,
+                    }}>
+                    <Box
+                      sx={{
+                        color: (theme) => {
+                          if (theme.palette.mode === "light") {
+                            return selectedItemIndex === index
+                              ? "primary.main"
+                              : "grey.300";
+                          }
                           return selectedItemIndex === index
                             ? "primary.main"
-                            : "grey.300";
-                        }
-                        return selectedItemIndex === index
-                          ? "primary.main"
-                          : "grey.700";
-                      },
-                    }}>
-                    {icon}
-                  </Box>
-                  <Box sx={{ textTransform: "none" }}>
-                    <Typography
-                      color="text.primary"
-                      variant="body2"
-                      fontWeight="bold">
-                      {title}
-                    </Typography>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                      sx={{ my: 0.5 }}>
-                      {description}
-                    </Typography>
-                    <Link
-                      color="primary"
-                      variant="body2"
-                      fontWeight="bold"
-                      sx={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        "& > svg": { transition: "0.2s" },
-                        "&:hover > svg": { transform: "translateX(2px)" },
-                      }}
-                      onClick={(event) => {
-                        event.stopPropagation();
+                            : "grey.700";
+                        },
                       }}>
-                      <span>Learn more</span>
-                      <ChevronRightRoundedIcon
-                        fontSize="small"
-                        sx={{ mt: "1px", ml: "2px" }}
-                      />
-                    </Link>
+                      {icon}
+                    </Box>
+                    <Box sx={{ textTransform: "none" }}>
+                      <Typography
+                        color="text.primary"
+                        variant="body2"
+                        fontWeight="bold">
+                        {title}
+                      </Typography>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        sx={{ my: 0.5 }}>
+                        {description}
+                      </Typography>
+                      <Link
+                        color="primary"
+                        variant="body2"
+                        fontWeight="bold"
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          "& > svg": { transition: "0.2s" },
+                          "&:hover > svg": { transform: "translateX(2px)" },
+                        }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                        }}>
+                        <span>Learn more</span>
+                        <ChevronRightRoundedIcon
+                          fontSize="small"
+                          sx={{ mt: "1px", ml: "2px" }}
+                        />
+                      </Link>
+                    </Box>
                   </Box>
-                </Box>
-              </Card>
+                </Card>
+              </motion.div>
             ))}
           </Stack>
         </Grid>
@@ -256,31 +289,37 @@ export default function Features() {
             display: { xs: "none", sm: "flex" },
             width: "100%",
           }}>
-          <Card
-            variant="outlined"
-            sx={{
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-              display: { xs: "none", sm: "flex" },
-              justifyContent: "center",
-              pointerEvents: "none",
-            }}>
-            <Box
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{ width: "100%" }}>
+            <Card
+              variant="outlined"
               sx={{
+                alignItems: "center",
+                height: "100%",
+                width: "100%",
                 display: { xs: "none", sm: "flex" },
                 justifyContent: "center",
-                width: 420,
-                height: 250,
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundImage: (theme) =>
-                  theme.palette.mode === "light"
-                    ? items[selectedItemIndex].imageLight
-                    : items[selectedItemIndex].imageDark,
-              }}
-            />
-          </Card>
+                pointerEvents: "none",
+              }}>
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "flex" },
+                  justifyContent: "center",
+                  width: 420,
+                  height: 250,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundImage: (theme) =>
+                    theme.palette.mode === "light"
+                      ? items[selectedItemIndex].imageLight
+                      : items[selectedItemIndex].imageDark,
+                }}
+              />
+            </Card>
+          </motion.div>
         </Grid>
       </Grid>
     </Container>

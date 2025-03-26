@@ -11,6 +11,8 @@ import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
 import SettingsSuggestRoundedIcon from "@mui/icons-material/SettingsSuggestRounded";
 import SupportAgentRoundedIcon from "@mui/icons-material/SupportAgentRounded";
 import ThumbUpAltRoundedIcon from "@mui/icons-material/ThumbUpAltRounded";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 const items = [
   {
@@ -52,88 +54,135 @@ const items = [
 ];
 
 export default function Highlights() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
   return (
     <Box
       id="highlights"
       sx={{
         pt: { xs: 4, sm: 12 },
-        // pb: { xs: 8, sm: 16 },
         marginLeft: "0",
         marginRight: "0",
         color: "black",
         backgroundSize: "100%",
-        // bgcolor: "background.default",
-        // width: '90vw'
       }}>
-      <Card
-        style={{
-          paddingTop: "5%",
-          paddingBottom: "10%",
-          backgroundColor: "#E0F2F1", // Light shade of green
-          borderRadius: "10px",
-          //   maxWidth: "60  0px",
-          margin: "0 auto",
-          fontSize: 32,
-          fontFamily: "Montserrat, Lato, sans-serif", // Modern font family
-        }}>
-        <Container
-          sx={{
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: { xs: 3, sm: 6 },
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}>
+        <Card
+          style={{
+            paddingTop: "5%",
+            paddingBottom: "10%",
+            backgroundColor: "#E0F2F1",
+            borderRadius: "10px",
+            margin: "0 auto",
+            fontSize: 32,
+            fontFamily: "Montserrat, Lato, sans-serif",
           }}>
-          <Box
+          <Container
             sx={{
-              width: { sm: "100%", md: "60%" },
-              textAlign: { sm: "left", md: "center" },
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: { xs: 3, sm: 6 },
             }}>
-            <Typography component="h2" variant="h4" sx={{
-              pb: {xs: 2, sm: 3, md: 5}
-            }}>
-              Highlights
-            </Typography>
-            <Typography variant="body1" sx={{ color: "black.400", fontFamily: 'Poppins' }}>
-              Explore why our product stands out: adaptability, durability,
-              user-friendly design, and innovation. Enjoy reliable customer
-              support and precision in every detail.
-            </Typography>
-          </Box>
-          <Grid container spacing={2.5}>
-            {items.map((item, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Stack
-                  direction="column"
-                  color="inherit"
-                  component={Card}
-                  spacing={1}
-                  useFlexGap
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.5, delay: 0.2 }}>
+              <Box
+                sx={{
+                  width: { sm: "100%", md: "60%" },
+                  textAlign: { sm: "left", md: "center" },
+                }}>
+                <Typography
+                  component="h2"
+                  variant="h4"
                   sx={{
-                    p: 3,
-                    height: "100%",
-                    border: "1px solid",
-                    borderColor: "grey.800",
-                    // opacity: .8,
-                    color: "white",
-                    background: "linear-gradient(#033363, #021F3B)",
-                    backgroundColor: "white.900",
+                    pb: { xs: 2, sm: 3, md: 5 },
                   }}>
-                  <Box sx={{ opacity: "100%" }}>{item.icon}</Box>
-                  <div>
-                    <Typography fontWeight="medium" gutterBottom>
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "black.400" }}>
-                      {item.description}
-                    </Typography>
-                  </div>
-                </Stack>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Card>
+                  Highlights
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "black.400", fontFamily: "Poppins" }}>
+                  Explore why our product stands out: adaptability, durability,
+                  user-friendly design, and innovation. Enjoy reliable customer
+                  support and precision in every detail.
+                </Typography>
+              </Box>
+            </motion.div>
+
+            <Grid container spacing={2.5}>
+              {items.map((item, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={
+                      isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
+                    }
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    whileTap={{ scale: 0.98 }}>
+                    <Stack
+                      direction="column"
+                      color="inherit"
+                      component={Card}
+                      spacing={1}
+                      useFlexGap
+                      sx={{
+                        p: 3,
+                        height: "100%",
+                        border: "1px solid",
+                        borderColor: "grey.800",
+                        color: "white",
+                        background: "linear-gradient(#033363, #021F3B)",
+                        backgroundColor: "white.900",
+                        transition: "all 0.3s ease-in-out",
+                      }}>
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={
+                          isInView
+                            ? { scale: 1, opacity: 1 }
+                            : { scale: 0.8, opacity: 0 }
+                        }
+                        transition={{
+                          duration: 0.3,
+                          delay: index * 0.1 + 0.2,
+                        }}>
+                        <Box sx={{ opacity: "100%" }}>{item.icon}</Box>
+                      </motion.div>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={
+                          isInView
+                            ? { opacity: 1, x: 0 }
+                            : { opacity: 0, x: -20 }
+                        }
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1 + 0.3,
+                        }}>
+                        <Typography fontWeight="medium" gutterBottom>
+                          {item.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "black.400" }}>
+                          {item.description}
+                        </Typography>
+                      </motion.div>
+                    </Stack>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Card>
+      </motion.div>
     </Box>
   );
 }
