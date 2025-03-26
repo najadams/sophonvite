@@ -11,9 +11,9 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
     { path: "/products", icon: "bx-cart-alt", text: "Inventory" },
     { path: "/customers", icon: "bx-user-plus", text: "Customers" },
     { path: "/vendors", icon: "bx-store-alt", text: "Vendors" },
-    { path: "/debt", icon: "debt", text: "Debt" },
+    { path: "/debt", icon: "bx-money", text: "Debt" },
     { path: "/transactions", icon: "bx-money-withdraw", text: "Transactions" },
-    { path: "/reports", icon: "bx-bxs-report", text: "Reports" },
+    { path: "/reports", icon: "bx-line-chart", text: "Reports" },
     { path: "/notification", icon: "bx-notification", text: "Notification" },
   ];
 
@@ -21,15 +21,15 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
     expanded: {
       width: "250px",
       transition: {
-        duration: 0.3,
-        ease: "easeInOut",
+        duration: 0.2,
+        ease: "easeOut",
       },
     },
     collapsed: {
       width: "70px",
       transition: {
-        duration: 0.3,
-        ease: "easeInOut",
+        duration: 0.2,
+        ease: "easeOut",
       },
     },
   };
@@ -39,16 +39,16 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
       x: 0,
       opacity: 1,
       transition: {
-        duration: 0.3,
-        ease: "easeInOut",
+        duration: 0.15,
+        ease: "easeOut",
       },
     },
     collapsed: {
-      x: -20,
+      x: -10,
       opacity: 0,
       transition: {
-        duration: 0.2,
-        ease: "easeInOut",
+        duration: 0.15,
+        ease: "easeOut",
       },
     },
   };
@@ -62,7 +62,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
       <div className="chevron" onClick={toggleSidebar}>
         <motion.i
           className={`toggle bx ${
-            isExpanded ? "bx-chevron-left" : "bx-chevron-right"
+            isExpanded ? "bx-chevrons-left" : "bx-chevrons-right"
           }`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -83,28 +83,23 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
                 variants={itemVariants}
                 initial={isExpanded ? "expanded" : "collapsed"}
                 animate={isExpanded ? "expanded" : "collapsed"}
-                transition={{ delay: index * 0.05 }}>
+                transition={{ delay: index * 0.03 }}>
                 <NavLink
                   className="navlink"
                   to={item.path}
                   activeclassname="active">
-                  <i className={`bx ${item.icon} icon`}>
-                    {item.icon === "debt" && (
-                      <img
-                        src="./debt.png"
-                        style={{ height: 20, width: 20 }}
-                        alt="D"
-                      />
-                    )}
-                  </i>
-                  <AnimatePresence>
+                  {/* Icon is always visible */}
+                  <i className={`bx ${item.icon} icon`} />
+
+                  {/* Show text only when sidebar is expanded */}
+                  <AnimatePresence mode="wait">
                     {isExpanded && (
                       <motion.span
                         className="text nav-text"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}>
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}>
                         {item.text}
                       </motion.span>
                     )}
