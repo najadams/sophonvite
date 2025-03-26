@@ -213,6 +213,7 @@ const Dashboard = () => {
   const productCount = counts?.productCount || 0;
   const userCount = counts?.workerCount || 0;
   const customerCount = counts?.customerCount || 0;
+  const sales = counts?.salesCount || 0;
 
   return (
     <motion.div
@@ -241,7 +242,7 @@ const Dashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Widgets
             title="Sales"
-            count={formatNumber(userCount)}
+            count={formatNumber(sales)}
             icon="sales"
             index={0}
           />
