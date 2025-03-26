@@ -6,16 +6,69 @@ import CollapsibleTable from "../components/common/CollapsibleTable";
 import axios from "../config";
 import Loader from "../components/common/Loader";
 import { Widgets } from "./Dashboard";
-import { Tabs, Tab } from "@mui/material";
+import { Tabs, Tab, Paper, IconButton, Tooltip } from "@mui/material";
 import SearchField from "../hooks/SearchField";
 import { TabPanel, allyProps } from "./ProductCatalogue";
 import MakeSales from "../components/forms/MakeSales";
 import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { styled } from "@mui/material/styles";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import SearchIcon from "@mui/icons-material/Search";
+
+const FilterContainer = styled(motion.div)(({ theme }) => ({
+  display: "flex",
+  width: "100%",
+  flexWrap: "wrap",
+  flexDirection: "row-reverse",
+  alignItems: "flex-end",
+  justifyContent: "space-between",
+  marginBottom: "20px",
+  gap: "16px",
+}));
+
+const FilterOptions = styled(motion.div)(({ theme }) => ({
+  display: "flex",
+  gap: "16px",
+  alignItems: "center",
+  padding: "16px",
+  background: "white",
+  borderRadius: "12px",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+  },
+}));
+
+const DateInput = styled("input")(({ theme }) => ({
+  padding: "8px 12px",
+  borderRadius: "8px",
+  border: "1px solid #e0e0e0",
+  fontSize: "14px",
+  transition: "all 0.2s ease-in-out",
+  "&:focus": {
+    outline: "none",
+    borderColor: "#1a237e",
+    boxShadow: "0 0 0 2px rgba(26, 35, 126, 0.1)",
+  },
+}));
+
+const FilterButton = styled(IconButton)(({ theme }) => ({
+  background: "white",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+  transition: "all 0.2s ease-in-out",
+  "&:hover": {
+    background: "#f5f5f5",
+    transform: "scale(1.05)",
+  },
+}));
 
 const SalesOrders = () => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const [customerOptions, setCustomerOptions] = useState([]);
-  const [value, setValue] = useState(0); // for managing tabs
+  const [value, setValue] = useState(0);
   const [productOptions, setProductOptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,8 +91,6 @@ const SalesOrders = () => {
     fetchProducts();
   }, [companyId]);
 
-
-  // Fetch receipts using React Query
   const fetchReceipts = async () => {
     try {
       const formattedDate = selectedDate.toISOString().split("T")[0];
@@ -59,8 +110,8 @@ const SalesOrders = () => {
     isError,
     refetch,
   } = useQuery(["receipts", companyId, selectedDate], fetchReceipts, {
-    refetchOnWindowFocus: true, // Refetch when window regains focus
-    enabled: value === 0, // Only fetch when in the "Sales" tab
+    refetchOnWindowFocus: true,
+    enabled: value === 0,
   });
 
   useEffect(() => {
@@ -74,8 +125,6 @@ const SalesOrders = () => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-
-    // Refetch receipts when switching back to the "Sales" tab
     if (newValue === 0) {
       refetch();
     }
@@ -92,6 +141,7 @@ const SalesOrders = () => {
   const newCustomer = (newCustomerOption) => {
     setCustomerOptions(newCustomerOption);
   };
+
   const newProduct = (newProductOption) => {
     setProductOptions(newProductOption);
   };
@@ -123,56 +173,59 @@ const SalesOrders = () => {
 
       <TabPanel value={value} index={0}>
         <div className="content">
-          <div
-            style={{
-              display: "flex",
-              width: "100%",
-              flexWrap: "wrap",
-              flexDirection: "row-reverse",
-              alignItems: "flex-end",
-              justifyContent: "space-between",
-              marginBottom: 10,
-            }}>
+          <FilterContainer>
             <Widgets title={"Sales"} count={`₵${formatNumber(totalSales)}`} />
-            <div className={`filter-options ${showFilters ? "visible" : ""}`}>
-              <span style={{ padding: 10 }}>
-                <label
-                  htmlFor="dateInput"
-                  style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                  Select Date:
-                </label>
-                <input
-                  className="date-input"
-                  type="date"
-                  id="dateInput"
-                  value={selectedDate.toISOString().split("T")[0]} // Format date to YYYY-MM-DD
-                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                />
-              </span>
-              <SearchField
-                onSearch={handleSearch} // Update search term state
-                placeholder={"Search Customer Name"}
-              />
-            </div>
-            <div className="filter-icon-container">
-              <i
-                className="bx bx-filter filter-icon"
-                onClick={toggleFilters}
-                style={{
-                  fontSize: 40,
-                  borderRadius: 10,
-                  backgroundColor: "white",
-                  padding: 5,
-                  cursor: "pointer",
-                }}></i>
-              <span className="filter-text">Filters</span>
-            </div>
-          </div>
+
+            <AnimatePresence>
+              {showFilters && (
+                <FilterOptions
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}>
+                    <CalendarTodayIcon color="action" />
+                    <DateInput
+                      type="date"
+                      value={selectedDate.toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        setSelectedDate(new Date(e.target.value))
+                      }
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}>
+                    <SearchIcon color="action" />
+                    <SearchField
+                      onSearch={handleSearch}
+                      placeholder="Search Customer Name"
+                    />
+                  </div>
+                </FilterOptions>
+              )}
+            </AnimatePresence>
+
+            <Tooltip title={showFilters ? "Hide Filters" : "Show Filters"}>
+              <FilterButton onClick={toggleFilters}>
+                <FilterListIcon color={showFilters ? "primary" : "action"} />
+              </FilterButton>
+            </Tooltip>
+          </FilterContainer>
+
           {!isLoading && !isError && receipts && receipts.length > 0 ? (
             <div style={{ width: "100%" }}>
               <CollapsibleTable
                 receipts={receipts}
-                searchTerm={searchTerm} // Pass search term to CollapsibleTable
+                searchTerm={searchTerm}
                 onFlagChange={refetch}
                 setValue={setValue}
               />

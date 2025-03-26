@@ -24,10 +24,11 @@ import axios from "../../config/index";
 import { formatNumber } from "../../config/Functions";
 import { useSelector } from "react-redux";
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#262626",
+    backgroundColor: "#1a237e",
     color: theme.palette.primary.contrastText,
     fontSize: "16px",
     position: "sticky",
@@ -47,6 +48,31 @@ const StyledTableRow = styled(TableRow)(({ theme, flagged }) => ({
     border: 0,
   },
   backgroundColor: flagged ? "#ffebee" : "inherit",
+  transition: "all 0.2s ease-in-out",
+  "&:hover": {
+    backgroundColor: flagged ? "#ffebee" : theme.palette.action.hover,
+    transform: "scale(1.001)",
+  },
+}));
+
+const DetailBox = styled(Box)(({ theme }) => ({
+  margin: 1,
+  background: "#f8f9fa",
+  borderRadius: "8px",
+  padding: "16px",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+  },
+}));
+
+const DetailTypography = styled(Typography)(({ theme }) => ({
+  color: "#1a237e",
+  fontWeight: 600,
+  marginBottom: "16px",
+  paddingBottom: "8px",
+  borderBottom: "2px solid #e3f2fd",
 }));
 
 function Row({ row, onFlagChange, setValue }) {
@@ -57,7 +83,6 @@ function Row({ row, onFlagChange, setValue }) {
   const [printValues, setPrintValues] = useState(null);
   const companyId = useSelector((state) => state.companyState.data.id);
 
-  
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
   };
@@ -75,11 +100,10 @@ function Row({ row, onFlagChange, setValue }) {
     navigate(`/receipts/${row._id}`, { state: { row } });
   };
 
-  // Updated handleEdit to use onEdit prop
   const handleEdit = () => {
-    navigate(`/sales/${row._id}`, { state: { row} })
+    navigate(`/sales/${row._id}`, { state: { row } });
     handleMenuClose();
-    setValue(1)
+    setValue(1);
   };
 
   const handleFlag = async () => {
@@ -89,7 +113,7 @@ function Row({ row, onFlagChange, setValue }) {
     try {
       await axios.patch(`/api/receipts/${row._id}/flag`, {
         flagged: updatedFlag,
-        companyId
+        companyId,
       });
       onFlagChange(row._id, updatedFlag);
     } catch (error) {
@@ -111,7 +135,7 @@ function Row({ row, onFlagChange, setValue }) {
     setTimeout(() => {
       setPrintValues(null);
     }, 2000);
-    setAnchorEl(null)
+    setAnchorEl(null);
   };
 
   return (
@@ -139,8 +163,12 @@ function Row({ row, onFlagChange, setValue }) {
             <IconButton
               aria-label="expand row"
               size="small"
-              onClick={() => setOpen(!open)}>
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              onClick={() => setOpen(!open)}
+              sx={{
+                transition: "transform 0.2s ease-in-out",
+                transform: open ? "rotate(180deg)" : "rotate(0)",
+              }}>
+              <KeyboardArrowDownIcon />
             </IconButton>
           </TableCell>
           <TableCell component="th" scope="row" style={{ width: "30%" }}>
@@ -155,21 +183,33 @@ function Row({ row, onFlagChange, setValue }) {
             <IconButton
               aria-label="more options"
               size="small"
-              onClick={handleMenuClick}>
+              onClick={handleMenuClick}
+              sx={{
+                transition: "transform 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}>
               <MoreVertIcon />
             </IconButton>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
-              onClose={handleMenuClose}>
+              onClose={handleMenuClose}
+              PaperProps={{
+                sx: {
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                },
+              }}>
               <MenuItem onClick={handlePrintClick}>Print</MenuItem>
               <MenuItem onClick={handleView}>View</MenuItem>
               <MenuItem onClick={handleFlag}>
                 {row.flagged ? "Unflag" : "Flag"}
                 {row.flagged ? (
-                  <FlagIcon fontSize="small" />
+                  <FlagIcon fontSize="small" sx={{ ml: 1 }} />
                 ) : (
-                  <OutlinedFlagIcon fontSize="small" />
+                  <OutlinedFlagIcon fontSize="small" sx={{ ml: 1 }} />
                 )}
               </MenuItem>
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
@@ -180,44 +220,57 @@ function Row({ row, onFlagChange, setValue }) {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box
-              sx={{ margin: 1, background: "#f5f5f5", fontFamily: "poppins" }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Detail
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Quantity</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Unit Price</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>Total Price</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.detail.map((item) => (
-                    <StyledTableRow key={item.name}>
-                      <TableCell component="th" scope="row">
-                        {capitalizeFirstLetter(item.name)}
-                      </TableCell>
-                      <TableCell align="right">{item.quantity}</TableCell>
-                      <TableCell align="right">{item.salesPrice}</TableCell>
-                      <TableCell align="right">
-                        {formatNumber(Math.ceil(item.salesPrice * item.quantity))}
-                      </TableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
+            <AnimatePresence>
+              {open && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}>
+                  <DetailBox>
+                    <DetailTypography variant="h6" component="div">
+                      Detail
+                    </DetailTypography>
+                    <Table size="small" aria-label="purchases">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Name</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>Quantity</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>Unit Price</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>Total Price</strong>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {row.detail.map((item) => (
+                          <StyledTableRow key={item.name}>
+                            <TableCell component="th" scope="row">
+                              {capitalizeFirstLetter(item.name)}
+                            </TableCell>
+                            <TableCell align="right">{item.quantity}</TableCell>
+                            <TableCell align="right">
+                              {item.salesPrice}
+                            </TableCell>
+                            <TableCell align="right">
+                              {formatNumber(
+                                Math.ceil(item.salesPrice * item.quantity)
+                              )}
+                            </TableCell>
+                          </StyledTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </DetailBox>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Collapse>
         </TableCell>
       </TableRow>
