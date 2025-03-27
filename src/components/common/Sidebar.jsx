@@ -81,8 +81,8 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
                 key={item.path}
                 className="nav-link"
                 variants={itemVariants}
-                initial={isExpanded ? "expanded" : "collapsed"}
-                animate={isExpanded ? "expanded" : "collapsed"}
+                initial={isExpanded ? "expanded" : ""}
+                animate={isExpanded ? "expanded" : ""}
                 transition={{ delay: index * 0.03 }}>
                 <NavLink
                   className="navlink"
