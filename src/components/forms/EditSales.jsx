@@ -36,7 +36,7 @@ const validationSchema = Yup.object().shape({
     Yup.object().shape({
       name: Yup.string().required("Product name is required"),
       quantity: Yup.number().required("Quantity is required"),
-      price: Yup.number().required("Price is required"),
+      price: Yup.number().required("Price is required").min(1, "Quantity can't be less than 1"),
     })
   ),
   total: Yup.number().required(),
@@ -165,6 +165,11 @@ const EditSales = () => {
           detailErrors[`products.${index}.quantity`] = `Product ${
             index + 1
           }'s quantity is required`;
+        }
+        if (parseFloat(detail.quantity )< 1) {
+          detailErrors[`products.${index}.quantity`] = `Product ${
+            index + 1
+          }'s price can't be less than 1`;
         }
         if (!detail.price) {
           detailErrors[`products.${index}.price`] = `Product ${
