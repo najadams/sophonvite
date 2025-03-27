@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import Button from "@mui/material/Button";
@@ -11,6 +11,7 @@ import {
   Paper,
   Grid,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import { DialogContext } from "../../context/context";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,12 +19,39 @@ import { ActionCreators } from "../../actions/action";
 import { tableActions } from "../../config/Functions";
 import { motion } from "framer-motion";
 import { alpha } from "@mui/material/styles";
+import { useQueryClient } from "react-query";
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Required"),
-  costPrice: Yup.number().required("Required"),
-  salesPrice: Yup.number().required("Required"),
-  onhand: Yup.number().required("Required"),
+  name: Yup.string()
+    .required("Product name is required")
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must not exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9\s-]+$/,
+      "Only letters, numbers, spaces, and hyphens are allowed"
+    ),
+  costPrice: Yup.number()
+    .required("Cost price is required")
+    .min(0, "Cost price cannot be negative")
+    .max(1000000, "Cost price is too high")
+    .typeError("Cost price must be a number"),
+  salesPrice: Yup.number()
+    .required("Sales price is required")
+    .min(0, "Sales price cannot be negative")
+    .max(1000000, "Sales price is too high")
+    .typeError("Sales price must be a number")
+    .test(
+      "sales-price",
+      "Sales price must be higher than cost price",
+      function (value) {
+        return value > this.parent.costPrice;
+      }
+    ),
+  onhand: Yup.number()
+    .required("Quantity is required")
+    .min(0, "Quantity cannot be negative")
+    .max(1000000, "Quantity is too high")
+    .typeError("Quantity must be a number"),
 });
 
 const ProductForm = ({ data, editMutation }) => {
@@ -33,6 +61,7 @@ const ProductForm = ({ data, editMutation }) => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const handleClose = useContext(DialogContext);
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return (
     <motion.div
@@ -88,24 +117,36 @@ const ProductForm = ({ data, editMutation }) => {
                   dispatch(ActionCreators.fetchInventorySuccess(product));
                   dispatch(ActionCreators.addProduct());
                   setDone(true);
+                  queryClient.invalidateQueries(["api/products", companyId]);
                 }
               }
               if (error) {
                 setError(error);
               } else {
                 setOpen(true);
-                editMutation.mutate(values);
+                if (editMutation?.mutate) {
+                  editMutation.mutate(values);
+                }
                 setTimeout(() => {
                   handleClose();
                 }, 2000);
               }
             } catch (err) {
               console.error(err);
+              setError("An error occurred while saving the product");
             } finally {
               setSubmitting(false);
             }
           }}>
-          {({ submitForm, isSubmitting, handleChange, resetForm }) => (
+          {({
+            submitForm,
+            isSubmitting,
+            handleChange,
+            resetForm,
+            values,
+            errors,
+            touched,
+          }) => (
             <Form>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -116,6 +157,8 @@ const ProductForm = ({ data, editMutation }) => {
                     label="Product Name"
                     fullWidth
                     variant="outlined"
+                    error={touched.name && Boolean(errors.name)}
+                    helperText={touched.name && errors.name}
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
                       const lowercaseValue = trimmedValue.toLowerCase();
@@ -133,6 +176,8 @@ const ProductForm = ({ data, editMutation }) => {
                     name="costPrice"
                     fullWidth
                     variant="outlined"
+                    error={touched.costPrice && Boolean(errors.costPrice)}
+                    helperText={touched.costPrice && errors.costPrice}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">$</InputAdornment>
@@ -149,6 +194,8 @@ const ProductForm = ({ data, editMutation }) => {
                     name="salesPrice"
                     fullWidth
                     variant="outlined"
+                    error={touched.salesPrice && Boolean(errors.salesPrice)}
+                    helperText={touched.salesPrice && errors.salesPrice}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">$</InputAdornment>
@@ -165,6 +212,8 @@ const ProductForm = ({ data, editMutation }) => {
                     name="onhand"
                     fullWidth
                     variant="outlined"
+                    error={touched.onhand && Boolean(errors.onhand)}
+                    helperText={touched.onhand && errors.onhand}
                     disabled={data}
                   />
                 </Grid>
@@ -203,7 +252,9 @@ const ProductForm = ({ data, editMutation }) => {
                       <Button
                         variant="contained"
                         color="primary"
-                        disabled={isSubmitting}
+                        disabled={
+                          isSubmitting || Object.keys(errors).length > 0
+                        }
                         onClick={submitForm}
                         size="large"
                         sx={{
@@ -227,17 +278,14 @@ const ProductForm = ({ data, editMutation }) => {
         </Formik>
 
         {error && (
-          <Typography
-            align="center"
-            color="error"
+          <Alert
+            severity="error"
             sx={{
               mt: 2,
-              p: 2,
-              backgroundColor: alpha("#d32f2f", 0.1),
               borderRadius: 1,
             }}>
             {error}
-          </Typography>
+          </Alert>
         )}
 
         <Snackbar

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { DialogContext } from "../../context/context";
 import { Formik, Field, Form, FieldArray } from "formik";
 import { TextField } from "formik-material-ui";
@@ -12,8 +12,8 @@ import {
   Grid,
   Paper,
   InputAdornment,
+  Alert,
 } from "@mui/material";
-import ErrorAlert from "../../utils/Error";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import * as Yup from "yup";
@@ -22,13 +22,34 @@ import { ActionCreators } from "../../actions/action";
 import { tableActions } from "../../config/Functions";
 import { motion } from "framer-motion";
 import { alpha } from "@mui/material/styles";
+import { useQueryClient } from "react-query";
+
+const phoneRegExp = /^(\+?\d{1,3}[- ]?)?\d{10}$/;
+const emailRegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Required"),
-  phone: Yup.array().of(Yup.string()),
-  email: Yup.array().of(Yup.string().email("Invalid email")),
-  address: Yup.string(),
-  company: Yup.string(),
+  name: Yup.string()
+    .required("Customer name is required")
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must not exceed 50 characters")
+    .matches(/^[a-zA-Z\s-]+$/, "Only letters, spaces, and hyphens are allowed"),
+  phone: Yup.array().of(
+    Yup.string()
+      .matches(phoneRegExp, "Invalid phone number format")
+      .required("Phone number is required")
+  ),
+  email: Yup.array().of(
+    Yup.string()
+      .matches(emailRegExp, "Invalid email format")
+      .required("Email is required")
+  ),
+  address: Yup.string().max(200, "Address must not exceed 200 characters"),
+  company: Yup.string()
+    .max(50, "Company name must not exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9\s-]+$/,
+      "Only letters, numbers, spaces, and hyphens are allowed"
+    ),
 });
 
 const CustomerForm = ({ data, editMutation }) => {
@@ -38,6 +59,7 @@ const CustomerForm = ({ data, editMutation }) => {
   const companyId = useSelector((state) => state.companyState.data.id);
   const handleClose = useContext(DialogContext);
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const initialValues = {
     name: data?.name || "",
@@ -61,6 +83,7 @@ const CustomerForm = ({ data, editMutation }) => {
         } else {
           dispatch(ActionCreators.addCustomer());
           setDone(true);
+          queryClient.invalidateQueries(["api/customers", companyId]);
         }
       }
       if (error) {
@@ -74,7 +97,7 @@ const CustomerForm = ({ data, editMutation }) => {
       }
     } catch (err) {
       console.error(err);
-      setError("An error occurred while saving");
+      setError("An error occurred while saving the customer");
     } finally {
       setSubmitting(false);
     }
@@ -108,7 +131,14 @@ const CustomerForm = ({ data, editMutation }) => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}>
-          {({ submitForm, isSubmitting, resetForm, values }) => (
+          {({
+            submitForm,
+            isSubmitting,
+            resetForm,
+            values,
+            errors,
+            touched,
+          }) => (
             <Form>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -118,6 +148,8 @@ const CustomerForm = ({ data, editMutation }) => {
                     label="Customer Name"
                     fullWidth
                     variant="outlined"
+                    error={touched.name && Boolean(errors.name)}
+                    helperText={touched.name && errors.name}
                     onBlur={(e) => {
                       const trimmedValue = e.target.value.trim();
                       e.target.value = trimmedValue.toLowerCase();
@@ -152,6 +184,14 @@ const CustomerForm = ({ data, editMutation }) => {
                               label={`Phone ${index + 1}`}
                               fullWidth
                               variant="outlined"
+                              error={
+                                touched[`phone.${index}`] &&
+                                Boolean(errors[`phone.${index}`])
+                              }
+                              helperText={
+                                touched[`phone.${index}`] &&
+                                errors[`phone.${index}`]
+                              }
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
@@ -212,6 +252,14 @@ const CustomerForm = ({ data, editMutation }) => {
                               label={`Email ${index + 1}`}
                               fullWidth
                               variant="outlined"
+                              error={
+                                touched[`email.${index}`] &&
+                                Boolean(errors[`email.${index}`])
+                              }
+                              helperText={
+                                touched[`email.${index}`] &&
+                                errors[`email.${index}`]
+                              }
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
@@ -254,6 +302,8 @@ const CustomerForm = ({ data, editMutation }) => {
                     variant="outlined"
                     multiline
                     rows={3}
+                    error={touched.address && Boolean(errors.address)}
+                    helperText={touched.address && errors.address}
                   />
                 </Grid>
 
@@ -264,6 +314,8 @@ const CustomerForm = ({ data, editMutation }) => {
                     label="Company Name"
                     fullWidth
                     variant="outlined"
+                    error={touched.company && Boolean(errors.company)}
+                    helperText={touched.company && errors.company}
                   />
                 </Grid>
 
@@ -301,7 +353,9 @@ const CustomerForm = ({ data, editMutation }) => {
                       <Button
                         variant="contained"
                         color="primary"
-                        disabled={isSubmitting}
+                        disabled={
+                          isSubmitting || Object.keys(errors).length > 0
+                        }
                         onClick={submitForm}
                         size="large"
                         sx={{
@@ -325,17 +379,14 @@ const CustomerForm = ({ data, editMutation }) => {
         </Formik>
 
         {error && (
-          <Typography
-            align="center"
-            color="error"
+          <Alert
+            severity="error"
             sx={{
               mt: 2,
-              p: 2,
-              backgroundColor: alpha("#d32f2f", 0.1),
               borderRadius: 1,
             }}>
             {error}
-          </Typography>
+          </Alert>
         )}
 
         <Snackbar
