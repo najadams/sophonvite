@@ -29,26 +29,38 @@ import SearchField from "../../hooks/SearchField";
 import { useDispatch } from "react-redux";
 import { ActionCreators } from "../../actions/action";
 import { capitalizeFirstLetter } from "../../config/Functions";
+import { motion, AnimatePresence } from "framer-motion";
+import { alpha } from "@mui/material/styles";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.mycolors.tablestyle.default,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+    color: theme.palette.primary.main,
     fontSize: "16px",
+    fontWeight: 600,
+    borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: "14px",
+    transition: "all 0.2s ease-in-out",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: alpha(theme.palette.primary.main, 0.02),
+  },
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+    transform: "scale(1.001)",
+    transition: "all 0.2s ease-in-out",
   },
   "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
+
+const MotionTableRow = motion(StyledTableRow);
 
 const TableCreater = ({ companyId, data, type }) => {
   const [Headers, setHeaders] = useState([]);
@@ -199,7 +211,7 @@ const TableCreater = ({ companyId, data, type }) => {
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(["api/products", companyId]);
-        const values = data.data.product
+        const values = data.data.product;
         const newData = updateValuesAfterEdit(Data, values);
         setData(newData);
       },
@@ -227,30 +239,38 @@ const TableCreater = ({ companyId, data, type }) => {
     }
   );
 
-
   if (isError) {
     return { error };
   }
 
   // Filter data based on search term
-  const filteredData = Data.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.company?.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+  const filteredData = Data.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.company?.toLowerCase().includes(searchTerm.toLocaleLowerCase())
   );
 
   return (
-    <Paper sx={{ width: "100%", overflowX: "hidden", overflowY: "hidden" }}>
+    <Paper
+      sx={{
+        width: "100%",
+        overflowX: "hidden",
+        overflowY: "hidden",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }}>
       <TableContainer
         component={Paper}
         style={{
           overflowX: isMobile && "hidden",
-          maxHeight: isSmallScreen ? "70vh" : "75vh", // Set max height for small screens
-          overflowY: isSmallScreen ? "auto" : "auto", // Enable vertical scroll for small screens
+          maxHeight: isSmallScreen ? "70vh" : "75vh",
+          overflowY: isSmallScreen ? "auto" : "auto",
+          borderRadius: "12px",
         }}>
-        <SearchField onSearch={setSearchTerm} /> {/* Search field */}
+        <SearchField onSearch={setSearchTerm} />
         <Table
           sx={{ minWidth: 650 }}
           size={isSmallScreen ? "small" : "medium"}
-          // dense={isSmallScreen ? } // Make table dense for small screens
           stickyHeader
           aria-label="sticky table">
           <TableHead>
@@ -264,9 +284,14 @@ const TableCreater = ({ companyId, data, type }) => {
             </TableRow>
           </TableHead>
           <TableBody className="table__body">
-            {filteredData.map((row) => {
-              return (
-                <StyledTableRow key={row.id}>
+            <AnimatePresence>
+              {filteredData.map((row, index) => (
+                <MotionTableRow
+                  key={row.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}>
                   {Headers.map((header) => (
                     <TableCell align="left" key={header}>
                       {capitalizeFirstLetter(row[header])}
@@ -276,13 +301,19 @@ const TableCreater = ({ companyId, data, type }) => {
                     <IconButton
                       aria-controls="simple-menu"
                       aria-haspopup="true"
-                      onClick={(event) => handleMenuClick(event, row)}>
+                      onClick={(event) => handleMenuClick(event, row)}
+                      sx={{
+                        transition: "transform 0.2s ease-in-out",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                        },
+                      }}>
                       <MoreVertIcon />
                     </IconButton>
                   </TableCell>
-                </StyledTableRow>
-              );
-            })}
+                </MotionTableRow>
+              ))}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </TableContainer>
@@ -291,11 +322,26 @@ const TableCreater = ({ companyId, data, type }) => {
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={handleMenuClose}>
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          },
+        }}>
         <MenuItem
           onClick={() => {
             handleEditOpen();
-            handleMenuClose(); // Ensure menu closes when edit is selected
+            handleMenuClose();
+          }}
+          sx={{
+            transition: "background-color 0.2s ease-in-out",
+            "&:hover": {
+              backgroundColor: alpha(
+                anchorEl?.getAttribute("data-color") || "#1976d2",
+                0.1
+              ),
+            },
           }}>
           <EditButton
             title={type === "products" ? "Edit Product" : "Edit Customer"}>
@@ -315,14 +361,29 @@ const TableCreater = ({ companyId, data, type }) => {
 
         <MenuItem
           onClick={() => {
-            handleMenuClose(); // Close the menu first
-            handleDelete(selectedRow); // Call the delete handler
+            handleMenuClose();
+            handleDelete(selectedRow);
+          }}
+          sx={{
+            color: "error.main",
+            transition: "background-color 0.2s ease-in-out",
+            "&:hover": {
+              backgroundColor: alpha("#d32f2f", 0.1),
+            },
           }}>
           Delete
         </MenuItem>
       </Menu>
 
-      <Dialog open={Boolean(deleteRow)} onClose={() => setDeleteRow(null)}>
+      <Dialog
+        open={Boolean(deleteRow)}
+        onClose={() => setDeleteRow(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: "12px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          },
+        }}>
         <DialogTitle>
           {`Delete ${
             type === "products" ? "Product" : "Customer"
@@ -336,10 +397,26 @@ const TableCreater = ({ companyId, data, type }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteRow(null)} color="primary">
+          <Button
+            onClick={() => setDeleteRow(null)}
+            color="primary"
+            sx={{
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+            }}>
             Cancel
           </Button>
-          <Button onClick={deleteRowConfirmed} color="primary" autoFocus>
+          <Button
+            onClick={deleteRowConfirmed}
+            color="error"
+            sx={{
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+            }}>
             Delete
           </Button>
         </DialogActions>
