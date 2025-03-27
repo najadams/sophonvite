@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   useQuery,
@@ -13,10 +13,6 @@ import UsersCard from "../components/UsersCard";
 import SearchField from "../hooks/SearchField";
 import {
   useMediaQuery,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   Snackbar,
   TextField,
@@ -40,7 +36,21 @@ const Debt = () => {
   const [selectedDebt, setSelectedDebt] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const matchesTablet = useMediaQuery("(max-width:600px)");
-  
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilters(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchDebts = async () => {
     const formattedDate = selectedDate.toISOString().split("T")[0];
     const url = showAllDebtors
@@ -107,38 +117,33 @@ const Debt = () => {
         return;
       }
       // Trigger the mutation to make the payment
-      setSubmitting(true)
+      setSubmitting(true);
       await paymentMutation.mutateAsync({
         debtId: selectedDebt.id,
         amount: paymentAmount,
         workerId: workerId,
       });
       const updatedDebts = debts.map((debt) => {
-        return (
-          debt.id === selectedDebt.id
-            ? (
-              debt.amount -= paymentAmount
-            )
-            : debt
-          );
-        })
-        
+        return debt.id === selectedDebt.id
+          ? (debt.amount -= paymentAmount)
+          : debt;
+      });
+
       // Update the state with the new debts list
       queryClient.setQueryData(
         ["debts", companyId, selectedDate, showAllDebtors],
         updatedDebts
       );
 
-
       // Close the payment dialog and reset the payment amount
       setPaymentDialogOpen(false);
       setPaymentAmount("");
-      setSubmitting(false)
-      
+      setSubmitting(false);
+
       setOpen(true);
     } catch (error) {
       console.error("Error during payment: ", error);
-      setSubmitting(false)
+      setSubmitting(false);
     }
   };
 
@@ -161,13 +166,11 @@ const Debt = () => {
     return Object.values(grouped);
   };
 
-
-
   const filteredDebts =
-    debts?.filter((debt) =>
-      debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) 
-      ||
-      debt.customerCompany?.toLowerCase().includes(searchTerm.toLowerCase())
+    debts?.filter(
+      (debt) =>
+        debt.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        debt.customerCompany?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   const displayedDebts = compressCards
@@ -224,63 +227,176 @@ const Debt = () => {
               width: "100%",
               alignItems: "flex-end",
               justifyContent: "space-between",
+              display: "flex",
+              gap: "1rem",
+              padding: "0.5rem",
+              position: "relative",
             }}>
-            <div className="filter-icon-container">
-              <i
-                className="bx bx-filter filter-icon"
+            <div
+              ref={filterRef}
+              className="filter-icon-container"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                position: "relative",
+              }}>
+              <button
                 onClick={toggleFilters}
                 style={{
-                  fontSize: 40,
-                  borderRadius: 10,
-                  backgroundColor: "white",
-                  padding: 5,
+                  background: "none",
+                  border: "none",
+                  padding: "0.5rem",
                   cursor: "pointer",
-                }}></i>
-              <span className="filter-text">Filters</span>
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#00796B",
+                  borderRadius: "8px",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 121, 107, 0.04)",
+                  },
+                }}
+                className="filter-button">
+                <i
+                  className="bx bx-filter-alt"
+                  style={{ fontSize: "1.2rem" }}></i>
+                <span style={{ fontSize: "0.9rem", fontWeight: "500" }}>
+                  Filters
+                </span>
+              </button>
+              <div
+                className={`filter-options ${showFilters ? "visible" : ""}`}
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: "0",
+                  background: "white",
+                  padding: "1.5rem",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                  zIndex: 1000,
+                  display: showFilters ? "flex" : "none",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  minWidth: "250px",
+                  marginTop: "0.5rem",
+                  opacity: showFilters ? 1 : 0,
+                  transform: showFilters
+                    ? "translateY(0)"
+                    : "translateY(-10px)",
+                  transition: "all 0.3s ease",
+                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "8px",
+                  }}>
+                  <label
+                    htmlFor="All"
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: "500",
+                      color: "#2c3e50",
+                    }}>
+                    Show All Debtors
+                  </label>
+                  <input
+                    className="checkbox"
+                    id="All"
+                    type="checkbox"
+                    checked={showAllDebtors}
+                    onChange={handleShowAllChange}
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      cursor: "pointer",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    padding: "0.5rem",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "8px",
+                  }}>
+                  <SearchField
+                    placeholder="Search Debtor"
+                    onSearch={handleSearch}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    padding: "0.5rem",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "8px",
+                  }}>
+                  <label
+                    htmlFor="dateInput"
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: "500",
+                      color: "#2c3e50",
+                    }}>
+                    Select Date
+                  </label>
+                  <input
+                    className="date-input"
+                    type="date"
+                    id="dateInput"
+                    value={selectedDate.toISOString().split("T")[0]}
+                    onChange={handleDateChange}
+                    style={{
+                      padding: "0.5rem",
+                      borderRadius: "6px",
+                      border: "1px solid #e9ecef",
+                      fontSize: "0.9rem",
+                      outline: "none",
+                      "&:focus": {
+                        borderColor: "#00796B",
+                      },
+                    }}
+                  />
+                </div>
+              </div>
             </div>
             {debts.length > 0 ? (
-              <Button variant={"outlined"} onClick={toggleCompressCards}>
-                {compressCards ? "Show Individual Debts" : "Compress Cards"}
-              </Button>
-            ) : (
-              ""
-            )}
-            <div className={`filter-options ${showFilters ? "visible" : ""}`}>
-              <span style={{ padding: 10 }}>
-                <label
-                  htmlFor="All"
-                  style={{ marginLeft: 2, fontSize: "larger", font: "icon" }}>
-                  All Debtors:
-                </label>
-                <input
-                  className="checkbox"
-                  id="All"
-                  type="checkbox"
-                  checked={showAllDebtors}
-                  onChange={handleShowAllChange}
-                />
-              </span>
-              <span style={{ display: "flex" }}>
-                <SearchField
-                  placeholder={"Search Debtor"}
-                  onSearch={handleSearch}
-                />
-              </span>
-              <span style={{ padding: 10, flex: 1 }}>
-                <label
-                  htmlFor="dateInput"
-                  style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                  Select Date:
-                </label>
-                <input
-                  className="date-input"
-                  type="date"
-                  id="dateInput"
-                  value={selectedDate.toISOString().split("T")[0]}
-                  onChange={handleDateChange}
-                />
-              </span>
-            </div>
+              <button
+                onClick={toggleCompressCards}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: "0.5rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#00796B",
+                  borderRadius: "8px",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 121, 107, 0.04)",
+                  },
+                }}
+                className="compress-button">
+                <i
+                  className={`bx ${
+                    compressCards ? "bx-expand" : "bx-compress"
+                  }`}
+                  style={{ fontSize: "1.2rem" }}></i>
+                <span style={{ fontSize: "0.9rem", fontWeight: "500" }}>
+                  {compressCards ? "Expand" : "Compress"}
+                </span>
+              </button>
+            ) : null}
           </div>
         </div>
         {!isLoading &&
@@ -291,42 +407,58 @@ const Debt = () => {
             style={{
               display: "flex",
               flexWrap: "wrap",
-              gap: 5,
+              gap: "1rem",
               justifyContent: "center",
+              padding: "1rem",
             }}>
-            {displayedDebts.map((debt) =>
-              compressCards ? (
-                <UsersCard
-                  key={debt.id}
-                  main={`₵${debt.amount}`}
-                  sub={debt.customerCompany !== 'NoCompany' ? debt.customerCompany : debt.customerName}
-                  contact={debt.contact}
-                  onClick={() => handleCardClick(debt)}
-                  additionalInfo={`Debt Date: ${new Date(
-                    debt.date
-                  ).toLocaleDateString()}`}
-                />
-              ) : (
-                <UsersCard
-                  key={debt.data}
-                  top={new Date(debt.date).toLocaleDateString()}
-                  main={`₵${debt.amount}`}
-                  sub={
-                    debt.customerCompany !== 'NoCompany'
-                      ? debt.customerCompany
-                      : debt.customerName
-                  }
-                  contact={debt.contact}
-                  onClick={() => handleCardClick(debt)}
-                  additionalInfo={`Debt Date: ${new Date(
-                    debt.date
-                  ).toLocaleDateString()}`}
-                />
-              )
-            )}
+            {displayedDebts.map((debt, index) => (
+              <div
+                key={debt.id || debt.data}
+                style={{
+                  animation: `fadeInUp 0.5s ease forwards ${index * 0.1}s`,
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                }}>
+                {compressCards ? (
+                  <UsersCard
+                    main={`₵${debt.amount}`}
+                    sub={
+                      debt.customerCompany !== "NoCompany"
+                        ? debt.customerCompany
+                        : debt.customerName
+                    }
+                    contact={debt.contact}
+                    onClick={() => handleCardClick(debt)}
+                    additionalInfo={`Debt Date: ${new Date(
+                      debt.date
+                    ).toLocaleDateString()}`}
+                  />
+                ) : (
+                  <UsersCard
+                    top={new Date(debt.date).toLocaleDateString()}
+                    main={`₵${debt.amount}`}
+                    sub={
+                      debt.customerCompany !== "NoCompany"
+                        ? debt.customerCompany
+                        : debt.customerName
+                    }
+                    contact={debt.contact}
+                    onClick={() => handleCardClick(debt)}
+                    additionalInfo={`Debt Date: ${new Date(
+                      debt.date
+                    ).toLocaleDateString()}`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="content">
+          <div
+            className="content"
+            style={{
+              animation: "fadeIn 0.5s ease forwards",
+              opacity: 0,
+            }}>
             {selectedDate.toISOString().split("T")[0] ===
             new Date().toISOString().split("T")[0] ? (
               <h2 style={{ paddingTop: "100px" }}>No Debts Acquired Today</h2>
@@ -338,6 +470,38 @@ const Debt = () => {
             )}
           </div>
         )}
+
+        <style>
+          {`
+            @keyframes fadeInUp {
+              from {
+                opacity: 0;
+                transform: translateY(20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+              }
+              to {
+                opacity: 1;
+              }
+            }
+
+            .filter-options {
+              transition: all 0.3s ease;
+            }
+
+            .filter-options.visible {
+              display: flex !important;
+            }
+          `}
+        </style>
 
         <PaymentDialog
           open={paymentDialogOpen}

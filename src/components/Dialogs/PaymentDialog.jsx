@@ -9,9 +9,9 @@ import {
   CircularProgress,
   Typography,
   Grid,
+  Box,
 } from "@mui/material";
 import { capitalizeFirstLetter, tableActions } from "../../config/Functions";
-import { useSelector } from "react-redux";
 import ReceiptDialog from "./ReceiptDialog";
 import PaymentDisplayDialog from "./PaymentDisplayDialog";
 
@@ -31,7 +31,7 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
 
   const handlePayment = async () => {
     setSubmitting(true);
-    await onSubmit(paymentAmount); // Call the parent function to handle payment
+    await onSubmit(paymentAmount);
     setSubmitting(false);
     onClose();
     setPaymentAmount(0);
@@ -39,7 +39,7 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
 
   const handleViewReceipt = async () => {
     setSubmittingView(true);
-    const  data = await tableActions.fetchReceiptsById({
+    const data = await tableActions.fetchReceiptsById({
       receiptId: selectedDebt?.id,
     });
     setReceiptData(data);
@@ -52,9 +52,8 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
     const data = await tableActions.fetchPaymentsById({
       debtId: selectedDebt?.id,
     });
-    console.log(data)
     setPaymentData(data);
-    setPaymentDisplayDialogOpen(true); // Open the payment display dialog
+    setPaymentDisplayDialogOpen(true);
     setSubmittingView(false);
   };
 
@@ -73,32 +72,108 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
       <Dialog
         open={open}
         onClose={onClose}
-        aria-labelledby="debt-payment-title"
-        aria-describedby="debt-payment-description">
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+            overflow: "hidden",
+          },
+        }}>
         <DialogTitle
-          id="debt-payment-title"
-          sx={{ background: "#00796B", color: "white", textAlign: "center" }}>
+          sx={{
+            background: "linear-gradient(135deg, #00796B 0%, #009688 100%)",
+            color: "white",
+            textAlign: "center",
+            py: 2,
+            "& .MuiTypography-root": {
+              fontSize: "1.5rem",
+              fontWeight: 600,
+            },
+          }}>
           Clear Customer Debt
         </DialogTitle>
-        <DialogContent sx={{ padding: "34px" }}>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
+        <DialogContent sx={{ p: 3 }}>
+          <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Typography variant="body1" gutterBottom>
-                <b>Customer:</b>{" "}
-                {capitalizeFirstLetter(selectedDebt?.customerName)}
-              </Typography>
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "#f8f9fa",
+                  borderRadius: 2,
+                  border: "1px solid #e9ecef",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#00796B",
+                    bgcolor: "#f0f7f5",
+                  },
+                }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}>
+                  Customer
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, color: "#2c3e50" }}>
+                  {selectedDebt?.customerCompany !== "NoCompany" ? (
+                    capitalizeFirstLetter(
+                      `${selectedDebt?.customerName} - ${selectedDebt?.customerCompany}`
+                    )
+                  ) : (
+                    capitalizeFirstLetter(selectedDebt?.customerName)
+                  )}
+                </Typography>
+              </Box>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1" gutterBottom>
-                <b>Cashier:</b>{" "}
-                {capitalizeFirstLetter(selectedDebt?.workerName)}
-              </Typography>
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "#f8f9fa",
+                  borderRadius: 2,
+                  border: "1px solid #e9ecef",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#00796B",
+                    bgcolor: "#f0f7f5",
+                  },
+                }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}>
+                  Cashier
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, color: "#2c3e50" }}>
+                  {capitalizeFirstLetter(selectedDebt?.workerName)}
+                </Typography>
+              </Box>
             </Grid>
             <Grid item xs={6}>
               <Button
                 variant="outlined"
                 onClick={handleViewPayment}
-                sx={{ color: "blue", textTransform: "capitalize" }}>
+                startIcon={
+                  <i
+                    className="bx bx-history"
+                    style={{ fontSize: "1.2rem" }}></i>
+                }
+                sx={{
+                  color: "#00796B",
+                  borderColor: "#00796B",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  "&:hover": {
+                    borderColor: "#00796B",
+                    bgcolor: "rgba(0, 121, 107, 0.04)",
+                  },
+                }}>
                 View Payments
               </Button>
             </Grid>
@@ -106,7 +181,22 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
               <Button
                 variant="outlined"
                 onClick={handleViewReceipt}
-                sx={{ color: "blue", textTransform: "capitalize" }}>
+                startIcon={
+                  <i
+                    className="bx bx-receipt"
+                    style={{ fontSize: "1.2rem" }}></i>
+                }
+                sx={{
+                  color: "#00796B",
+                  borderColor: "#00796B",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  "&:hover": {
+                    borderColor: "#00796B",
+                    bgcolor: "rgba(0, 121, 107, 0.04)",
+                  },
+                }}>
                 View Receipt
               </Button>
             </Grid>
@@ -116,10 +206,17 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 label="Amount Owed"
                 type="number"
                 fullWidth
-                variant="standard"
+                variant="outlined"
                 value={selectedDebt?.amount || 0}
                 InputProps={{
                   readOnly: true,
+                  sx: {
+                    bgcolor: "#f8f9fa",
+                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e9ecef",
+                    },
+                  },
                 }}
               />
             </Grid>
@@ -129,9 +226,20 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 label="Amount Paid"
                 type="number"
                 fullWidth
-                variant="standard"
+                variant="outlined"
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                InputProps={{
+                  sx: {
+                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#00796B",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#00796B",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={6}>
@@ -140,34 +248,67 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
                 label="Balance Left"
                 type="number"
                 fullWidth
-                variant="standard"
+                variant="outlined"
                 value={calculateBalance()}
                 InputProps={{
                   readOnly: true,
+                  sx: {
+                    bgcolor: "#f8f9fa",
+                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e9ecef",
+                    },
+                  },
                 }}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions
-          sx={{ justifyContent: "space-between", padding: "16px" }}>
-          <Button onClick={onClose} variant="text" sx={{ color: "#00796B" }}>
+          sx={{
+            p: 2,
+            justifyContent: "space-between",
+            borderTop: "1px solid #e9ecef",
+          }}>
+          <Button
+            onClick={onClose}
+            variant="text"
+            sx={{
+              color: "#666",
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": {
+                bgcolor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}>
             Cancel
           </Button>
           {submitting ? (
-            <CircularProgress size={24} />
+            <CircularProgress size={24} sx={{ color: "#00796B" }} />
           ) : (
             <Button
               onClick={handlePayment}
               variant="contained"
-              sx={{ background: "#00796B", color: "white" }}>
+              startIcon={
+                <i className="bx bx-check" style={{ fontSize: "1.2rem" }}></i>
+              }
+              sx={{
+                bgcolor: "#00796B",
+                color: "white",
+                borderRadius: "8px",
+                textTransform: "none",
+                fontWeight: 500,
+                px: 3,
+                "&:hover": {
+                  bgcolor: "#00695C",
+                },
+              }}>
               Submit Payment
             </Button>
           )}
         </DialogActions>
       </Dialog>
 
-      {/* Receipt Dialog */}
       {receiptData && (
         <ReceiptDialog
           open={receiptDialogOpen}
@@ -176,7 +317,6 @@ const PaymentDialog = ({ open, onClose, selectedDebt, onSubmit }) => {
         />
       )}
 
-      {/* Payment Display Dialog */}
       {paymentData && (
         <PaymentDisplayDialog
           open={paymentDisplayDialogOpen}
