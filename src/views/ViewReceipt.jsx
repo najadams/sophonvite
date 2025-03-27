@@ -1,8 +1,23 @@
-import { Card, Typography, Grid, Divider } from "@mui/material";
+import {
+  Card,
+  Typography,
+  Grid,
+  Divider,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import { useLocation } from "react-router-dom"; // Import useLocation hook
 import { capitalizeFirstLetter } from "../config/Functions";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
+import { alpha } from "@mui/material/styles";
 
 const ViewReceipt = () => {
   const company = useSelector((state) => state.companyState.data);
@@ -11,12 +26,24 @@ const ViewReceipt = () => {
 
   // Ensure that row exists before proceeding
   if (!row) {
-    return <Typography variant="h6">No receipt details available</Typography>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}>
+        <Typography variant="h6" color="text.secondary">
+          No receipt details available
+        </Typography>
+      </Box>
+    );
   }
 
   const {
     customerName,
-     customerCompany,
+    customerCompany,
     detail,
     amountPaid,
     total,
@@ -28,199 +55,243 @@ const ViewReceipt = () => {
 
   // Define colors
   const primaryColor = "#00796B"; // A pleasant greenish-blue color
-const secondaryColor = "#004D40"; // Darker shade for contrast
-//   const primaryColor = "#1976d2 ";
-//   const secondaryColor = "#1976d2 "; // Darker shade for contrast
+  const secondaryColor = "#004D40"; // Darker shade for contrast
+  //   const primaryColor = "#1976d2 ";
+  //   const secondaryColor = "#1976d2 "; // Darker shade for contrast
 
   return (
-    <div className="page">
-      <Card
-        style={{
-          padding: "20px",
-          backgroundColor: "#E0F2F1", // Light shade of green
-          borderRadius: "10px",
-          //   maxWidth: "60  0px",
-          margin: "0 auto",
-          fontFamily: "'Roboto', sans-serif", // Modern font family
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{ height: "100%", overflow: "auto" }}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          py: 4,
+          px: 2,
         }}>
-        {/* Company Info */}
-        <Typography
-          variant="h4"
-          style={{
-            textAlign: "center",
-            color: primaryColor,
-            fontWeight: "bold",
-            marginBottom: "10px",
+        <Box
+          sx={{
+            width: "100%",
+            // maxWidth: "800px",
+            flex: 1,
           }}>
-          {capitalizeFirstLetter(company?.companyName)}
-        </Typography>
-
-        {company?.tinNumber && (
-          <Typography variant="body1" align="center" color="textSecondary">
-            Tin Number: {company.tinNumber.toUpperCase()}
-          </Typography>
-        )}
-
-        {company?.contact && (
-          <Typography variant="body1" align="center" color="textSecondary">
-            Contact: {company.contact}
-          </Typography>
-        )}
-
-        {company?.momo && (
-          <Typography variant="body1" align="center" color="textSecondary">
-            Momo: {company.momo}
-          </Typography>
-        )}
-
-        <Divider
-          style={{ margin: "20px 0", backgroundColor: secondaryColor }}
-        />
-
-        {/* Customer Info */}
-        <Grid container spacing={2}>
-          <Grid item xs={6} sm={4} md={4}>
-            <Typography variant="subtitle1" color={primaryColor}>
-              Customer:
-            </Typography>
-            <Typography variant="body1">
-              {capitalizeFirstLetter(customerName)} - {capitalizeFirstLetter(customerCompany)} 
-            </Typography>
-          </Grid>
-          <Grid item xs={6} sm={4} md={4}>
-            <Typography variant="subtitle1" color={primaryColor}>
-              Cashier:
-            </Typography>
-            <Typography variant="body1">
-              {capitalizeFirstLetter(workerName)}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={4} md={4}>
-            <Typography variant="subtitle1" color={primaryColor}>
-              Date:
-            </Typography>
-            <Typography variant="body1">
-              {format(new Date(date), "dd/MM/yyyy")}
-              {/* Format date */}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        <Divider
-          style={{ margin: "20px 0", backgroundColor: secondaryColor }}
-        />
-
-        {/* Products Info */}
-        <Typography
-          variant="h5"
-          style={{
-            textAlign: "center",
-            color: primaryColor,
-            marginBottom: "10px",
-          }}>
-          Purchased Products
-        </Typography>
-
-        <table style={{ width: "100%", marginBottom: "20px" }}>
-          <thead>
-            <tr style={{ backgroundColor: secondaryColor, color: "white" }}>
-              <th style={{ padding: "10px" }}>Qty</th>
-              <th style={{ padding: "10px" }}>Product</th>
-              <th style={{ padding: "10px" }}>Price</th>
-              <th style={{ padding: "10px" }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detail.map((product, index) => (
-              <tr key={index} style={{ textAlign: "center" }}>
-                <td style={{ padding: "8px" }}>{product.quantity}</td>
-                <td style={{ padding: "8px" }}>
-                  {capitalizeFirstLetter(product.name)}
-                </td>
-                <td style={{ padding: "8px" }}>
-                  ₵{product.price || product.salesPrice}
-                </td>
-                <td style={{ padding: "8px" }}>
-                  ₵
-                  {product.price
-                    ? Math.ceil(product.price * product.quantity)
-                    : Math.ceil(product.salesPrice * product.quantity)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Summary Info */}
-        <Divider
-          style={{ margin: "20px 0", backgroundColor: secondaryColor }}
-        />
-
-        <Grid container spacing={2}>
-          {company.taxRate && (
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" color={primaryColor}>
-                Tax (%):
+          <Card
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 4 },
+              borderRadius: 3,
+              backgroundColor: alpha("#fff", 0.8),
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}>
+            {/* Company Info */}
+            <Box sx={{ textAlign: "center", mb: 3 }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "primary.main",
+                  fontWeight: 600,
+                  mb: 1,
+                }}>
+                {capitalizeFirstLetter(company?.companyName)}
               </Typography>
-              <Typography variant="body1">{company.taxRate}</Typography>
-            </Grid>
-          )}
-          {discount !== undefined && discount !== null && discount !== 0 && (
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" color={primaryColor}>
-                Discount:
-              </Typography>
-              <Typography variant="body1">₵{discount}</Typography>
-            </Grid>
-          )}
-          <Grid item xs={6}>
-            <Typography variant="subtitle1" color={primaryColor}>
-              Total:
-            </Typography>
-            <Typography variant="body1">₵{total}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle1" color={primaryColor}>
-              Paid:
-            </Typography>
-            <Typography variant="body1">₵{amountPaid}</Typography>
-          </Grid>
-          {balance !== undefined && balance !== null && balance !== 0 && (
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" color={primaryColor}>
-                Balance:
-              </Typography>
-              <Typography variant="body1">₵{balance}</Typography>
-            </Grid>
-          )}
-        </Grid>
 
-        <Divider
-          style={{ margin: "20px 0", backgroundColor: secondaryColor }}
-        />
+              {company?.tinNumber && (
+                <Typography variant="body1" color="text.secondary">
+                  Tin Number: {company.tinNumber.toUpperCase()}
+                </Typography>
+              )}
 
-        {/* Footer Message */}
-        <Typography
-          variant="body2"
-          style={{
-            textAlign: "center",
-            color: secondaryColor,
-            marginTop: "10px",
-          }}>
-          Goods Sold Are Not Returnable
-        </Typography>
-        <Typography
-          variant="h6"
-          style={{
-            textAlign: "center",
-            color: primaryColor,
-            fontWeight: "bold",
-            marginTop: "10px",
-          }}>
-          Thank you for shopping with us!
-        </Typography>
-      </Card>
-    </div>
+              {company?.contact && (
+                <Typography variant="body1" color="text.secondary">
+                  Contact: {company.contact}
+                </Typography>
+              )}
+
+              {company?.momo && (
+                <Typography variant="body1" color="text.secondary">
+                  Momo: {company.momo}
+                </Typography>
+              )}
+            </Box>
+
+            <Divider sx={{ my: 3, backgroundColor: "primary.main" }} />
+
+            {/* Customer Info */}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="subtitle1" color="primary" sx={{ mb: 1 }}>
+                  Customer
+                </Typography>
+                <Typography variant="body1">
+                  {capitalizeFirstLetter(customerName)} -{" "}
+                  {capitalizeFirstLetter(customerCompany)}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="subtitle1" color="primary" sx={{ mb: 1 }}>
+                  Cashier
+                </Typography>
+                <Typography variant="body1">
+                  {capitalizeFirstLetter(workerName)}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="subtitle1" color="primary" sx={{ mb: 1 }}>
+                  Date
+                </Typography>
+                <Typography variant="body1">
+                  {format(new Date(date), "dd/MM/yyyy")}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 3, backgroundColor: "primary.main" }} />
+
+            {/* Products Table */}
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                color: "primary.main",
+                mb: 3,
+                fontWeight: 500,
+              }}>
+              Purchased Products
+            </Typography>
+
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              sx={{
+                mb: 3,
+                borderRadius: 2,
+                backgroundColor: alpha("#f5f5f5", 0.5),
+                maxHeight: "400px",
+                overflow: "auto",
+              }}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Qty
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Product
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Price
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Total
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {detail.map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell align="center">{product.quantity}</TableCell>
+                      <TableCell align="center">
+                        {capitalizeFirstLetter(product.name)}
+                      </TableCell>
+                      <TableCell align="center">
+                        ₵{product.price || product.salesPrice}
+                      </TableCell>
+                      <TableCell align="center">
+                        ₵
+                        {product.price
+                          ? Math.ceil(product.price * product.quantity)
+                          : Math.ceil(product.salesPrice * product.quantity)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Divider sx={{ my: 3, backgroundColor: "primary.main" }} />
+
+            {/* Summary Info */}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              {company.taxRate && (
+                <Grid item xs={6}>
+                  <Typography
+                    variant="subtitle1"
+                    color="primary"
+                    sx={{ mb: 1 }}>
+                    Tax (%)
+                  </Typography>
+                  <Typography variant="body1">{company.taxRate}</Typography>
+                </Grid>
+              )}
+              {discount !== undefined &&
+                discount !== null &&
+                discount !== 0 && (
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle1"
+                      color="primary"
+                      sx={{ mb: 1 }}>
+                      Discount
+                    </Typography>
+                    <Typography variant="body1">₵{discount}</Typography>
+                  </Grid>
+                )}
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" color="primary" sx={{ mb: 1 }}>
+                  Total
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  ₵{total}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" color="primary" sx={{ mb: 1 }}>
+                  Paid
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  ₵{amountPaid}
+                </Typography>
+              </Grid>
+              {balance !== undefined && balance !== null && balance !== 0 && (
+                <Grid item xs={6}>
+                  <Typography
+                    variant="subtitle1"
+                    color="primary"
+                    sx={{ mb: 1 }}>
+                    Balance
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    ₵{balance}
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+
+            <Divider sx={{ my: 3, backgroundColor: "primary.main" }} />
+
+            {/* Footer */}
+            <Box sx={{ textAlign: "center", mt: "auto" }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Goods Sold Are Not Returnable
+              </Typography>
+              <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+                Thank you for shopping with us!
+              </Typography>
+            </Box>
+          </Card>
+        </Box>
+      </Box>
+    </motion.div>
   );
 };
 
