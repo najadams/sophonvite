@@ -10,6 +10,8 @@ import {
   IconButton,
   Box,
   Grid,
+  Paper,
+  InputAdornment,
 } from "@mui/material";
 import ErrorAlert from "../../utils/Error";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,13 +20,13 @@ import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { ActionCreators } from "../../actions/action";
 import { tableActions } from "../../config/Functions";
+import { motion } from "framer-motion";
+import { alpha } from "@mui/material/styles";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
   phone: Yup.array().of(Yup.string()),
-  email: Yup.array().of(
-    Yup.string().email("Invalid email")
-  ),
+  email: Yup.array().of(Yup.string().email("Invalid email")),
   address: Yup.string(),
   company: Yup.string(),
 });
@@ -44,7 +46,6 @@ const CustomerForm = ({ data, editMutation }) => {
     address: data?.address || "",
     company: data?.company || "",
   };
-  useEffect(() => { console.log(data) }, [data]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setSubmitting(true);
@@ -53,7 +54,6 @@ const CustomerForm = ({ data, editMutation }) => {
       if (data) {
         values.id = data.id;
         error = await tableActions.updateCustomer(values);
-        console.log(values)
       } else {
         const result = await tableActions.addCustomer({ ...values, companyId });
         if (typeof result === "string") {
@@ -81,164 +81,276 @@ const CustomerForm = ({ data, editMutation }) => {
   };
 
   return (
-    <div style={{ paddingTop: 20 }}>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}>
-        {({ submitForm, isSubmitting, resetForm, values }) => (
-          <Form>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Field
-                  component={TextField}
-                  name="name"
-                  label="Name"
-                  fullWidth
-                  onBlur={(e) => {
-                    const trimmedValue = e.target.value.trim();
-                    // Update the value to lower case trimmed value
-                    e.target.value = trimmedValue.toLowerCase();
-                  }}
-                />
-              </Grid>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          borderRadius: 2,
+          backgroundColor: alpha("#fff", 0.8),
+          backdropFilter: "blur(10px)",
+        }}>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 4,
+            fontWeight: 500,
+            color: "primary.main",
+            textAlign: "center",
+          }}>
+          {data ? "Edit Customer" : "Add New Customer"}
+        </Typography>
 
-              <Grid item xs={12}>
-                <FieldArray name="phone">
-                  {({ remove, push }) => (
-                    <div>
-                      <Typography variant="h6">Phone Numbers</Typography>
-                      {values.phone.map((phone, index) => (
-                        <Box
-                          key={index}
-                          display="flex"
-                          alignItems="center"
-                          gap={1}
-                          mb={1}>
-                          <Field
-                            component={TextField}
-                            name={`phone.${index}`}
-                            label={`Phone ${index + 1}`}
-                            fullWidth
-                          />
-                          <IconButton
-                            onClick={() => remove(index)}
-                            disabled={values.phone.length === 1}>
-                            <RemoveIcon />
-                          </IconButton>
-                        </Box>
-                      ))}
-                      <IconButton onClick={() => push("")}>
-                        <AddIcon />
-                      </IconButton>
-                    </div>
-                  )}
-                </FieldArray>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FieldArray name="email">
-                  {({ remove, push }) => (
-                    <div>
-                      <Typography variant="h6">Email Addresses</Typography>
-                      {values.email.map((email, index) => (
-                        <Box
-                          key={index}
-                          display="flex"
-                          alignItems="center"
-                          gap={1}
-                          mb={1}>
-                          <Field
-                            component={TextField}
-                            name={`email.${index}`}
-                            label={`Email ${index + 1}`}
-                            fullWidth
-                          />
-                          <IconButton
-                            onClick={() => remove(index)}
-                            disabled={values.email.length === 1}>
-                            <RemoveIcon />
-                          </IconButton>
-                        </Box>
-                      ))}
-                      <IconButton onClick={() => push("")}>
-                        <AddIcon />
-                      </IconButton>
-                    </div>
-                  )}
-                </FieldArray>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Field
-                  component={TextField}
-                  name="address"
-                  label="Address"
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Field
-                  component={TextField}
-                  name="company"
-                  label="Company Name"
-                  fullWidth
-                />
-              </Grid>
-
-              {isSubmitting && (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}>
+          {({ submitForm, isSubmitting, resetForm, values }) => (
+            <Form>
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <LinearProgress />
+                  <Field
+                    component={TextField}
+                    name="name"
+                    label="Customer Name"
+                    fullWidth
+                    variant="outlined"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      e.target.value = trimmedValue.toLowerCase();
+                    }}
+                  />
                 </Grid>
-              )}
 
-              <Grid item xs={12}>
-                <Box display="flex" justifyContent="flex-end">
-                  {done ? (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        resetForm();
-                        setDone(false);
-                      }}>
-                      Customer Added! Click to Add New Customer
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={isSubmitting}
-                      onClick={submitForm}>
-                      {data ? "Save Changes" : "Add Customer"}
-                    </Button>
-                  )}
-                </Box>
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ mb: 1, color: "text.secondary" }}>
+                    Phone Numbers
+                  </Typography>
+                  <FieldArray name="phone">
+                    {({ remove, push }) => (
+                      <Box>
+                        {values.phone.map((phone, index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mb: 2,
+                              p: 2,
+                              backgroundColor: alpha("#f5f5f5", 0.5),
+                              borderRadius: 1,
+                            }}>
+                            <Field
+                              component={TextField}
+                              name={`phone.${index}`}
+                              label={`Phone ${index + 1}`}
+                              fullWidth
+                              variant="outlined"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    📞
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                            <IconButton
+                              onClick={() => remove(index)}
+                              disabled={values.phone.length === 1}
+                              sx={{
+                                color: "error.main",
+                                "&:hover": {
+                                  backgroundColor: alpha("#d32f2f", 0.1),
+                                },
+                              }}>
+                              <RemoveIcon />
+                            </IconButton>
+                          </Box>
+                        ))}
+                        <Button
+                          startIcon={<AddIcon />}
+                          onClick={() => push("")}
+                          variant="outlined"
+                          sx={{ mt: 1 }}>
+                          Add Phone Number
+                        </Button>
+                      </Box>
+                    )}
+                  </FieldArray>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ mb: 1, color: "text.secondary" }}>
+                    Email Addresses
+                  </Typography>
+                  <FieldArray name="email">
+                    {({ remove, push }) => (
+                      <Box>
+                        {values.email.map((email, index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mb: 2,
+                              p: 2,
+                              backgroundColor: alpha("#f5f5f5", 0.5),
+                              borderRadius: 1,
+                            }}>
+                            <Field
+                              component={TextField}
+                              name={`email.${index}`}
+                              label={`Email ${index + 1}`}
+                              fullWidth
+                              variant="outlined"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    ✉️
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                            <IconButton
+                              onClick={() => remove(index)}
+                              disabled={values.email.length === 1}
+                              sx={{
+                                color: "error.main",
+                                "&:hover": {
+                                  backgroundColor: alpha("#d32f2f", 0.1),
+                                },
+                              }}>
+                              <RemoveIcon />
+                            </IconButton>
+                          </Box>
+                        ))}
+                        <Button
+                          startIcon={<AddIcon />}
+                          onClick={() => push("")}
+                          variant="outlined"
+                          sx={{ mt: 1 }}>
+                          Add Email Address
+                        </Button>
+                      </Box>
+                    )}
+                  </FieldArray>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Field
+                    component={TextField}
+                    name="address"
+                    label="Address"
+                    fullWidth
+                    variant="outlined"
+                    multiline
+                    rows={3}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Field
+                    component={TextField}
+                    name="company"
+                    label="Company Name"
+                    fullWidth
+                    variant="outlined"
+                  />
+                </Grid>
+
+                {isSubmitting && (
+                  <Grid item xs={12}>
+                    <LinearProgress sx={{ height: 6, borderRadius: 3 }} />
+                  </Grid>
+                )}
+
+                <Grid item xs={12}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                    {done ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={() => {
+                          resetForm();
+                          setDone(false);
+                        }}
+                        sx={{
+                          px: 4,
+                          py: 1.5,
+                          borderRadius: 2,
+                          textTransform: "none",
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            transform: "scale(1.02)",
+                          },
+                        }}>
+                        Customer Added! Click to Add New Customer
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={isSubmitting}
+                        onClick={submitForm}
+                        size="large"
+                        sx={{
+                          px: 4,
+                          py: 1.5,
+                          borderRadius: 2,
+                          textTransform: "none",
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            transform: "scale(1.02)",
+                          },
+                        }}>
+                        {data ? "Save Changes" : "Add Customer"}
+                      </Button>
+                    )}
+                  </Box>
+                </Grid>
               </Grid>
-            </Grid>
-          </Form>
+            </Form>
+          )}
+        </Formik>
+
+        {error && (
+          <Typography
+            align="center"
+            color="error"
+            sx={{
+              mt: 2,
+              p: 2,
+              backgroundColor: alpha("#d32f2f", 0.1),
+              borderRadius: 1,
+            }}>
+            {error}
+          </Typography>
         )}
-      </Formik>
 
-      {error && (
-        <ErrorAlert
-          message={error}
-          onClose={() => setError(null)}
-          severity="error"
+        <Snackbar
+          open={open}
+          autoHideDuration={5000}
+          onClose={() => setOpen(false)}
+          message={
+            data
+              ? "Customer Changed Successfully"
+              : "Customer added successfully"
+          }
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         />
-      )}
-
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={() => setOpen(false)}
-        message={
-          data ? "Customer Changed Successfully" : "Customer added successfully"
-        }
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      />
-    </div>
+      </Paper>
+    </motion.div>
   );
 };
 
