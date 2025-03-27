@@ -358,7 +358,7 @@ const Dashboard = () => {
           </DummyCard>
         </Grid>
 
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={7}>
           <DummyCard title="Most Selling Products" index={2}>
             {isOverallLoading ? (
               <Loader type={2} />
@@ -395,7 +395,7 @@ const Dashboard = () => {
           </DummyCard>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={5}>
           <DummyCard title="Top Profitable Products" index={3}>
             {isOverallLoading ? (
               <Loader type={2} />
