@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { TextField, InputAdornment, IconButton, Tooltip } from "@mui/material";
+import { Search, Clear } from "@mui/icons-material";
+import { motion } from "framer-motion";
 
 const SearchField = ({ onSearch, placeholder, customstyles }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTerm(searchTerm);
-    }, 2000);
+    }, 500); // Reduced debounce time for better responsiveness
 
     return () => {
       clearTimeout(handler);
@@ -15,47 +19,73 @@ const SearchField = ({ onSearch, placeholder, customstyles }) => {
   }, [searchTerm]);
 
   useEffect(() => {
-    // Check if debouncedTerm is empty, if so, trigger onSearch with an empty string or a value that returns all data
     onSearch(debouncedTerm.trim());
   }, [debouncedTerm, onSearch]);
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    onSearch(searchTerm.trim());
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      onSearch(searchTerm.trim());
-    }
+  const handleClear = () => {
+    setSearchTerm("");
+    onSearch("");
   };
 
   return (
-    <form
-      onSubmit={handleSearch}
-      className="search-box"
-      style={{
-        display: "flex",
-        outline: "thin",
-        borderRadius: 20,
-        boxShadow: 1,
-        maxWidth: 280,
-        padding: 10,
-        ...customstyles,
-      }}>
-      <i
-        className="bx bx-search-alt icon"
-        style={{ fontSize: 30, paddingTop: 5 }}></i>
-      <input
-        type="search"
-        className="date-input"
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      style={{ width: "100%", maxWidth: 300, ...customstyles }}>
+      <TextField
+        fullWidth
+        variant="outlined"
         placeholder={placeholder || "Search..."}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        size="small"
+        sx={{
+          backgroundColor: "background.paper",
+          borderRadius: 2,
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 2,
+            transition: "all 0.2s ease-in-out",
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
+            "&.Mui-focused": {
+              backgroundColor: "background.paper",
+              boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
+            },
+          },
+          "& .MuiOutlinedInput-input": {
+            padding: "8px 14px",
+          },
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search color={isFocused ? "primary" : "action"} />
+            </InputAdornment>
+          ),
+          endAdornment: searchTerm && (
+            <InputAdornment position="end">
+              <Tooltip title="Clear search">
+                <IconButton
+                  size="small"
+                  onClick={handleClear}
+                  sx={{
+                    color: "action.active",
+                    "&:hover": {
+                      color: "primary.main",
+                    },
+                  }}>
+                  <Clear fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </InputAdornment>
+          ),
+        }}
       />
-    </form>
+    </motion.div>
   );
 };
 

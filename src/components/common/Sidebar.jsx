@@ -65,8 +65,13 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             isExpanded ? "bx-chevrons-left" : "bx-chevrons-right"
           }`}
           whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        />
+          whileTap={{ scale: 0.95 }}>
+          {isExpanded ? (
+            <i className={"bx-chevrons-left"} />
+          ) : (
+            <i className={"bx-chevrons-right"} />
+          )}
+        </motion.i>
       </div>
 
       <div className="menu-bar">

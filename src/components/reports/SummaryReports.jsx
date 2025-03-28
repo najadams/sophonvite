@@ -7,6 +7,8 @@ import {
   Divider,
   Paper,
   Tooltip,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   TrendingUp,
@@ -17,6 +19,8 @@ import {
 import { formatNumber } from "../../config/Functions";
 
 const SummaryReport = ({ data }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const {
     totalCashReceived,
     totalCashReceivedAmount,
@@ -25,55 +29,71 @@ const SummaryReport = ({ data }) => {
   const totalCash = totalCashReceivedAmount;
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper elevation={0} sx={{ p: 3, mb: 4, backgroundColor: "#f8f9fa" }}>
+    <Box sx={{ p: { xs: 0.5, sm: 2 }, maxWidth: "100%", overflow: "hidden" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          mb: 3,
+          backgroundColor: "#f8f9fa",
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}>
         <Typography
           variant="h4"
           gutterBottom
           sx={{
             fontWeight: 600,
             color: "#1a237e",
-            mb: 3,
+            mb: 2,
+            fontSize: { xs: "1.25rem", sm: "1.75rem" },
           }}>
           Summary Report
         </Typography>
 
         {/* Summary Cards */}
-        <Grid container spacing={2}>
+        <Grid container spacing={{ xs: 1, sm: 1.5 }}>
           {/* Total Sales */}
           <Grid item xs={12} sm={6} md={3}>
             <Card
               elevation={2}
               sx={{
-                p: 3,
+                p: { xs: 1.5, sm: 2 },
                 textAlign: "center",
                 backgroundColor: "#ffffff",
-                borderRadius: "12px",
+                borderRadius: "8px",
                 transition: "transform 0.2s",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
                 "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: 3,
+                  transform: "translateY(-3px)",
+                  boxShadow: 2,
                 },
               }}>
               <Box
                 sx={{
                   backgroundColor: "#e8f5e9",
                   borderRadius: "50%",
-                  width: 60,
-                  height: 60,
+                  width: { xs: 40, sm: 45 },
+                  height: { xs: 40, sm: 45 },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 10px",
+                  margin: "0 auto 8px",
                 }}>
-                <TrendingUp color="success" sx={{ fontSize: 30 }} />
+                <TrendingUp
+                  color="success"
+                  sx={{ fontSize: { xs: 20, sm: 24 } }}
+                />
               </Box>
               <Typography
                 variant="h6"
                 sx={{
                   color: "#666",
-                  mb: 1,
+                  mb: 0.5,
                   fontWeight: 500,
+                  fontSize: { xs: "0.85rem", sm: "0.9rem" },
                 }}>
                 Total Sales
               </Typography>
@@ -82,6 +102,7 @@ const SummaryReport = ({ data }) => {
                 sx={{
                   fontWeight: 700,
                   color: "#2e7d32",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}>
                 ₵{`${formatNumber(sales.totalSales)}`}
               </Typography>
@@ -93,35 +114,42 @@ const SummaryReport = ({ data }) => {
             <Card
               elevation={2}
               sx={{
-                p: 3,
+                p: { xs: 1.5, sm: 2 },
                 textAlign: "center",
                 backgroundColor: "#ffffff",
-                borderRadius: "12px",
+                borderRadius: "8px",
                 transition: "transform 0.2s",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
                 "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: 3,
+                  transform: "translateY(-3px)",
+                  boxShadow: 2,
                 },
               }}>
               <Box
                 sx={{
                   backgroundColor: "#e3f2fd",
                   borderRadius: "50%",
-                  width: 60,
-                  height: 60,
+                  width: { xs: 40, sm: 45 },
+                  height: { xs: 40, sm: 45 },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 16px",
+                  margin: "0 auto 8px",
                 }}>
-                <AttachMoney color="primary" sx={{ fontSize: 30 }} />
+                <AttachMoney
+                  color="primary"
+                  sx={{ fontSize: { xs: 20, sm: 24 } }}
+                />
               </Box>
               <Typography
                 variant="h6"
                 sx={{
                   color: "#666",
-                  mb: 1,
+                  mb: 0.5,
                   fontWeight: 500,
+                  fontSize: { xs: "0.85rem", sm: "0.9rem" },
                 }}>
                 Debt Payments
               </Typography>
@@ -130,6 +158,7 @@ const SummaryReport = ({ data }) => {
                 sx={{
                   fontWeight: 700,
                   color: "#1976d2",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}>
                 ₵{formatNumber(debtPayments.totalPaid)}
               </Typography>
@@ -141,35 +170,42 @@ const SummaryReport = ({ data }) => {
             <Card
               elevation={2}
               sx={{
-                p: 3,
+                p: { xs: 1.5, sm: 2 },
                 textAlign: "center",
                 backgroundColor: "#ffffff",
-                borderRadius: "12px",
+                borderRadius: "8px",
                 transition: "transform 0.2s",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
                 "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: 3,
+                  transform: "translateY(-3px)",
+                  boxShadow: 2,
                 },
               }}>
               <Box
                 sx={{
                   backgroundColor: "#ffebee",
                   borderRadius: "50%",
-                  width: 60,
-                  height: 60,
+                  width: { xs: 40, sm: 45 },
+                  height: { xs: 40, sm: 45 },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 16px",
+                  margin: "0 auto 8px",
                 }}>
-                <TrendingDown color="error" sx={{ fontSize: 30 }} />
+                <TrendingDown
+                  color="error"
+                  sx={{ fontSize: { xs: 20, sm: 24 } }}
+                />
               </Box>
               <Typography
                 variant="h6"
                 sx={{
                   color: "#666",
-                  mb: 1,
+                  mb: 0.5,
                   fontWeight: 500,
+                  fontSize: { xs: "0.85rem", sm: "0.9rem" },
                 }}>
                 Debts Acquired
               </Typography>
@@ -178,6 +214,7 @@ const SummaryReport = ({ data }) => {
                 sx={{
                   fontWeight: 700,
                   color: "#d32f2f",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}>
                 ₵{formatNumber(debtsAcquired.totalDebts)}
               </Typography>
@@ -193,35 +230,42 @@ const SummaryReport = ({ data }) => {
               <Card
                 elevation={2}
                 sx={{
-                  p: 3,
+                  p: { xs: 1.5, sm: 2 },
                   textAlign: "center",
                   backgroundColor: "#ffffff",
-                  borderRadius: "12px",
+                  borderRadius: "8px",
                   transition: "transform 0.2s",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
                   "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: 3,
+                    transform: "translateY(-3px)",
+                    boxShadow: 2,
                   },
                 }}>
                 <Box
                   sx={{
                     backgroundColor: "#fff3e0",
                     borderRadius: "50%",
-                    width: 60,
-                    height: 60,
+                    width: { xs: 40, sm: 45 },
+                    height: { xs: 40, sm: 45 },
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    margin: "0 auto 16px",
+                    margin: "0 auto 8px",
                   }}>
-                  <AttachMoney color="secondary" sx={{ fontSize: 30 }} />
+                  <AttachMoney
+                    color="secondary"
+                    sx={{ fontSize: { xs: 20, sm: 24 } }}
+                  />
                 </Box>
                 <Typography
                   variant="h6"
                   sx={{
                     color: "#666",
-                    mb: 1,
+                    mb: 0.5,
                     fontWeight: 500,
+                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
                   }}>
                   Cash Received
                 </Typography>
@@ -230,6 +274,7 @@ const SummaryReport = ({ data }) => {
                   sx={{
                     fontWeight: 700,
                     color: "#f57c00",
+                    fontSize: { xs: "1.25rem", sm: "1.5rem" },
                   }}>
                   {`₵${formatNumber(totalCash - sales.discounts)}`}
                 </Typography>
@@ -240,32 +285,43 @@ const SummaryReport = ({ data }) => {
       </Paper>
 
       {/* Breakdown Section */}
-      <Paper elevation={0} sx={{ p: 3, backgroundColor: "#f8f9fa" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          backgroundColor: "#f8f9fa",
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}>
         <Typography
           variant="h5"
           sx={{
             fontWeight: 600,
             color: "#1a237e",
-            mb: 3,
+            mb: 2,
+            fontSize: { xs: "1.1rem", sm: "1.25rem" },
           }}>
           Breakdown
         </Typography>
-        <Divider sx={{ mb: 3 }} />
-        <Grid container spacing={3}>
+        <Divider sx={{ mb: 2 }} />
+        <Grid container spacing={{ xs: 1.5, sm: 2 }}>
           <Grid item xs={12} sm={6}>
-            <Card elevation={2} sx={{ p: 3, borderRadius: "12px" }}>
+            <Card
+              elevation={2}
+              sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: "8px" }}>
               <Typography
                 variant="h6"
                 sx={{
                   color: "#1a237e",
-                  mb: 2,
+                  mb: 1.5,
                   fontWeight: 600,
+                  fontSize: { xs: "0.9rem", sm: "1rem" },
                 }}>
                 Sales Breakdown
               </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#666" }}>Momo:</span>
                   <span style={{ fontWeight: 600, color: "#2e7d32" }}>
@@ -273,7 +329,7 @@ const SummaryReport = ({ data }) => {
                   </span>
                 </Typography>
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#666" }}>Cash:</span>
                   <span style={{ fontWeight: 600, color: "#2e7d32" }}>
@@ -284,19 +340,22 @@ const SummaryReport = ({ data }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Card elevation={2} sx={{ p: 3, borderRadius: "12px" }}>
+            <Card
+              elevation={2}
+              sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: "8px" }}>
               <Typography
                 variant="h6"
                 sx={{
                   color: "#1a237e",
-                  mb: 2,
+                  mb: 1.5,
                   fontWeight: 600,
+                  fontSize: { xs: "0.9rem", sm: "1rem" },
                 }}>
                 Debt Payments Breakdown
               </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#666" }}>Momo:</span>
                   <span style={{ fontWeight: 600, color: "#1976d2" }}>
@@ -304,7 +363,7 @@ const SummaryReport = ({ data }) => {
                   </span>
                 </Typography>
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#666" }}>Cash:</span>
                   <span style={{ fontWeight: 600, color: "#1976d2" }}>

@@ -23,6 +23,7 @@ import {
   AccountBalance,
   Discount,
 } from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const StyledTableHead = styled(TableHead)(({ theme }) => ({
   backgroundColor: "#1a237e",
@@ -326,39 +327,48 @@ const SalesTable = ({ salesTransactions = [] }) => {
           </TableRow>
         </StyledTableHead>
         <TableBody>
-          {sortedTransactions.map((transaction) => (
-            <TableRow
-              key={transaction.receiptId}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#f5f5f5",
-                },
-              }}>
-              <TableCell>
-                {new Date(transaction.date).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                {capitalizeFirstLetter(
-                  `${transaction.customerName} - ${transaction.customerCompany}`
-                )}
-              </TableCell>
-              <TableCell align="right">
-                {capitalizeFirstLetter(transaction.workerName)}
-              </TableCell>
-              <TableCell align="right">
-                ₵{formatNumber(transaction.totalAmount.toFixed(2))}
-              </TableCell>
-              <TableCell align="right">
-                ₵{formatNumber(transaction.totalAmountPaid.toFixed(2))}
-              </TableCell>
-              <TableCell align="right">
-                ₵{formatNumber(transaction.discount)}
-              </TableCell>
-              <TableCell align="right">
-                ₵{formatNumber(transaction.balance.toFixed(2))}
-              </TableCell>
-            </TableRow>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {sortedTransactions.map((transaction, index) => (
+              <motion.tr
+                key={transaction.receiptId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{
+                  duration: 0.2,
+                  delay: index * 0.02,
+                  ease: "easeOut",
+                }}
+                style={{
+                  display: "table-row",
+                  backgroundColor: "white",
+                }}>
+                <TableCell>
+                  {new Date(transaction.date).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {capitalizeFirstLetter(
+                    `${transaction.customerName} - ${transaction.customerCompany}`
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  {capitalizeFirstLetter(transaction.workerName)}
+                </TableCell>
+                <TableCell align="right">
+                  ₵{formatNumber(transaction.totalAmount.toFixed(2))}
+                </TableCell>
+                <TableCell align="right">
+                  ₵{formatNumber(transaction.totalAmountPaid.toFixed(2))}
+                </TableCell>
+                <TableCell align="right">
+                  ₵{formatNumber(transaction.discount)}
+                </TableCell>
+                <TableCell align="right">
+                  ₵{formatNumber(transaction.balance.toFixed(2))}
+                </TableCell>
+              </motion.tr>
+            ))}
+          </AnimatePresence>
         </TableBody>
       </Table>
     </TableContainer>
