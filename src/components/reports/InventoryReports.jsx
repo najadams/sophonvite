@@ -12,9 +12,11 @@ import {
   TableRow,
   TableContainer,
   TableSortLabel,
+  Box,
 } from "@mui/material";
 import SearchField from "../../hooks/SearchField";
 import { StyledTableHead } from "./SalesReport";
+import { Inventory, TrendingUp, AttachMoney } from "@mui/icons-material";
 
 const capitalizeFirstLetter = (str) => {
   if (typeof str === "string") {
@@ -29,17 +31,144 @@ const capitalizeFirstLetter = (str) => {
 // Inventory Summary Cards Component
 const InventorySummaryCards = ({ inventoryData }) => {
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={4} sm={3} md={3}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Total Items Sold</Typography>
-            <Typography variant="h4">₵{inventoryData?.toFixed(2)}</Typography>
-          </CardContent>
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={6} md={4}>
+        <Card
+          elevation={2}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            transition: "transform 0.2s",
+            "&:hover": {
+              transform: "translateY(-5px)",
+              boxShadow: 3,
+            },
+          }}>
+          <Box
+            sx={{
+              backgroundColor: "#e3f2fd",
+              borderRadius: "50%",
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}>
+            <Inventory color="primary" sx={{ fontSize: 30 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#666",
+              mb: 1,
+              fontWeight: 500,
+            }}>
+            Total Items Sold
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#1976d2",
+            }}>
+            ₵{inventoryData?.toFixed(2)}
+          </Typography>
         </Card>
       </Grid>
-      <Grid item xs={9}>
-        {/* Add any additional cards here */}
+      <Grid item xs={12} sm={6} md={4}>
+        <Card
+          elevation={2}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            transition: "transform 0.2s",
+            "&:hover": {
+              transform: "translateY(-5px)",
+              boxShadow: 3,
+            },
+          }}>
+          <Box
+            sx={{
+              backgroundColor: "#e8f5e9",
+              borderRadius: "50%",
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}>
+            <TrendingUp color="success" sx={{ fontSize: 30 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#666",
+              mb: 1,
+              fontWeight: 500,
+            }}>
+            Total Sales Value
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#2e7d32",
+            }}>
+            ₵{inventoryData?.toFixed(2)}
+          </Typography>
+        </Card>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <Card
+          elevation={2}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            transition: "transform 0.2s",
+            "&:hover": {
+              transform: "translateY(-5px)",
+              boxShadow: 3,
+            },
+          }}>
+          <Box
+            sx={{
+              backgroundColor: "#fff3e0",
+              borderRadius: "50%",
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}>
+            <AttachMoney color="secondary" sx={{ fontSize: 30 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#666",
+              mb: 1,
+              fontWeight: 500,
+            }}>
+            Average Price
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#f57c00",
+            }}>
+            ₵{(inventoryData / 100).toFixed(2)}
+          </Typography>
+        </Card>
       </Grid>
     </Grid>
   );
@@ -57,7 +186,6 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
     setOrderBy(property);
   };
 
-  // Filtering and sorting the inventory items based on search term
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -77,7 +205,13 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
   });
 
   return (
-    <TableContainer sx={{ marginTop: 2 }} component={Paper}>
+    <TableContainer
+      component={Paper}
+      elevation={2}
+      sx={{
+        borderRadius: "12px",
+        overflow: "hidden",
+      }}>
       <Table>
         <StyledTableHead>
           <TableRow>
@@ -117,7 +251,13 @@ const InventoryTable = ({ inventoryItems = [], searchTerm }) => {
         </StyledTableHead>
         <TableBody>
           {sortedItems.map((item) => (
-            <TableRow key={item._id}>
+            <TableRow
+              key={item._id}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#f5f5f5",
+                },
+              }}>
               <TableCell>{capitalizeFirstLetter(item.name)}</TableCell>
               <TableCell align="right">{item.totalQuantity || 0}</TableCell>
               <TableCell align="right">
@@ -148,17 +288,44 @@ const InventoryReports = ({ inventoryItems }) => {
   }, [inventoryItems]);
 
   return (
-    <div className="content" style={{ width: "100%" }}>
-      <Typography variant="h4" gutterBottom>
-        Inventory Report
-      </Typography>
-      <InventorySummaryCards inventoryData={totalCash} />
-      <div
-        style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
-        <SearchField onSearch={setSearchTerm} />
-      </div>
-      <InventoryTable inventoryItems={inventoryItems} searchTerm={searchTerm} />
-    </div>
+    <Box sx={{ p: 3 }}>
+      <Paper elevation={0} sx={{ p: 3, mb: 4, backgroundColor: "#f8f9fa" }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 600,
+            color: "#1a237e",
+            mb: 3,
+          }}>
+          Inventory Report
+        </Typography>
+        <InventorySummaryCards inventoryData={totalCash} />
+      </Paper>
+
+      <Paper elevation={0} sx={{ p: 3, backgroundColor: "#f8f9fa" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 600,
+              color: "#1a237e",
+            }}>
+            Inventory Items
+          </Typography>
+          <SearchField onSearch={setSearchTerm} />
+        </Box>
+        <InventoryTable
+          inventoryItems={inventoryItems}
+          searchTerm={searchTerm}
+        />
+      </Paper>
+    </Box>
   );
 };
 

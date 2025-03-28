@@ -1,10 +1,25 @@
 import React, { useState, useEffect, lazy } from "react";
-import { Tabs, Tab, CircularProgress, Typography } from "@mui/material";
+import {
+  Tabs,
+  Tab,
+  CircularProgress,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  Tooltip,
+  Collapse,
+  Paper,
+  TextField,
+  Stack,
+} from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { fetchReportData, getNextDayDate } from "../config/Functions";
 import SummaryReport from "../components/reports/SummaryReports";
+import { motion, AnimatePresence } from "framer-motion";
+import { DateRange, FilterList, Refresh } from "@mui/icons-material";
 
 // Lazy-loaded components
 const PurchasesReport = lazy(() =>
@@ -16,8 +31,30 @@ const InventoryReport = lazy(() =>
 const DebtsReport = lazy(() => import("../components/reports/DebtsReports"));
 const SalesReport = lazy(() => import("../components/reports/SalesReport"));
 
-// Fetch report data using Axios
+const pageVariants = {
+  initial: {
+    opacity: 0,
+    y: 20,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut",
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+  },
+};
 
+const loadingVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 
 const Reports = () => {
   const [value, setValue] = useState(0);
@@ -25,62 +62,90 @@ const Reports = () => {
     startDate: new Date().toISOString().split("T")[0],
     endDate: getNextDayDate(),
   });
+  const [showFilters, setShowFilters] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const companyId = useSelector((state) => state.companyState.data.id);
   // const matchesMobile = useMediaQuery("(max-width:600px)");
-  const [showFilters, setShowFilters] = useState(false);
-  
+
+  // Add a refetch function to all queries
   const {
     data: summaryData,
     isLoading: isSummaryLoading,
     isError: isSummaryError,
+    refetch: refetchSummary,
   } = useQuery(
     ["summary", companyId, filters],
     () => fetchReportData(companyId, "summary", filters),
-    { enabled: value === 0, keepPreviousData: true }
-    );
-  
+    {
+      enabled: value === 0,
+      keepPreviousData: true,
+      staleTime: 0, // Always fetch fresh data
+    }
+  );
+
   const {
     data: salesData,
     isLoading: isSalesLoading,
     isError: isSalesError,
+    refetch: refetchSales,
   } = useQuery(
     ["sales", companyId, filters],
     () => fetchReportData(companyId, "sales", filters),
-    { enabled: value === 1, keepPreviousData: true }
+    {
+      enabled: value === 1,
+      keepPreviousData: true,
+      staleTime: 0,
+    }
   );
 
   const {
     data: purchasesData,
     isLoading: isPurchasesLoading,
     isError: isPurchasesError,
+    refetch: refetchPurchases,
   } = useQuery(
     ["purchases", companyId, filters],
     () => fetchReportData(companyId, "purchases", filters),
-    { enabled: value === 3, keepPreviousData: true }
+    {
+      enabled: value === 3,
+      keepPreviousData: true,
+      staleTime: 0,
+    }
   );
 
   const {
     data: inventoryData,
     isLoading: isInventoryLoading,
     isError: isInventoryError,
+    refetch: refetchInventory,
   } = useQuery(
     ["inventory", companyId, filters],
     () => fetchReportData(companyId, "inventory", filters),
-    { enabled: value === 2, keepPreviousData: true }
+    {
+      enabled: value === 2,
+      keepPreviousData: true,
+      staleTime: 0,
+    }
   );
 
   const {
     data: debtsData,
     isLoading: isDebtsLoading,
     isError: isDebtsError,
+    refetch: refetchDebts,
   } = useQuery(
     ["debts", companyId, filters],
     () => fetchReportData(companyId, "debts", filters),
-    { enabled: value === 4, keepPreviousData: true }
+    {
+      enabled: value === 4,
+      keepPreviousData: true,
+      staleTime: 0,
+    }
   );
 
   const handleDateChange = (e, type) => {
     setFilters({ ...filters, [type]: e.target.value });
+    setIsRefreshing(true);
   };
 
   const toggleFilters = () => {
@@ -91,76 +156,238 @@ const Reports = () => {
     setValue(newValue);
   };
 
-  const summasryData = {
-    totalSales: 15000.75, // Total sales value in dollars
-    debtsPaid: 3000.5, // Total value of debts paid
-    debtsAcquired: 1200.0, // Total value of debts acquired
-    // dateRange: "01 Nov 2024 - 07 Nov 2024", // Date range for the summary report
+  // Function to refetch data based on current tab
+  const refetchCurrentData = async () => {
+    setIsRefreshing(true);
+    try {
+      switch (value) {
+        case 0:
+          await refetchSummary();
+          break;
+        case 1:
+          await refetchSales();
+          break;
+        case 2:
+          await refetchInventory();
+          break;
+        case 3:
+          await refetchPurchases();
+          break;
+        case 4:
+          await refetchDebts();
+          break;
+        default:
+          break;
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
   };
+
+  // Effect to handle data refetching when filters change
+  useEffect(() => {
+    if (isRefreshing) {
+      refetchCurrentData();
+    }
+  }, [filters, value]);
 
   const renderContent = () => {
     if (value === 0) {
-      // if (isSummaryLoading) return <CircularProgress />;
-      // if (isSummaryError)
-      //   return (
-      //     <Typography color="error">Error loading sales report</Typography>
-      //   );
       if (!summaryData) return <Typography>No summary available</Typography>;
       return (
-        <SummaryReport
-          data={summaryData}
-          />
+        <motion.div
+          key="summary"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit">
+          <SummaryReport data={summaryData} />
+        </motion.div>
       );
     }
     if (value === 1) {
-      if (isSalesLoading) return <CircularProgress />;
-      if (isSalesError)
+      if (isSalesLoading) {
         return (
-          <Typography color="error">Error loading sales report</Typography>
+          <motion.div
+            key="loading"
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+            }}>
+            <CircularProgress />
+          </motion.div>
         );
+      }
+      if (isSalesError) {
+        return (
+          <motion.div
+            key="error"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit">
+            <Typography color="error">Error loading sales report</Typography>
+          </motion.div>
+        );
+      }
       if (!salesData) return <Typography>No sales data available</Typography>;
       return (
-        <SalesReport
-          salesData={salesData.sales}
-          salesTransactions={salesData.salesTransactions}
-        />
+        <motion.div
+          key="sales"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit">
+          <SalesReport
+            salesData={salesData.sales}
+            salesTransactions={salesData.salesTransactions}
+          />
+        </motion.div>
       );
     }
 
-       if (value === 2) {
-         if (isInventoryLoading) return <CircularProgress />;
-         if (isInventoryError)
-           return (
-             <Typography color="error">
-               Error loading inventory report
-             </Typography>
-           );
-         if (!inventoryData)
-           return <Typography>No inventory data available</Typography>;
-         return (
-           <InventoryReport inventoryItems={inventoryData.aggregatedData} />
-         );
-       }
+    if (value === 2) {
+      if (isInventoryLoading) {
+        return (
+          <motion.div
+            key="loading"
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+            }}>
+            <CircularProgress />
+          </motion.div>
+        );
+      }
+      if (isInventoryError) {
+        return (
+          <motion.div
+            key="error"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit">
+            <Typography color="error">
+              Error loading inventory report
+            </Typography>
+          </motion.div>
+        );
+      }
+      if (!inventoryData)
+        return <Typography>No inventory data available</Typography>;
+      return (
+        <motion.div
+          key="inventory"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit">
+          <InventoryReport inventoryItems={inventoryData.aggregatedData} />
+        </motion.div>
+      );
+    }
 
     if (value === 3) {
-      if (isPurchasesLoading) return <CircularProgress />;
-      if (isPurchasesError)
+      if (isPurchasesLoading) {
         return (
-          <Typography color="error">Error loading purchases report</Typography>
+          <motion.div
+            key="loading"
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+            }}>
+            <CircularProgress />
+          </motion.div>
         );
+      }
+      if (isPurchasesError) {
+        return (
+          <motion.div
+            key="error"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit">
+            <Typography color="error">
+              Error loading purchases report
+            </Typography>
+          </motion.div>
+        );
+      }
       if (!purchasesData)
         return <Typography>No purchases data available</Typography>;
-      return <PurchasesReport data={purchasesData.purchases} />;
+      return (
+        <motion.div
+          key="purchases"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit">
+          <PurchasesReport data={purchasesData.purchases} />
+        </motion.div>
+      );
     }
 
     if (value === 4) {
-      if (isDebtsLoading) return <CircularProgress />;
-      if (isDebtsError)
+      if (isDebtsLoading) {
         return (
-          <Typography color="error">Error loading debts report</Typography>
+          <motion.div
+            key="loading"
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+            }}>
+            <CircularProgress />
+          </motion.div>
         );
+      }
+      if (isDebtsError) {
+        return (
+          <motion.div
+            key="error"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit">
+            <Typography color="error">Error loading debts report</Typography>
+          </motion.div>
+        );
+      }
       if (!debtsData) return <Typography>No debts data available</Typography>;
-      return <DebtsReport data={debtsData.debts} />;
+      return (
+        <motion.div
+          key="debts"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit">
+          <DebtsReport data={debtsData.debts} />
+        </motion.div>
+      );
     }
 
     return null;
@@ -189,8 +416,11 @@ const Reports = () => {
         </div>
         <div style={{ padding: 20 }}>.</div>
       </div>
-      <div className="content">
-        <div
+      <div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           style={{
             display: "flex",
             width: "100%",
@@ -200,51 +430,73 @@ const Reports = () => {
             justifyContent: "space-between",
             marginBottom: 10,
           }}>
-          <div style={{display: 'flex'}} className={`filter-options ${showFilters ? "visible" : ""}`}>
-            <span style={{ padding: 10 }}>
-              <label
-                htmlFor="startDate"
-                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                Start Date:
-              </label>
-              <input
-                className="date-input"
-                type="date"
-                id="startDate"
-                value={filters.startDate}
-                onChange={(e) => handleDateChange(e, "startDate")}
-              />
-            </span>
-            <span style={{ padding: 10 }}>
-              <label
-                htmlFor="endDate"
-                style={{ marginLeft: 10, fontSize: "larger", font: "icon" }}>
-                End Date:
-               </label>
-              <input
-                className="date-input"
-                type="date"
-                id="endDate"
-                value={filters.endDate}
-                onChange={(e) => handleDateChange(e, "endDate")}
-              />
-            </span>
-          </div>
-          <div className="filter-icon-container">
-            <i
-              className="bx bx-filter filter-icon"
-              onClick={toggleFilters}
-              style={{
-                fontSize: 40,
-                borderRadius: 10,
-                backgroundColor: "white",
-                padding: 5,
-                cursor: "pointer",
-              }}></i>
-            <span className="filter-text">Filters</span>
-          </div>
-        </div>
-        {renderContent()}
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <Collapse in={showFilters} orientation="horizontal">
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: 2,
+                  display: "flex",
+                  gap: 2,
+                  alignItems: "center",
+                }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <TextField
+                    label="Start Date"
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => handleDateChange(e, "startDate")}
+                    InputLabelProps={{ shrink: true }}
+                    size="small"
+                  />
+                  <TextField
+                    label="End Date"
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => handleDateChange(e, "endDate")}
+                    InputLabelProps={{ shrink: true }}
+                    size="small"
+                  />
+                </Stack>
+              </Paper>
+            </Collapse>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Tooltip title="Toggle Filters">
+                <IconButton
+                  onClick={toggleFilters}
+                  color={showFilters ? "primary" : "default"}
+                  sx={{
+                    backgroundColor: showFilters
+                      ? "primary.light"
+                      : "background.paper",
+                    "&:hover": {
+                      backgroundColor: showFilters
+                        ? "primary.light"
+                        : "action.hover",
+                    },
+                  }}>
+                  <FilterList />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Refresh Data">
+                <IconButton
+                  onClick={refetchCurrentData}
+                  disabled={isRefreshing}
+                  sx={{
+                    backgroundColor: "background.paper",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}>
+                  <Refresh className={isRefreshing ? "rotating" : ""} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+        </motion.div>
+        <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
       </div>
     </div>
   );
