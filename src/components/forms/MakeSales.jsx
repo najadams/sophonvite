@@ -864,6 +864,7 @@ const MakeSales = ({
                   background: "white",
                   borderRadius: "8px",
                   border: "1px solid #e0e0e0",
+                  width: "75%"
                 }}>
                 <Typography variant="h6" sx={{ color: "#333" }}>
                   Balance
