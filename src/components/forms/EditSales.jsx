@@ -792,7 +792,7 @@ const EditSales = () => {
                 <Field name="total">
                   {() => (
                     <Typography variant="h6" sx={{ color: "#2196f3" }}>
-                      $
+                      ₵
                       {values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0
@@ -901,7 +901,7 @@ const EditSales = () => {
                             : "#4caf50",
                         fontWeight: 600,
                       }}>
-                      $
+                      ₵
                       {values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0

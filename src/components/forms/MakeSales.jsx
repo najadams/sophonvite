@@ -776,7 +776,7 @@ const MakeSales = ({
                 <Field name="total">
                   {() => (
                     <Typography variant="h6" sx={{ color: "#2196f3" }}>
-                      $
+                      ₵
                       {values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0
@@ -864,7 +864,7 @@ const MakeSales = ({
                   background: "white",
                   borderRadius: "8px",
                   border: "1px solid #e0e0e0",
-                  width: "75%"
+                  width: "75%",
                 }}>
                 <Typography variant="h6" sx={{ color: "#333" }}>
                   Balance
@@ -886,7 +886,7 @@ const MakeSales = ({
                             : "#4caf50",
                         fontWeight: 600,
                       }}>
-                      $
+                      ₵
                       {values.products?.reduce(
                         (sum, product) => sum + (product?.totalPrice || 0),
                         0
