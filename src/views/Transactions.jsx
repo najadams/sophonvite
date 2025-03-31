@@ -61,7 +61,7 @@ const Transactions = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 1 }}>
       <Paper elevation={0} sx={{ p: 3, backgroundColor: "#f8f9fa" }}>
         <Typography
           variant="h4"
