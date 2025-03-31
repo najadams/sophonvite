@@ -11,6 +11,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import Unauthorized from "../views/common/Unauthorized";
 
 const Dashboard = lazy(() => import("../views/Dashboard"));
+const VendorDetails = lazy(() => import("../views/VendorDetails"))
 const Customers = lazy(() => import("../views/Customers"));
 const ProductCatalogue = lazy(() => import("../views/ProductCatalogue"));
 const StockEntry = lazy(() => import("../views/StockEntry"));
@@ -120,6 +121,7 @@ const AuthenticatedRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route path="/vendors/:vendorId" element={<VendorDetails />} />
       <Route
         path="/reports/*"
         element={
