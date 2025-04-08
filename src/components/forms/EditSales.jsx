@@ -166,11 +166,11 @@ const EditSales = () => {
             index + 1
           }'s quantity is required`;
         }
-        if (parseFloat(detail.quantity )< 1) {
-          detailErrors[`products.${index}.quantity`] = `Product ${
-            index + 1
-          }'s price can't be less than 1`;
-        }
+        // if (parseFloat(detail.quantity )< 1) {
+        //   detailErrors[`products.${index}.quantity`] = `Product ${
+        //     index + 1
+        //   }'s price can't be less than 1`;
+        // }
         if (!detail.price) {
           detailErrors[`products.${index}.price`] = `Product ${
             index + 1
