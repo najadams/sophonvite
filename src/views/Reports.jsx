@@ -193,6 +193,36 @@ const Reports = () => {
 
   const renderContent = () => {
     if (value === 0) {
+      if(isSummaryLoading) {
+        return (
+          <motion.div
+            key="loading"
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+            }}>
+            <CircularProgress />
+          </motion.div>
+        );
+      }
+      if (isSummaryError) {
+        return (
+          <motion.div
+            key="error"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit">
+            <Typography color="error">Error loading summary report</Typography>
+          </motion.div>
+        );
+      }
       if (!summaryData) return <Typography>No summary available</Typography>;
       return (
         <motion.div
